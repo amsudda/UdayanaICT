@@ -27,7 +27,7 @@ function YouTubeIcon({ className = '' }: { className?: string }) {
 
 export function Footer() {
   return (
-    <footer className="bg-apple-light dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
+    <footer id="contact" className="bg-apple-light dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors scroll-mt-20">
       <div className="max-w-7xl mx-auto">
         {/* Red banner card */}
         <div className="relative overflow-hidden rounded-3xl px-6 py-10 sm:px-12 sm:py-12 shadow-[0_20px_50px_rgba(180,15,30,0.35)] bg-[radial-gradient(ellipse_110%_150%_at_30%_15%,#e3142b_0%,#b51022_28%,#6e0b16_58%,#2a0508_82%,#150103_100%)]">

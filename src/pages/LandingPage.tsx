@@ -43,6 +43,13 @@ export function LandingPage() {
   const [paused, setPaused] = useState(false);
   const [promos, setPromos] = useState(promotions);
   const [featured, setFeatured] = useState<any[]>([]);
+  const [recruitNotice, setRecruitNotice] = useState<string>('2025 බඳවා ගැනීම් දැන් විවෘතයි');
+
+  useEffect(() => {
+    supabase.from('settings').select('recruitment_notice').eq('id', 1).single().then(({ data }) => {
+      if (data && data.recruitment_notice != null) setRecruitNotice(data.recruitment_notice);
+    });
+  }, []);
 
   useEffect(() => {
     supabase
@@ -136,10 +143,12 @@ export function LandingPage() {
                   <span className="pixel-cursor">_</span>
                 </div>
 
-                {/* Badge */}
-                <span className="block sm:inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-6 border border-blue-100 dark:border-blue-800 transition-colors">
-                  2025 බඳවා ගැනීම් දැන් විවෘතයි
-                </span>
+                {/* Recruitment notice — editable in Admin → Settings */}
+                {recruitNotice.trim() && (
+                  <span className="block sm:inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-6 border border-blue-100 dark:border-blue-800 transition-colors">
+                    {recruitNotice}
+                  </span>
+                )}
 
                 {/* Heading */}
                 <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6 transition-colors">
@@ -268,7 +277,7 @@ export function LandingPage() {
         </section>
 
         {/* Promotions / Announcements Carousel */}
-        <section className="py-16 bg-white dark:bg-slate-900 transition-colors">
+        <section id="promos" className="py-16 bg-white dark:bg-slate-900 transition-colors scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Section header */}
             <div className="text-center mb-10">
@@ -402,7 +411,7 @@ export function LandingPage() {
         )}
 
         {/* ===== TESTIMONIALS SECTION ===== */}
-        <section className="py-24 bg-gradient-to-b from-blue-50/60 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors">
+        <section id="reviews" className="py-24 bg-gradient-to-b from-blue-50/60 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {/* Section Header */}
@@ -558,7 +567,7 @@ export function LandingPage() {
         </section>
 
         {/* Features / Why Choose Us */}
-        <section id="features" className="py-24 bg-white dark:bg-slate-900 transition-colors">
+        <section id="features" className="py-24 bg-white dark:bg-slate-900 transition-colors scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>

@@ -91,8 +91,9 @@ export function Navbar() {
 
           {!isDashboard ? (
             <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Features</a>
-              <a href="#courses" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Courses</a>
+              <a href="#promos" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Promotions</a>
+              <a href="#reviews" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Reviews</a>
+              <a href="#features" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Why Us</a>
               <a href="#contact" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Contact</a>
             </div>
           ) : null}
@@ -213,8 +214,9 @@ export function Navbar() {
                 </div>
               ) : (
                 <div className="px-4 pt-2 pb-6 space-y-2">
-                  <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Features</a>
-                  <a href="#courses" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Courses</a>
+                  <a href="#promos" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Promotions</a>
+                  <a href="#reviews" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Reviews</a>
+                  <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Why Us</a>
                   <a href="#contact" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Contact</a>
                   <div className="pt-4 flex flex-col gap-3">
                     <Link to="/login" className="w-full"><Button variant="secondary" className="w-full">Log In</Button></Link>

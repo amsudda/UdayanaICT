@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Building2Icon, MessageCircleIcon, CalendarClockIcon, Loader2Icon, CheckIcon } from 'lucide-react';
+import { Building2Icon, MessageCircleIcon, CalendarClockIcon, MegaphoneIcon, Loader2Icon, CheckIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -8,7 +8,8 @@ const inputCls = 'w-full h-11 rounded-xl border border-slate-200 px-3.5 text-sm 
 
 const empty = {
   bank_name: '', account_name: '', account_number: '', branch: '',
-  whatsapp_number: '', al_exam_date: '', ol_exam_date: '', term_start_date: ''
+  whatsapp_number: '', al_exam_date: '', ol_exam_date: '', term_start_date: '',
+  recruitment_notice: ''
 };
 
 function Section({ icon: Icon, title, desc, children }: { icon: any; title: string; desc: string; children: React.ReactNode }) {
@@ -43,7 +44,8 @@ export function AdminSettingsPage() {
           whatsapp_number: data.whatsapp_number ?? '',
           al_exam_date: data.al_exam_date ?? '',
           ol_exam_date: data.ol_exam_date ?? '',
-          term_start_date: data.term_start_date ?? ''
+          term_start_date: data.term_start_date ?? '',
+          recruitment_notice: data.recruitment_notice ?? ''
         });
       }
       setLoading(false);
@@ -63,7 +65,8 @@ export function AdminSettingsPage() {
       whatsapp_number: form.whatsapp_number || null,
       al_exam_date: form.al_exam_date || null,
       ol_exam_date: form.ol_exam_date || null,
-      term_start_date: form.term_start_date || null
+      term_start_date: form.term_start_date || null,
+      recruitment_notice: form.recruitment_notice.trim() || null
     }).eq('id', 1);
     setSaving(false);
     setSaved(true);
@@ -97,6 +100,10 @@ export function AdminSettingsPage() {
               <input className={inputCls} value={form.branch} onChange={(e) => set('branch', e.target.value)} placeholder="Colombo Main" />
             </div>
           </div>
+        </Section>
+
+        <Section icon={MegaphoneIcon} title="Homepage banner" desc="The recruitment notice shown at the top of the landing hero. Update it each year (leave blank to hide).">
+          <input className={inputCls} value={form.recruitment_notice} onChange={(e) => set('recruitment_notice', e.target.value)} placeholder="e.g. 2026 බඳවා ගැනීම් දැන් විවෘතයි" />
         </Section>
 
         <Section icon={MessageCircleIcon} title="WhatsApp" desc="Used for the 'send slip on WhatsApp' and contact buttons.">
