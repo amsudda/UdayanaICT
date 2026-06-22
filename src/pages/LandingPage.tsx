@@ -15,6 +15,29 @@ import { CourseCard } from '../components/shared/CourseCard';
 import { promotions } from '../data/mockData';
 import { supabase } from '../lib/supabase';
 
+/* ── tiny 8-bit pixel sprites (SVG, crisp) ── */
+const svgBase = 'pixel-svg w-full h-full';
+const PixelFloppy = () => (
+  <svg viewBox="0 0 16 16" className={svgBase} fill="currentColor"><rect x="1" y="1" width="14" height="14" /><rect x="3" y="2" width="8" height="4" fill="#fff" /><rect x="9" y="2" width="2" height="4" /><rect x="4" y="9" width="8" height="5" fill="#fff" /><rect x="6" y="10" width="4" height="3" /></svg>
+);
+const PixelTerminal = () => (
+  <svg viewBox="0 0 16 16" className={svgBase} fill="currentColor"><rect x="1" y="2" width="14" height="12" /><rect x="2" y="3" width="12" height="2" fill="#fff" opacity=".35" /><rect x="3" y="8" width="2" height="2" fill="#fff" /><rect x="6" y="8" width="6" height="2" fill="#fff" /></svg>
+);
+const PixelController = () => (
+  <svg viewBox="0 0 16 16" className={svgBase} fill="currentColor"><rect x="2" y="6" width="12" height="6" /><rect x="1" y="8" width="2" height="3" /><rect x="13" y="8" width="2" height="3" /><rect x="4" y="8" width="2" height="2" fill="#fff" /><rect x="10" y="8" width="2" height="2" fill="#fff" /></svg>
+);
+const PixelStar = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 16 16" className={`pixel-svg ${className}`} fill="currentColor"><rect x="7" y="2" width="2" height="12" /><rect x="2" y="7" width="12" height="2" /><rect x="4" y="4" width="2" height="2" /><rect x="10" y="4" width="2" height="2" /><rect x="4" y="10" width="2" height="2" /><rect x="10" y="10" width="2" height="2" /></svg>
+);
+
+const heroSprites = [
+  { Comp: PixelFloppy, cls: 'top-10 left-[5%] w-8 h-8 text-apple-blue/25', delay: '0s' },
+  { Comp: PixelController, cls: 'top-1/2 left-[1%] w-7 h-7 text-violet-400/25', delay: '1.3s' },
+  { Comp: PixelStar, cls: 'bottom-14 left-[9%] w-5 h-5 text-amber-400/40', delay: '2.1s' },
+  { Comp: PixelTerminal, cls: 'top-8 right-[3%] w-8 h-8 text-emerald-400/25', delay: '0.6s' },
+  { Comp: PixelStar, cls: 'bottom-24 right-[2%] w-4 h-4 text-blue-400/40', delay: '1.7s' }
+];
+
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -86,6 +109,15 @@ export function LandingPage() {
           {/* Subtle background gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-white to-white dark:from-slate-900/60 dark:via-slate-950 dark:to-slate-950 -z-10 transition-colors" />
 
+          {/* floating 8-bit sprites */}
+          <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
+            {heroSprites.map((s, i) => (
+              <span key={i} className={`pixel-float absolute ${s.cls}`} style={{ animationDelay: s.delay }}>
+                <s.Comp />
+              </span>
+            ))}
+          </div>
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
@@ -95,8 +127,15 @@ export function LandingPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7 }}
               >
+                {/* Pixel "level up" chip */}
+                <div className="font-pixel inline-flex items-center gap-2 mb-4 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900">
+                  <PixelStar className="w-3 h-3 text-amber-400" />
+                  LEVEL UP YOUR ICT
+                  <span className="pixel-cursor">_</span>
+                </div>
+
                 {/* Badge */}
-                <span className="inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-6 border border-blue-100 dark:border-blue-800 transition-colors">
+                <span className="block sm:inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-6 border border-blue-100 dark:border-blue-800 transition-colors">
                   2025 බඳවා ගැනීම් දැන් විවෘතයි
                 </span>
 
@@ -180,7 +219,7 @@ export function LandingPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
-                    className="absolute top-6 -right-4 md:-right-8 bg-white dark:bg-slate-800 rounded-2xl shadow-apple-hover dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] p-4 max-w-[200px] transition-colors border border-gray-100 dark:border-slate-700"
+                    className="absolute -bottom-5 right-2 md:-right-6 bg-white dark:bg-slate-800 rounded-2xl shadow-apple-hover dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] p-4 max-w-[210px] transition-colors border border-gray-100 dark:border-slate-700"
                   >
                     <p className="text-sm font-medium text-apple-text dark:text-apple-light leading-snug mb-2 transition-colors">
                       "ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!"
