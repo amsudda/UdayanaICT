@@ -62,10 +62,12 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
               <ProgressBar value={course.progress} />
             </div> :
 
-          <div className="flex items-center text-sm text-apple-subtext dark:text-slate-400 gap-1 transition-colors">
+          course.lessonCount ? (
+            <div className="flex items-center text-sm text-apple-subtext dark:text-slate-400 gap-1 transition-colors">
               <BookOpenIcon className="w-4 h-4" />
               <span>{course.lessonCount} lessons</span>
             </div>
+          ) : null
           }
         </div>
       </div>

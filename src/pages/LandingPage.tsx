@@ -22,27 +22,24 @@ export function LandingPage() {
   const [featured, setFeatured] = useState<any[]>([]);
 
   useEffect(() => {
-    (async () => {
-      const { data: ps } = await supabase
-        .from('packs')
-        .select('*')
-        .eq('is_published', true)
-        .eq('audience_scope', 'public')
-        .order('created_at', { ascending: false })
-        .limit(3);
-      const list = ps ?? [];
-      if (!list.length) {
-        setFeatured([]);
-        return;
-      }
-      const { data: pv } = await supabase.from('pack_videos').select('pack_id').in('pack_id', list.map((p: any) => p.id));
-      const counts = (pv ?? []).reduce((a: any, r: any) => { a[r.pack_id] = (a[r.pack_id] ?? 0) + 1; return a; }, {});
-      setFeatured(list.map((p: any) => ({
-        id: p.id, title: p.title, description: p.description ?? '',
-        image: p.thumbnail_url ?? '', progress: 0,
-        lessonCount: counts[p.id] ?? 0, category: p.type ?? 'Course'
-      })));
-    })();
+    supabase
+      .from('featured_courses')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order')
+      .then(({ data }) => {
+        setFeatured(
+          (data ?? []).map((c: any) => ({
+            id: c.id,
+            title: c.title,
+            description: c.description ?? '',
+            image: c.image_url ?? '',
+            progress: 0,
+            lessonCount: 0,
+            category: c.tag ?? 'Course'
+          }))
+        );
+      });
   }, []);
 
   useEffect(() => {

@@ -9,6 +9,7 @@ import {
   CalendarClockIcon,
   UsersIcon,
   MegaphoneIcon,
+  GraduationCapIcon,
   SettingsIcon,
   LogOutIcon,
   MenuIcon,
@@ -30,6 +31,7 @@ const nav = [
   { name: 'Live Classes', path: '/admin/live', icon: CalendarClockIcon },
   { name: 'Students', path: '/admin/students', icon: UsersIcon },
   { name: 'Promotions', path: '/admin/promotions', icon: MegaphoneIcon },
+  { name: 'Featured', path: '/admin/featured', icon: GraduationCapIcon },
   { name: 'Settings', path: '/admin/settings', icon: SettingsIcon }
 ];
 
