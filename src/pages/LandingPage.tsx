@@ -82,7 +82,9 @@ export function LandingPage() {
               description: p.description ?? '',
               image: p.image_url ?? '',
               ctaText: p.cta_text ?? 'Learn more',
-              ctaLink: p.cta_link ?? '/signup'
+              ctaLink: p.cta_link ?? '/signup',
+              imageFit: p.image_fit ?? 'cover',
+              imagePosition: p.image_position ?? 'center'
             }))
           );
         }
@@ -282,7 +284,7 @@ export function LandingPage() {
             </div>
 
             <div
-              className="relative group rounded-3xl overflow-hidden shadow-apple dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] h-[340px] md:h-[440px]"
+              className="relative group rounded-3xl overflow-hidden shadow-apple dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] h-[340px] md:h-[440px] bg-slate-900"
               onMouseEnter={() => setPaused(true)}
               onMouseLeave={() => setPaused(false)}
             >
@@ -298,7 +300,11 @@ export function LandingPage() {
                   <img
                     src={promos[currentPromo].image}
                     alt={promos[currentPromo].title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
+                    style={{
+                      objectFit: (promos[currentPromo] as any).imageFit ?? 'cover',
+                      objectPosition: (promos[currentPromo] as any).imagePosition ?? 'center'
+                    }}
                   />
                   {/* Left-to-right dark gradient for text legibility */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20 z-10" />

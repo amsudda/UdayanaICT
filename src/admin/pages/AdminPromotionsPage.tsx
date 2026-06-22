@@ -29,8 +29,16 @@ const emptyForm = {
   audience_program: 'A/L',
   batch_ids: [] as string[],
   is_active: true,
-  image_url: '' as string | null
+  image_url: '' as string | null,
+  image_fit: 'cover',
+  image_position: 'center'
 };
+
+const POSITIONS = [
+  ['left top', 'top', 'right top'],
+  ['left', 'center', 'right'],
+  ['left bottom', 'bottom', 'right bottom']
+];
 
 export function AdminPromotionsPage() {
   const [promos, setPromos] = useState<any[]>([]);
@@ -72,7 +80,8 @@ export function AdminPromotionsPage() {
       tag: p.tag ?? '', title: p.title ?? '', description: p.description ?? '',
       cta_text: p.cta_text ?? '', cta_link: p.cta_link ?? '',
       audience_scope: p.audience_scope ?? 'public', audience_program: p.audience_program ?? 'A/L',
-      batch_ids: p.batch_ids ?? [], is_active: p.is_active ?? true, image_url: p.image_url ?? ''
+      batch_ids: p.batch_ids ?? [], is_active: p.is_active ?? true, image_url: p.image_url ?? '',
+      image_fit: p.image_fit ?? 'cover', image_position: p.image_position ?? 'center'
     });
     setImgFile(null);
     setImgPreview(p.image_url ?? undefined);
@@ -109,7 +118,9 @@ export function AdminPromotionsPage() {
       audience_program: form.audience_scope === 'program' ? form.audience_program : null,
       batch_ids: form.audience_scope === 'batches' ? form.batch_ids : [],
       is_active: form.is_active,
-      image_url: imageUrl || null
+      image_url: imageUrl || null,
+      image_fit: form.image_fit,
+      image_position: form.image_position
     };
     if (editing) await supabase.from('promotions').update(payload).eq('id', editing.id);
     else await supabase.from('promotions').insert({ ...payload, sort_order: promos.length });
@@ -202,12 +213,58 @@ export function AdminPromotionsPage() {
         }
       >
         <div className="space-y-4">
+          {/* live landing preview — matches the homepage carousel */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Image</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Landing preview</label>
+            <div className="rounded-xl overflow-hidden relative bg-slate-900" style={{ aspectRatio: '16 / 7' }}>
+              {imgPreview && (
+                <img src={imgPreview} alt="" className="absolute inset-0 w-full h-full" style={{ objectFit: form.image_fit as any, objectPosition: form.image_position }} />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
+              <div className="absolute inset-0 flex flex-col justify-center items-start p-4">
+                {form.tag && <span className="inline-block py-0.5 px-2 rounded-full bg-blue-600 text-white text-[8px] font-bold mb-1.5">{form.tag}</span>}
+                <p className="text-white font-bold text-sm leading-tight line-clamp-2 max-w-[75%]">{form.title || 'Promotion title'}</p>
+                {form.description && <p className="text-gray-200 text-[10px] mt-1 leading-snug line-clamp-2 max-w-[70%]">{form.description}</p>}
+                {form.cta_text && <span className="mt-2 inline-block bg-blue-600 text-white text-[9px] font-semibold px-2.5 py-1 rounded-full">{form.cta_text}</span>}
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 mt-1.5">Text sits on the <strong>left</strong> — keep the important part of your image on the right.</p>
+          </div>
+
+          {/* upload */}
+          <div>
             <input ref={imgRef} type="file" accept="image/*" className="sr-only" onChange={onImg} />
-            <button type="button" onClick={() => imgRef.current?.click()} className="w-full aspect-[2/1] rounded-xl border border-dashed border-slate-300 bg-slate-50 overflow-hidden flex items-center justify-center text-slate-400 hover:border-blue-400">
-              {imgPreview ? <img src={imgPreview} alt="" className="w-full h-full object-cover" /> : <span className="flex flex-col items-center gap-1 text-sm"><UploadCloudIcon className="w-5 h-5" /> Upload image</span>}
+            <button type="button" onClick={() => imgRef.current?.click()} className="w-full h-11 flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-500 hover:border-blue-400 hover:text-blue-600 text-sm font-medium">
+              <UploadCloudIcon className="w-4 h-4" /> {imgPreview ? 'Change image' : 'Upload image'}
             </button>
+          </div>
+
+          {/* fit + focal point */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Image fit</label>
+              <div className="flex gap-2">
+                {(['cover', 'contain'] as const).map((f) => (
+                  <button key={f} type="button" onClick={() => setForm({ ...form, image_fit: f })}
+                    className={`flex-1 h-9 rounded-lg text-xs font-semibold capitalize transition-colors ${form.image_fit === f ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">Cover fills &amp; crops · Contain shows it all.</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Focal point</label>
+              <div className="inline-grid grid-cols-3 gap-1">
+                {POSITIONS.flat().map((pos) => (
+                  <button key={pos} type="button" title={pos} onClick={() => setForm({ ...form, image_position: pos })}
+                    className={`w-7 h-7 rounded border transition-colors ${form.image_position === pos ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 hover:border-blue-400'}`}>
+                    <span className={`block w-1.5 h-1.5 rounded-full mx-auto ${form.image_position === pos ? 'bg-white' : 'bg-slate-300'}`} />
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">Which part to keep when cropping.</p>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Tag (small label)</label>
