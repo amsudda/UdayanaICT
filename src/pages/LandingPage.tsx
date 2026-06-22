@@ -12,13 +12,38 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
-import { courses, promotions } from '../data/mockData';
+import { promotions } from '../data/mockData';
 import { supabase } from '../lib/supabase';
 
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
   const [promos, setPromos] = useState(promotions);
+  const [featured, setFeatured] = useState<any[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data: ps } = await supabase
+        .from('packs')
+        .select('*')
+        .eq('is_published', true)
+        .eq('audience_scope', 'public')
+        .order('created_at', { ascending: false })
+        .limit(3);
+      const list = ps ?? [];
+      if (!list.length) {
+        setFeatured([]);
+        return;
+      }
+      const { data: pv } = await supabase.from('pack_videos').select('pack_id').in('pack_id', list.map((p: any) => p.id));
+      const counts = (pv ?? []).reduce((a: any, r: any) => { a[r.pack_id] = (a[r.pack_id] ?? 0) + 1; return a; }, {});
+      setFeatured(list.map((p: any) => ({
+        id: p.id, title: p.title, description: p.description ?? '',
+        image: p.thumbnail_url ?? '', progress: 0,
+        lessonCount: counts[p.id] ?? 0, category: p.type ?? 'Course'
+      })));
+    })();
+  }, []);
 
   useEffect(() => {
     supabase
@@ -300,41 +325,39 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* Featured Courses */}
-        <section id="courses" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-4">
-                Featured Courses
-              </h2>
-              <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-2xl mx-auto transition-colors">
-                Comprehensive courses designed to help you excel in both theory
-                and practical examinations.
-              </p>
-            </div>
+        {/* Featured Courses — only shown when the tutor has published public packs */}
+        {featured.length > 0 && (
+          <section id="courses" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-4">
+                  Featured Courses
+                </h2>
+                <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-2xl mx-auto transition-colors">
+                  Comprehensive courses designed to help you excel in both theory
+                  and practical examinations.
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.slice(0, 3).map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  showProgress={false}
-                />
-              ))}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {featured.map((course) => (
+                  <CourseCard key={course.id} course={course} showProgress={false} />
+                ))}
+              </div>
 
-            <div className="mt-12 text-center">
-              <Link to="/signup">
-                <Button
-                  variant="secondary"
-                  className="flex items-center gap-2 mx-auto dark:border-slate-700 dark:text-apple-light dark:hover:bg-slate-800 transition-colors"
-                >
-                  View All Courses <ArrowRightIcon className="w-4 h-4" />
-                </Button>
-              </Link>
+              <div className="mt-12 text-center">
+                <Link to="/signup">
+                  <Button
+                    variant="secondary"
+                    className="flex items-center gap-2 mx-auto dark:border-slate-700 dark:text-apple-light dark:hover:bg-slate-800 transition-colors"
+                  >
+                    Sign up to see all <ArrowRightIcon className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* ===== TESTIMONIALS SECTION ===== */}
         <section className="py-24 bg-gradient-to-b from-blue-50/60 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors">
