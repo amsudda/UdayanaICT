@@ -1,0 +1,12 @@
+# Netlify deploy config for the Udayana ICT LMS (Vite + React SPA)
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: send every path to index.html so client-side routes
+# (e.g. /dashboard, /signup) work on refresh and direct links instead of 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
