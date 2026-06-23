@@ -31,13 +31,22 @@ const emptyForm = {
   is_active: true,
   image_url: '' as string | null,
   image_fit: 'cover',
-  image_position: 'center'
+  image_position: 'center',
+  font_family: ''
 };
 
 const POSITIONS = [
   ['left top', 'top', 'right top'],
   ['left', 'center', 'right'],
   ['left bottom', 'bottom', 'right bottom']
+];
+
+const FONTS = [
+  { label: 'Default', value: '' },
+  { label: 'Gemunu Libre (Sinhala + English)', value: "'Gemunu Libre', sans-serif" },
+  { label: 'Noto Sans Sinhala', value: "'Noto Sans Sinhala', sans-serif" },
+  { label: 'Abhaya Libre (Sinhala serif)', value: "'Abhaya Libre', serif" },
+  { label: 'Poppins (English)', value: "'Poppins', sans-serif" }
 ];
 
 export function AdminPromotionsPage() {
@@ -81,7 +90,8 @@ export function AdminPromotionsPage() {
       cta_text: p.cta_text ?? '', cta_link: p.cta_link ?? '',
       audience_scope: p.audience_scope ?? 'public', audience_program: p.audience_program ?? 'A/L',
       batch_ids: p.batch_ids ?? [], is_active: p.is_active ?? true, image_url: p.image_url ?? '',
-      image_fit: p.image_fit ?? 'cover', image_position: p.image_position ?? 'center'
+      image_fit: p.image_fit ?? 'cover', image_position: p.image_position ?? 'center',
+      font_family: p.font_family ?? ''
     });
     setImgFile(null);
     setImgPreview(p.image_url ?? undefined);
@@ -120,7 +130,8 @@ export function AdminPromotionsPage() {
       is_active: form.is_active,
       image_url: imageUrl || null,
       image_fit: form.image_fit,
-      image_position: form.image_position
+      image_position: form.image_position,
+      font_family: form.font_family || null
     };
     if (editing) await supabase.from('promotions').update(payload).eq('id', editing.id);
     else await supabase.from('promotions').insert({ ...payload, sort_order: promos.length });
@@ -221,14 +232,19 @@ export function AdminPromotionsPage() {
                 <img src={imgPreview} alt="" className="absolute inset-0 w-full h-full" style={{ objectFit: form.image_fit as any, objectPosition: form.image_position }} />
               )}
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
-              <div className="absolute inset-0 flex flex-col justify-center items-start p-4">
+              <div className="absolute inset-0 flex flex-col justify-center items-start p-4" style={{ fontFamily: form.font_family || undefined }}>
                 {form.tag && <span className="inline-block py-0.5 px-2 rounded-full bg-blue-600 text-white text-[8px] font-bold mb-1.5">{form.tag}</span>}
                 <p className="text-white font-bold text-sm leading-tight line-clamp-2 max-w-[75%]">{form.title || 'Promotion title'}</p>
                 {form.description && <p className="text-gray-200 text-[10px] mt-1 leading-snug line-clamp-2 max-w-[70%]">{form.description}</p>}
                 {form.cta_text && <span className="mt-2 inline-block bg-blue-600 text-white text-[9px] font-semibold px-2.5 py-1 rounded-full">{form.cta_text}</span>}
               </div>
             </div>
-            <p className="text-xs text-slate-400 mt-1.5">Text sits on the <strong>left</strong> — keep the important part of your image on the right.</p>
+            <div className="mt-1.5 space-y-1">
+              <p className="text-xs text-slate-400">Text sits on the <strong>left</strong> — keep the important part of your image on the right.</p>
+              <p className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
+                📐 Recommended cover size: <strong>1600 × 700 px</strong> (landscape, ~16:7). JPG or PNG.
+              </p>
+            </div>
           </div>
 
           {/* upload */}
@@ -277,6 +293,13 @@ export function AdminPromotionsPage() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
             <textarea rows={2} className="w-full rounded-xl border border-slate-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Text font</label>
+            <select className={inputCls} value={form.font_family} onChange={(e) => setForm({ ...form, font_family: e.target.value })} style={{ fontFamily: form.font_family || undefined }}>
+              {FONTS.map((f) => <option key={f.label} value={f.value}>{f.label}</option>)}
+            </select>
+            <p className="text-[11px] text-slate-400 mt-1">Sinhala-capable fonts shown first. Tip: type Sinhala with Helakuru or Google Input Tools.</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

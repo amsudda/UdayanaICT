@@ -91,7 +91,8 @@ export function LandingPage() {
               ctaText: p.cta_text ?? 'Learn more',
               ctaLink: p.cta_link ?? '/signup',
               imageFit: p.image_fit ?? 'cover',
-              imagePosition: p.image_position ?? 'center'
+              imagePosition: p.image_position ?? 'center',
+              fontFamily: p.font_family ?? ''
             }))
           );
         }
@@ -319,7 +320,7 @@ export function LandingPage() {
                   <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20 z-10" />
 
                   {/* Content */}
-                  <div className="absolute inset-0 z-20 flex flex-col justify-center items-start text-left p-8 sm:p-12 md:p-16 max-w-2xl">
+                  <div className="absolute inset-0 z-20 flex flex-col justify-center items-start text-left p-8 sm:p-12 md:p-16 max-w-2xl" style={{ fontFamily: (promos[currentPromo] as any).fontFamily || undefined }}>
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
