@@ -46,7 +46,7 @@ export function LandingPage() {
   const [recruitNotice, setRecruitNotice] = useState<string>('2025 බඳවා ගැනීම් දැන් විවෘතයි');
 
   useEffect(() => {
-    supabase.from('settings').select('recruitment_notice').eq('id', 1).single().then(({ data }) => {
+    supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
       if (data && data.recruitment_notice != null) setRecruitNotice(data.recruitment_notice);
     });
   }, []);
@@ -95,6 +95,7 @@ export function LandingPage() {
               fontFamily: p.font_family ?? ''
             }))
           );
+          setCurrentPromo(0);
         }
       });
   }, []);
@@ -107,7 +108,10 @@ export function LandingPage() {
     if (paused) return;
     const timer = setInterval(nextPromo, 5000);
     return () => clearInterval(timer);
-  }, [paused]);
+  }, [paused, promos.length]);
+
+  // safe accessor — guards against currentPromo being out of range after a refetch
+  const activePromo = promos[currentPromo % promos.length] ?? promos[0];
 
   return (
     <div className="min-h-screen bg-apple-light dark:bg-slate-950 flex flex-col font-sans transition-colors duration-300">
@@ -308,36 +312,36 @@ export function LandingPage() {
                   className="absolute inset-0"
                 >
                   <img
-                    src={promos[currentPromo].image}
-                    alt={promos[currentPromo].title}
+                    src={activePromo.image}
+                    alt={activePromo.title}
                     className="w-full h-full"
                     style={{
-                      objectFit: (promos[currentPromo] as any).imageFit ?? 'cover',
-                      objectPosition: (promos[currentPromo] as any).imagePosition ?? 'center'
+                      objectFit: (activePromo as any).imageFit ?? 'cover',
+                      objectPosition: (activePromo as any).imagePosition ?? 'center'
                     }}
                   />
                   {/* Left-to-right dark gradient for text legibility */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20 z-10" />
 
                   {/* Content */}
-                  <div className="absolute inset-0 z-20 flex flex-col justify-center items-start text-left p-8 sm:p-12 md:p-16 max-w-2xl" style={{ fontFamily: (promos[currentPromo] as any).fontFamily || undefined }}>
+                  <div className="absolute inset-0 z-20 flex flex-col justify-center items-start text-left p-8 sm:p-12 md:p-16 max-w-2xl" style={{ fontFamily: (activePromo as any).fontFamily || undefined }}>
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.15 }}
                     >
                       <span className="inline-block py-1 px-3.5 rounded-full bg-apple-blue text-white font-semibold text-xs sm:text-sm mb-4 shadow-lg">
-                        {promos[currentPromo].tag}
+                        {activePromo.tag}
                       </span>
                       <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
-                        {promos[currentPromo].title}
+                        {activePromo.title}
                       </h3>
                       <p className="text-base md:text-lg text-gray-200 mb-7 max-w-lg leading-relaxed">
-                        {promos[currentPromo].description}
+                        {activePromo.description}
                       </p>
-                      <Link to={promos[currentPromo].ctaLink}>
+                      <Link to={activePromo.ctaLink}>
                         <Button size="lg" className="font-semibold">
-                          {promos[currentPromo].ctaText}
+                          {activePromo.ctaText}
                         </Button>
                       </Link>
                     </motion.div>
