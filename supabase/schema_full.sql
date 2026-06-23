@@ -183,20 +183,42 @@ begin
   return new;
 end; $$;
 
+-- structured student-code counter (per cohort: AL26, OL27, …)
+create table if not exists public.student_code_counters (
+  cohort text primary key,
+  last_no int not null default 0
+);
+alter table public.student_code_counters enable row level security;
+
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
-declare m jsonb := new.raw_user_meta_data;
+declare
+  m jsonb := new.raw_user_meta_data;
+  v_program text := nullif(m->>'program','');
+  v_year int := nullif(m->>'exam_year','')::int;
+  v_prefix text;
+  v_no int;
+  v_code text;
 begin
+  v_prefix := case when v_program = 'A/L' then 'AL' when v_program = 'O/L' then 'OL' else 'UI' end;
+  if v_year is not null then v_prefix := v_prefix || right(v_year::text, 2); end if;
+
+  insert into public.student_code_counters (cohort, last_no)
+  values (v_prefix, 1)
+  on conflict (cohort) do update set last_no = public.student_code_counters.last_no + 1
+  returning last_no into v_no;
+
+  v_code := v_prefix || '-' || lpad(v_no::text, 3, '0');  -- e.g. AL26-001
+
   insert into public.profiles (
     id, email, role, student_code, full_name, phone, nic, gender, birth_date,
     school, district, medium, program, exam_year, guardian_name, guardian_phone, address
   ) values (
-    new.id, new.email, 'student',
-    'STU-' || lpad(((abs(hashtext(new.id::text)) % 90000) + 10000)::text, 5, '0'),
+    new.id, new.email, 'student', v_code,
     nullif(m->>'full_name',''), nullif(m->>'phone',''), nullif(m->>'nic',''),
     nullif(m->>'gender',''), nullif(m->>'birth_date','')::date, nullif(m->>'school',''),
-    nullif(m->>'district',''), nullif(m->>'medium',''), nullif(m->>'program',''),
-    nullif(m->>'exam_year','')::int, nullif(m->>'guardian_name',''),
+    nullif(m->>'district',''), nullif(m->>'medium',''), v_program,
+    v_year, nullif(m->>'guardian_name',''),
     nullif(m->>'guardian_phone',''), nullif(m->>'address','')
   ) on conflict (id) do nothing;
   return new;
