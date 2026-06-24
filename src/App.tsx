@@ -26,6 +26,7 @@ import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
 import { AdminPromotionsPage } from './admin/pages/AdminPromotionsPage';
 import { AdminSettingsPage } from './admin/pages/AdminSettingsPage';
 import { AdminFeaturedPage } from './admin/pages/AdminFeaturedPage';
+import { AdminMarksPage } from './admin/pages/AdminMarksPage';
 
 function FullSpinner() {
   return (
@@ -107,6 +108,7 @@ function AnimatedRoutes() {
           <Route path="students" element={<AdminStudentsPage />} />
           <Route path="promotions" element={<AdminPromotionsPage />} />
           <Route path="featured" element={<AdminFeaturedPage />} />
+          <Route path="marks" element={<AdminMarksPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
       </Routes>

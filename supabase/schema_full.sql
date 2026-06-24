@@ -330,6 +330,24 @@ create policy settings_read on public.settings for select using (true);
 drop policy if exists settings_admin on public.settings;
 create policy settings_admin on public.settings for update using (public.is_admin()) with check (public.is_admin());
 
+-- ---------- PAPER MARKS ----------
+create table if not exists public.paper_marks (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  paper_no int,
+  type text not null default 'full' check (type in ('full','timing')),
+  marks numeric(6,2) not null default 0,
+  max_marks numeric(6,2) not null default 100,
+  exam_date date,
+  created_at timestamptz not null default now()
+);
+alter table public.paper_marks enable row level security;
+drop policy if exists marks_read on public.paper_marks;
+create policy marks_read on public.paper_marks for select using (student_id = auth.uid() or public.is_admin());
+drop policy if exists marks_admin on public.paper_marks;
+create policy marks_admin on public.paper_marks for all using (public.is_admin()) with check (public.is_admin());
+
 -- ---------- GRANTS ----------
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;

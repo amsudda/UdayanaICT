@@ -8,16 +8,15 @@ import {
   ReceiptTextIcon,
   UserIcon,
   VideoIcon,
-  LockIcon,
-  CalendarIcon
+  TrendingUpIcon
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { supabase } from '../lib/supabase';
-import { loadLibrary, type LibMonth, type LibPack } from '../data/library';
 import { formatLKR } from '../data/paymentConfig';
 import { Badge } from '../components/ui/Badge';
+import { MarksChart, type Mark } from '../components/shared/MarksChart';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -44,36 +43,27 @@ export function DashboardPage() {
   const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
   const [live, setLive] = useState<any[]>([]);
-  const [packs, setPacks] = useState<LibPack[]>([]);
-  const [recordings, setRecordings] = useState<LibMonth[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [marks, setMarks] = useState<Mark[]>([]);
 
   const refresh = useCallback(async () => {
     if (!user) return;
-    const [{ data: lc }, lib, { data: pays }] = await Promise.all([
+    const [{ data: lc }, { data: pays }, { data: mk }] = await Promise.all([
       supabase.from('live_classes').select('*').order('scheduled_at', { ascending: true }),
-      loadLibrary(user.id),
-      supabase.from('payments').select('*').eq('student_id', user.id).order('created_at', { ascending: false }).limit(4)
+      supabase.from('payments').select('*').eq('student_id', user.id).order('created_at', { ascending: false }).limit(4),
+      supabase.from('paper_marks').select('*').eq('student_id', user.id)
     ]);
     setLive(lc ?? []);
-    setPacks(lib.packs);
-    setRecordings(lib.recordings);
     setPayments(pays ?? []);
+    setMarks((mk ?? []) as Mark[]);
   }, [user]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const liveNow = live.find((c) => isLiveNow(c.scheduled_at));
-  const upcoming = live.filter((c) => new Date(c.scheduled_at).getTime() > Date.now() - 3 * 3600000).slice(0, 2);
-  const classItems = [
-    ...packs.map((p) => ({ kind: 'pack' as const, id: p.id, title: p.title, thumb: p.thumbnailUrl, unlocked: true })),
-    ...recordings.map((m) => ({ kind: 'month' as const, id: m.id, title: `${m.month} ${m.year}`, thumb: m.thumbnailUrl, unlocked: m.unlocked }))
-  ].slice(0, 3);
 
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: reduce ? 0 : 0.07 } } };
   const item = reduce ? { hidden: { opacity: 1 }, show: { opacity: 1 } } : { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.32 } } };
-
-  const fmtTime = (iso: string) => new Date(iso).toLocaleString('en-LK', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-7 sm:space-y-10">
@@ -133,58 +123,15 @@ export function DashboardPage() {
         </div>
       </motion.section>
 
-      {/* upcoming live */}
+      {/* paper marks */}
       <motion.section variants={item}>
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
-          <h2 className="text-base sm:text-2xl font-bold text-apple-text dark:text-apple-light">Upcoming Live Classes</h2>
-          <button onClick={() => navigate('/dashboard/live')} className="text-sm font-medium text-apple-blue hover:underline flex items-center gap-1 shrink-0">View all <ArrowRightIcon className="w-4 h-4" /></button>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <TrendingUpIcon className="w-5 h-5 text-apple-blue" />
+          <h2 className="text-base sm:text-2xl font-bold text-apple-text dark:text-apple-light">Paper Marks</h2>
         </div>
-        {upcoming.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-6 text-center text-sm text-apple-subtext dark:text-slate-400">No upcoming classes for you right now.</div>
-        ) : (
-          <div className="space-y-3">
-            {upcoming.map((c) => (
-              <div key={c.id} className="flex items-center gap-4 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl p-4">
-                <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-apple-blue flex items-center justify-center shrink-0"><VideoIcon className="w-5 h-5" /></div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-apple-text dark:text-apple-light truncate">{c.title}</p>
-                  <p className="text-xs text-apple-subtext dark:text-slate-400 mt-0.5 flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> {fmtTime(c.scheduled_at)}</p>
-                </div>
-                <a href={c.zoom_link} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-full bg-apple-blue text-white text-sm font-semibold px-4 py-2 hover:bg-blue-600">Join</a>
-              </div>
-            ))}
-          </div>
-        )}
-      </motion.section>
-
-      {/* my classes */}
-      <motion.section variants={item}>
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
-          <h2 className="text-base sm:text-2xl font-bold text-apple-text dark:text-apple-light">My Classes</h2>
-          <button onClick={() => navigate('/dashboard/courses')} className="text-sm font-medium text-apple-blue hover:underline flex items-center gap-1 shrink-0">View all <ArrowRightIcon className="w-4 h-4" /></button>
+        <div className="rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
+          <MarksChart marks={marks} />
         </div>
-        {classItems.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-6 text-center">
-            <p className="text-sm text-apple-subtext dark:text-slate-400 mb-3">Nothing here yet.</p>
-            <button onClick={() => navigate('/dashboard/extra-classes')} className="inline-flex items-center gap-2 text-sm font-semibold text-apple-blue hover:underline"><ShoppingCartIcon className="w-4 h-4" /> Browse the store</button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-            {classItems.map((c) => (
-              <button key={c.id} type="button"
-                onClick={() => (c.kind === 'month' && !c.unlocked ? navigate('/dashboard/payments') : navigate(`/dashboard/watch/${c.id}`))}
-                className="group text-left bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.15)] active:scale-[0.98] transition-transform">
-                <div className="relative overflow-hidden bg-slate-100 dark:bg-slate-800" style={{ aspectRatio: '16/9' }}>
-                  {c.thumb && <img src={c.thumb} alt="" className={`w-full h-full object-cover ${c.unlocked ? '' : 'opacity-40'}`} />}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                  {!c.unlocked && <span className="absolute inset-0 flex items-center justify-center text-white"><LockIcon className="w-6 h-6" /></span>}
-                  <span className="absolute top-3 left-3 text-[11px] font-semibold bg-apple-blue/90 text-white px-2.5 py-1 rounded-full">{c.kind === 'pack' ? 'Pack' : 'Recording'}</span>
-                </div>
-                <div className="p-4"><h3 className="text-sm font-bold text-apple-text dark:text-apple-light leading-snug line-clamp-2">{c.title}</h3></div>
-              </button>
-            ))}
-          </div>
-        )}
       </motion.section>
 
       {/* recent payments */}
