@@ -1,24 +1,24 @@
 import { useEffect, useState, useCallback } from 'react';
-import { SearchIcon, UsersIcon, MailIcon, PhoneIcon, AlertCircleIcon } from 'lucide-react';
+import { SearchIcon, UsersIcon, MailIcon, PhoneIcon, AlertCircleIcon, ChevronDownIcon, FolderIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Drawer } from '../components/Drawer';
 import { formatLKR } from '../../data/paymentConfig';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const selectCls = 'h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40';
 const statusBadge: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
   approved: 'bg-emerald-100 text-emerald-700',
   rejected: 'bg-red-100 text-red-700'
 };
+const PROGRAMS = ['A/L', 'O/L'];
 
 export function AdminStudentsPage() {
   const [students, setStudents] = useState<any[]>([]);
   const [batches, setBatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [batchFilter, setBatchFilter] = useState('all');
+  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
   // detail
   const [detail, setDetail] = useState<any | null>(null);
@@ -29,8 +29,8 @@ export function AdminStudentsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     const [{ data: ss }, { data: bs }] = await Promise.all([
-      supabase.from('profiles').select('*, batch_members(batch:batches(id,name))').eq('role', 'student').order('created_at', { ascending: false }),
-      supabase.from('batches').select('id, name, program').order('exam_year', { ascending: false })
+      supabase.from('profiles').select('*, batch_members(batch:batches(id,name,program,exam_year))').eq('role', 'student').order('student_code'),
+      supabase.from('batches').select('*').order('exam_year', { ascending: false }).order('name')
     ]);
     setStudents(ss ?? []);
     setBatches(bs ?? []);
@@ -39,17 +39,24 @@ export function AdminStudentsPage() {
   useEffect(() => { load(); }, [load]);
 
   const batchesOf = (s: any) => (s.batch_members ?? []).map((m: any) => m.batch).filter(Boolean);
+  const initials = (n?: string) => (n ?? '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-LK', { year: 'numeric', month: 'short', day: '2-digit' });
 
-  const visible = students.filter((s) => {
-    const q = search.trim().toLowerCase();
-    const matchSearch = !q || [s.full_name, s.email, s.student_code, s.phone].some((v: string) => (v ?? '').toLowerCase().includes(q));
-    const bIds = batchesOf(s).map((b: any) => b.id);
-    const matchBatch =
-      batchFilter === 'all' ? true : batchFilter === 'unassigned' ? bIds.length === 0 : bIds.includes(batchFilter);
-    return matchSearch && matchBatch;
+  // grouping
+  const studentsByBatch: Record<string, any[]> = {};
+  const unassigned: any[] = [];
+  students.forEach((s) => {
+    const bs = batchesOf(s);
+    if (bs.length === 0) unassigned.push(s);
+    else bs.forEach((b: any) => { (studentsByBatch[b.id] ??= []).push(s); });
   });
 
-  const unassignedCount = students.filter((s) => batchesOf(s).length === 0).length;
+  const q = search.trim().toLowerCase();
+  const searchResults = q
+    ? students.filter((s) => [s.full_name, s.email, s.student_code, s.phone].some((v: string) => (v ?? '').toLowerCase().includes(q)))
+    : [];
+
+  const toggle = (id: string) => setOpenFolders((p) => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   const openDetail = async (s: any) => {
     setDetail(s);
@@ -74,78 +81,101 @@ export function AdminStudentsPage() {
     load();
   };
 
-  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-LK', { year: 'numeric', month: 'short', day: '2-digit' });
-  const initials = (n?: string) => (n ?? '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  const StudentRow = ({ s }: { s: any }) => (
+    <button onClick={() => openDetail(s)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors">
+      <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+        {s.avatar_url ? <img src={s.avatar_url} alt="" className="w-full h-full object-cover" /> : initials(s.full_name)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-slate-900 truncate">{s.full_name || '(no name)'}</p>
+        <p className="text-xs text-slate-400 truncate">{s.student_code} · {s.email}</p>
+      </div>
+    </button>
+  );
+
+  const Folder = ({ id, title, sub, items, accent }: { id: string; title: string; sub: string; items: any[]; accent?: string }) => {
+    const isOpen = openFolders.has(id);
+    return (
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <button onClick={() => toggle(id)} className="w-full flex items-center gap-3 p-4 hover:bg-slate-50 transition-colors">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${accent ?? 'bg-blue-50 text-blue-600'}`}>
+            <FolderIcon className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0 text-left">
+            <p className="font-semibold text-slate-900 truncate">{title}</p>
+            <p className="text-xs text-slate-500">{sub}</p>
+          </div>
+          <span className="text-xs font-bold text-slate-400 bg-slate-100 rounded-md px-2 py-0.5">{items.length}</span>
+          <ChevronDownIcon className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+        {isOpen && (
+          <div className="border-t border-slate-100 divide-y divide-slate-100">
+            {items.length === 0 ? <p className="text-sm text-slate-400 p-4">No students.</p> : items.map((s) => <StudentRow key={s.id + id} s={s} />)}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Students</h1>
-      <p className="text-sm text-slate-500 mt-1 mb-5">
-        Assign students to a batch to verify them and give them access.
-      </p>
+      <p className="text-sm text-slate-500 mt-1 mb-5">Browse by batch, or search. Assign a student to a batch to verify them.</p>
 
-      {/* unassigned alert */}
-      {unassignedCount > 0 && (
-        <button
-          onClick={() => setBatchFilter('unassigned')}
-          className="flex items-center gap-3 w-full mb-5 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3 hover:bg-amber-100 transition-colors text-left"
-        >
-          <AlertCircleIcon className="w-5 h-5 text-amber-600 shrink-0" />
-          <span className="text-sm text-amber-800 flex-1">
-            <span className="font-bold">{unassignedCount}</span> student{unassignedCount > 1 ? 's' : ''} not in a batch yet — assign them to verify.
-          </span>
-        </button>
-      )}
-
-      {/* filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <select className={selectCls} value={batchFilter} onChange={(e) => setBatchFilter(e.target.value)}>
-          <option value="all">All students</option>
-          <option value="unassigned">Unassigned</option>
-          {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-        </select>
-        <div className="relative flex-1 min-w-0">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input className={`${selectCls} w-full pl-9`} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, email, phone or ID…" />
-        </div>
+      {/* search */}
+      <div className="relative mb-5">
+        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input className="w-full h-11 pl-9 pr-4 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search any student by name, email, phone or ID…" />
       </div>
 
       {loading ? (
         <p className="text-sm text-slate-400">Loading…</p>
-      ) : visible.length === 0 ? (
-        <div className="text-center py-16 rounded-2xl border border-dashed border-slate-300 bg-white">
-          <UsersIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-          <p className="font-semibold text-slate-700">No students</p>
-          <p className="text-sm text-slate-400 mt-1">None match these filters.</p>
+      ) : q ? (
+        /* search results (flat) */
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100">
+          {searchResults.length === 0 ? <p className="text-sm text-slate-400 p-4">No students match "{search}".</p> : searchResults.map((s) => <StudentRow key={s.id} s={s} />)}
         </div>
       ) : (
-        <div className="space-y-2.5">
-          {visible.map((s) => {
-            const bs = batchesOf(s);
+        /* batch folders */
+        <div className="space-y-6">
+          {unassigned.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2 text-amber-700">
+                <AlertCircleIcon className="w-4 h-4" />
+                <p className="text-xs font-bold uppercase tracking-wider">Needs a batch</p>
+              </div>
+              <Folder id="unassigned" title="Unassigned students" sub="Assign these to a batch to verify them" items={unassigned} accent="bg-amber-100 text-amber-600" />
+            </div>
+          )}
+
+          {PROGRAMS.map((prog) => {
+            const progBatches = batches.filter((b) => b.program === prog);
+            if (progBatches.length === 0) return null;
             return (
-              <button key={s.id} onClick={() => openDetail(s)} className="w-full flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 text-left hover:border-slate-300 transition-colors">
-                <div className="w-11 h-11 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
-                  {s.avatar_url ? <img src={s.avatar_url} alt="" className="w-full h-full object-cover" /> : initials(s.full_name)}
+              <div key={prog}>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">{prog} batches</p>
+                <div className="space-y-3">
+                  {progBatches.map((b) => (
+                    <Folder
+                      key={b.id}
+                      id={b.id}
+                      title={b.name}
+                      sub={`${b.exam_year ?? ''}${b.medium ? ` · ${b.medium}` : ''}`}
+                      items={studentsByBatch[b.id] ?? []}
+                      accent={prog === 'A/L' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}
+                    />
+                  ))}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-semibold text-slate-900 truncate">{s.full_name || '(no name)'}</p>
-                    <span className="text-xs text-slate-400">{s.student_code}</span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {s.program ?? '—'}{s.exam_year ? ` ${s.exam_year}` : ''} · {s.email}
-                  </p>
-                </div>
-                <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-                  {bs.length === 0 ? (
-                    <span className="text-[11px] font-semibold px-2 py-1 rounded-md bg-amber-100 text-amber-700">Needs batch</span>
-                  ) : (
-                    bs.slice(0, 2).map((b: any) => <span key={b.id} className="text-[11px] font-semibold px-2 py-1 rounded-md bg-slate-100 text-slate-600">{b.name}</span>)
-                  )}
-                </div>
-              </button>
+              </div>
             );
           })}
+
+          {batches.length === 0 && unassigned.length === 0 && (
+            <div className="text-center py-16 rounded-2xl border border-dashed border-slate-300 bg-white">
+              <UsersIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+              <p className="font-semibold text-slate-700">No students yet</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -153,7 +183,6 @@ export function AdminStudentsPage() {
       <Drawer open={!!detail} onClose={() => setDetail(null)} title={detail?.full_name || 'Student'}>
         {detail && (
           <div className="space-y-6">
-            {/* identity */}
             <div className="flex items-center gap-3">
               <div className="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold overflow-hidden shrink-0">
                 {detail.avatar_url ? <img src={detail.avatar_url} alt="" className="w-full h-full object-cover" /> : initials(detail.full_name)}
@@ -164,7 +193,6 @@ export function AdminStudentsPage() {
               </div>
             </div>
 
-            {/* contact / info */}
             <div className="grid grid-cols-1 gap-2 text-sm">
               <p className="flex items-center gap-2 text-slate-600"><MailIcon className="w-4 h-4 text-slate-400" /> {detail.email || '—'}</p>
               <p className="flex items-center gap-2 text-slate-600"><PhoneIcon className="w-4 h-4 text-slate-400" /> {detail.phone || '—'}</p>
@@ -174,7 +202,6 @@ export function AdminStudentsPage() {
               {detail.guardian_phone && <p className="text-slate-600"><span className="text-slate-400">Guardian:</span> {detail.guardian_name || ''} {detail.guardian_phone}</p>}
             </div>
 
-            {/* batches */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Batches (assign = verify)</p>
               {batches.length === 0 ? (
@@ -192,7 +219,6 @@ export function AdminStudentsPage() {
               )}
             </div>
 
-            {/* owned content */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Owns</p>
               {enrollments.length === 0 ? (
@@ -208,7 +234,6 @@ export function AdminStudentsPage() {
               )}
             </div>
 
-            {/* payments */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Recent payments</p>
               {payments.length === 0 ? (
