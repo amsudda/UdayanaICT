@@ -17,6 +17,7 @@ import { supabase } from '../lib/supabase';
 import { formatLKR } from '../data/paymentConfig';
 import { Badge } from '../components/ui/Badge';
 import { MarksChart, type Mark } from '../components/shared/MarksChart';
+import { StudyTimeCard } from '../components/shared/StudyTimeCard';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -121,6 +122,11 @@ export function DashboardPage() {
             </button>
           ))}
         </div>
+      </motion.section>
+
+      {/* study time */}
+      <motion.section variants={item}>
+        <StudyTimeCard />
       </motion.section>
 
       {/* paper marks */}

@@ -348,6 +348,20 @@ create policy marks_read on public.paper_marks for select using (student_id = au
 drop policy if exists marks_admin on public.paper_marks;
 create policy marks_admin on public.paper_marks for all using (public.is_admin()) with check (public.is_admin());
 
+-- ---------- STUDY LOGS ----------
+create table if not exists public.study_logs (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.profiles(id) on delete cascade,
+  log_date date not null,
+  hours numeric(4,1) not null default 0,
+  created_at timestamptz not null default now(),
+  unique (student_id, log_date)
+);
+alter table public.study_logs enable row level security;
+drop policy if exists study_rw on public.study_logs;
+create policy study_rw on public.study_logs for all
+  using (student_id = auth.uid() or public.is_admin()) with check (student_id = auth.uid());
+
 -- ---------- GRANTS ----------
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
