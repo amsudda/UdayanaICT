@@ -67,9 +67,18 @@
 .pixel-float {
   animation: pixel-float 5s ease-in-out infinite;
 }
+@keyframes pixel-scan {
+  from { background-position: 0 0; }
+  to { background-position: 0 4px; }
+}
+.pixel-scanlines {
+  background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0.12) 1px, transparent 1px, transparent 3px);
+  animation: pixel-scan 0.9s steps(2) infinite;
+}
 @media (prefers-reduced-motion: reduce) {
   .pixel-float,
-  .pixel-cursor {
+  .pixel-cursor,
+  .pixel-scanlines {
     animation: none;
   }
 }

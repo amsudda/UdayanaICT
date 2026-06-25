@@ -12,7 +12,7 @@ import { districts, examYears, genders, mediums, programs } from '../data/studen
 function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-apple-blue mb-4">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#c20f24] mb-4">
         {title}
       </h3>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>
@@ -274,7 +274,7 @@ export function SignupPage() {
 
         {/* ── National ID ── */}
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-apple-blue mb-4">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#c20f24] mb-4">
             ජාතික හැඳුනුම්පත / National ID
           </h3>
           <div className="relative">
@@ -297,7 +297,7 @@ export function SignupPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full h-12 rounded-full bg-apple-blue text-white font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50"
+          className="w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors disabled:opacity-50 shadow-[0_8px_24px_rgba(194,15,36,0.35)]"
         >
           {submitting ? 'Creating account…' : 'Create Account'}
         </button>
@@ -305,7 +305,7 @@ export function SignupPage() {
 
       <p className="mt-8 text-center text-sm text-apple-subtext">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-apple-blue hover:underline">
+        <Link to="/login" className="font-medium text-[#c20f24] hover:underline">
           Log in
         </Link>
       </p>

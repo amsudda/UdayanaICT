@@ -83,7 +83,7 @@ export function LoginPage() {
             </button>
           </div>
           <div className="flex justify-end mt-2">
-            <a href="#" className="text-sm font-medium text-apple-blue hover:underline">
+            <a href="#" className="text-sm font-medium text-[#c20f24] hover:underline">
               Forgot password?
             </a>
           </div>
@@ -94,7 +94,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full h-12 rounded-full bg-apple-blue text-white font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50"
+          className="w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors disabled:opacity-50 shadow-[0_8px_24px_rgba(194,15,36,0.35)]"
         >
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>
@@ -102,7 +102,7 @@ export function LoginPage() {
 
       <p className="mt-8 text-center text-sm text-apple-subtext">
         Don't have an account?{' '}
-        <Link to="/signup" className="font-medium text-apple-blue hover:underline">
+        <Link to="/signup" className="font-medium text-[#c20f24] hover:underline">
           Sign up
         </Link>
       </p>
