@@ -37,10 +37,24 @@ const heroSprites = [
   { Comp: PixelStar, cls: 'bottom-24 right-[2%] w-4 h-4 text-blue-400/40', delay: '1.7s' }
 ];
 
+/* Shown only until the tutor adds real promotions in the admin panel. */
+const GUIDE_PROMO = {
+  id: 'guide',
+  tag: 'නව සිසුන් සඳහා · GET STARTED',
+  title: 'Udayana ICT වෙත සාදරයෙන් පිළිගනිමු!',
+  description: 'සිසුවෙකු ලෙස ලියාපදිංචි වී වීඩියෝ පාඩම්, සජීවී පන්ති සහ ඔබේ ලකුණු ලුහුබැඳීමට ප්‍රවේශය ලබාගන්න. ඉහත "Sign Up" බොත්තම click කරන්න.',
+  image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=600&fit=crop',
+  ctaText: 'දැන්ම ලියාපදිංචි වන්න',
+  ctaLink: '/signup',
+  imageFit: 'cover',
+  imagePosition: 'center',
+  fontFamily: ''
+};
+
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [promos, setPromos] = useState<any[]>([]);
+  const [promos, setPromos] = useState<any[]>([GUIDE_PROMO]);
   const [featured, setFeatured] = useState<any[]>([]);
   const [recruitNotice, setRecruitNotice] = useState<string>('2025 බඳවා ගැනීම් දැන් විවෘතයි');
 
