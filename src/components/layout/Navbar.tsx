@@ -134,7 +134,7 @@ export function Navbar() {
                   <Button variant="ghost" size="sm" className="dark:text-apple-light dark:hover:bg-slate-800">Log In</Button>
                 </Link>
                 <Link to="/signup">
-                  <Button size="sm">Sign Up</Button>
+                  <Button size="sm" className="!bg-[#c20f24] hover:!bg-[#9c0c1d]">Sign Up</Button>
                 </Link>
               </>
             )}
@@ -220,7 +220,7 @@ export function Navbar() {
                   <a href="#contact" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Contact</a>
                   <div className="pt-4 flex flex-col gap-3">
                     <Link to="/login" className="w-full"><Button variant="secondary" className="w-full">Log In</Button></Link>
-                    <Link to="/signup" className="w-full"><Button className="w-full">Sign Up</Button></Link>
+                    <Link to="/signup" className="w-full"><Button className="w-full !bg-[#c20f24] hover:!bg-[#9c0c1d]">Sign Up</Button></Link>
                   </div>
                 </div>
               )}

@@ -30,7 +30,7 @@ const PixelStar = ({ className = '' }: { className?: string }) => (
 );
 
 const heroSprites = [
-  { Comp: PixelFloppy, cls: 'top-10 left-[5%] w-8 h-8 text-apple-blue/25', delay: '0s' },
+  { Comp: PixelFloppy, cls: 'top-10 left-[5%] w-8 h-8 text-[#c20f24]/25', delay: '0s' },
   { Comp: PixelController, cls: 'top-1/2 left-[1%] w-7 h-7 text-violet-400/25', delay: '1.3s' },
   { Comp: PixelStar, cls: 'bottom-14 left-[9%] w-5 h-5 text-amber-400/40', delay: '2.1s' },
   { Comp: PixelTerminal, cls: 'top-8 right-[3%] w-8 h-8 text-emerald-400/25', delay: '0.6s' },
@@ -134,7 +134,7 @@ export function LandingPage() {
         {/* Hero Section */}
         <section className="relative pt-24 pb-16 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
           {/* Subtle background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-white to-white dark:from-slate-900/60 dark:via-slate-950 dark:to-slate-950 -z-10 transition-colors" />
+          <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 via-white to-white dark:from-slate-900/60 dark:via-slate-950 dark:to-slate-950 -z-10 transition-colors" />
 
           {/* floating 8-bit sprites */}
           <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
@@ -163,7 +163,7 @@ export function LandingPage() {
 
                 {/* Recruitment notice — editable in Admin → Settings */}
                 {recruitNotice.trim() && (
-                  <span className="block sm:inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-6 border border-blue-100 dark:border-blue-800 transition-colors">
+                  <span className="block sm:inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-6 border border-red-100 dark:border-red-900 transition-colors">
                     {recruitNotice}
                   </span>
                 )}
@@ -187,7 +187,7 @@ export function LandingPage() {
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <Link to="/signup">
-                    <Button size="lg" className="w-full sm:w-auto min-w-[160px] font-semibold">
+                    <Button size="lg" className="w-full sm:w-auto min-w-[160px] font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
                       ඉගෙනීම අරඹන්න
                     </Button>
                   </Link>
@@ -215,32 +215,32 @@ export function LandingPage() {
                 {/* Photo container with circuit-board style background */}
                 <div className="relative w-full max-w-sm lg:max-w-md">
                   {/* Background card */}
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700 transform translate-x-2 translate-y-2 transition-colors" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-rose-50 to-rose-100 dark:from-slate-800 dark:to-slate-700 transform translate-x-2 translate-y-2 transition-colors" />
 
                   {/* Decorative circuit pattern */}
                   <div className="absolute inset-0 rounded-3xl overflow-hidden opacity-10">
                     <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                       <pattern id="circuit" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                        <path d="M 10 0 L 10 10 L 0 10" fill="none" stroke="#2563eb" strokeWidth="0.8" />
-                        <path d="M 30 40 L 30 30 L 40 30" fill="none" stroke="#2563eb" strokeWidth="0.8" />
-                        <path d="M 0 30 L 10 30 L 10 40" fill="none" stroke="#2563eb" strokeWidth="0.8" />
-                        <circle cx="10" cy="10" r="2" fill="#2563eb" />
-                        <circle cx="30" cy="30" r="2" fill="#2563eb" />
-                        <circle cx="10" cy="30" r="2" fill="#2563eb" />
+                        <path d="M 10 0 L 10 10 L 0 10" fill="none" stroke="#c20f24" strokeWidth="0.8" />
+                        <path d="M 30 40 L 30 30 L 40 30" fill="none" stroke="#c20f24" strokeWidth="0.8" />
+                        <path d="M 0 30 L 10 30 L 10 40" fill="none" stroke="#c20f24" strokeWidth="0.8" />
+                        <circle cx="10" cy="10" r="2" fill="#c20f24" />
+                        <circle cx="30" cy="30" r="2" fill="#c20f24" />
+                        <circle cx="10" cy="30" r="2" fill="#c20f24" />
                       </pattern>
                       <rect width="100%" height="100%" fill="url(#circuit)" />
                     </svg>
                   </div>
 
                   {/* Teacher photo */}
-                  <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-gradient-to-b from-blue-100 to-blue-200 dark:from-slate-700 dark:to-slate-800 flex items-end justify-center min-h-[380px] md:min-h-[460px]">
+                  <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-gradient-to-b from-rose-100 to-rose-200 dark:from-slate-700 dark:to-slate-800 flex items-end justify-center min-h-[380px] md:min-h-[460px]">
                     <img
                       src="/images/udayana-portrait.png"
                       alt="උදයන පසිඳු - ICT ගුරුවරයා"
                       className="w-full h-full object-cover object-center absolute inset-0"
                     />
                     {/* Gradient overlay at bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-50/80 dark:from-slate-900/80 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-rose-50/80 dark:from-slate-900/80 to-transparent" />
                   </div>
 
                   {/* Floating Quote Card */}
@@ -253,7 +253,7 @@ export function LandingPage() {
                     <p className="text-sm font-medium text-apple-text dark:text-apple-light leading-snug mb-2 transition-colors">
                       "ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!"
                     </p>
-                    <p className="text-xs text-apple-blue font-semibold">- උදයන පසිඳු</p>
+                    <p className="text-xs text-[#c20f24] font-semibold">- උදයන පසිඳු</p>
                   </motion.div>
                 </div>
               </motion.div>
@@ -300,7 +300,7 @@ export function LandingPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Section header */}
             <div className="text-center mb-10">
-              <span className="inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-4 border border-blue-100 dark:border-blue-800 transition-colors">
+              <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900 transition-colors">
                 නවතම තොරතුරු
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-3">
@@ -344,7 +344,7 @@ export function LandingPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.15 }}
                     >
-                      <span className="inline-block py-1 px-3.5 rounded-full bg-apple-blue text-white font-semibold text-xs sm:text-sm mb-4 shadow-lg">
+                      <span className="inline-block py-1 px-3.5 rounded-full bg-[#c20f24] text-white font-semibold text-xs sm:text-sm mb-4 shadow-lg">
                         {activePromo.tag}
                       </span>
                       <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
@@ -354,7 +354,7 @@ export function LandingPage() {
                         {activePromo.description}
                       </p>
                       <Link to={activePromo.ctaLink}>
-                        <Button size="lg" className="font-semibold">
+                        <Button size="lg" className="font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
                           {activePromo.ctaText}
                         </Button>
                       </Link>
@@ -431,7 +431,7 @@ export function LandingPage() {
         )}
 
         {/* ===== TESTIMONIALS SECTION ===== */}
-        <section id="reviews" className="py-24 bg-gradient-to-b from-blue-50/60 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors scroll-mt-20">
+        <section id="reviews" className="py-24 bg-gradient-to-b from-red-50/50 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {/* Section Header */}
@@ -442,7 +442,7 @@ export function LandingPage() {
               transition={{ duration: 0.6 }}
               className="text-center mb-14"
             >
-              <span className="inline-block py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/40 text-apple-blue font-medium text-sm mb-4 border border-blue-100 dark:border-blue-800">
+              <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900">
                 සිසුන්ගේ අදහස්
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light mb-4 transition-colors">
@@ -534,9 +534,9 @@ export function LandingPage() {
 
                   {/* Quote */}
                   <p className="text-apple-text dark:text-slate-200 text-sm leading-relaxed flex-1 transition-colors">
-                    <span className="text-apple-blue text-xl font-serif leading-none mr-1">"</span>
+                    <span className="text-[#c20f24] text-xl font-serif leading-none mr-1">"</span>
                     {t.quote}
-                    <span className="text-apple-blue text-xl font-serif leading-none ml-1">"</span>
+                    <span className="text-[#c20f24] text-xl font-serif leading-none ml-1">"</span>
                   </p>
 
                   {/* Divider */}
@@ -544,7 +544,7 @@ export function LandingPage() {
                     <img
                       src={t.avatar}
                       alt={t.name}
-                      className="w-11 h-11 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                      className="w-11 h-11 rounded-full object-cover ring-2 ring-red-100 dark:ring-red-900"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-apple-text dark:text-apple-light text-sm truncate transition-colors">
@@ -578,7 +578,7 @@ export function LandingPage() {
               className="mt-12 text-center"
             >
               <Link to="/signup">
-                <Button size="lg" className="font-semibold">
+                <Button size="lg" className="font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
                   ඔබේ ජය ගමන ආරම්භ කරන්න →
                 </Button>
               </Link>
@@ -620,8 +620,8 @@ export function LandingPage() {
                     },
                   ].map((feature, idx) => (
                     <div key={idx} className="flex gap-4">
-                      <div className="mt-1 bg-blue-50 dark:bg-blue-900/40 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors">
-                        <CheckCircleIcon className="w-5 h-5 text-apple-blue" />
+                      <div className="mt-1 bg-red-50 dark:bg-red-900/30 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors">
+                        <CheckCircleIcon className="w-5 h-5 text-[#c20f24]" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold text-apple-text dark:text-apple-light transition-colors mb-1">
@@ -637,7 +637,7 @@ export function LandingPage() {
               </div>
 
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-apple-blue/20 to-purple-500/20 rounded-3xl transform rotate-3 scale-105 -z-10" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#c20f24]/20 to-rose-500/20 rounded-3xl transform rotate-3 scale-105 -z-10" />
                 <img
                   src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop"
                   alt="Students learning"
