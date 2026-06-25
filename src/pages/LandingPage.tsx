@@ -12,7 +12,6 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
-import { promotions } from '../data/mockData';
 import { supabase } from '../lib/supabase';
 
 /* ── tiny 8-bit pixel sprites (SVG, crisp) ── */
@@ -41,7 +40,7 @@ const heroSprites = [
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [promos, setPromos] = useState(promotions);
+  const [promos, setPromos] = useState<any[]>([]);
   const [featured, setFeatured] = useState<any[]>([]);
   const [recruitNotice, setRecruitNotice] = useState<string>('2025 බඳවා ගැනීම් දැන් විවෘතයි');
 
@@ -281,7 +280,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* Promotions / Announcements Carousel */}
+        {/* Promotions / Announcements Carousel — only when real promos exist */}
+        {promos.length > 0 && (
         <section id="promos" className="py-16 bg-white dark:bg-slate-900 transition-colors scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Section header */}
@@ -380,6 +380,7 @@ export function LandingPage() {
             </div>
           </div>
         </section>
+        )}
 
         {/* Featured Courses — only shown when the tutor has published public packs */}
         {featured.length > 0 && (
