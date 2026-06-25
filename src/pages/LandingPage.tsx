@@ -12,6 +12,7 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
+import { PixelBurstButton, PixelReveal } from '../components/shared/PixelFx';
 import { supabase } from '../lib/supabase';
 
 /* ── tiny 8-bit pixel sprites (SVG, crisp) ── */
@@ -186,11 +187,9 @@ export function LandingPage() {
 
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <Link to="/signup">
-                    <Button size="lg" className="w-full sm:w-auto min-w-[160px] font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
-                      ඉගෙනීම අරඹන්න
-                    </Button>
-                  </Link>
+                  <PixelBurstButton to="/signup" className="w-full sm:w-auto text-base">
+                    ඉගෙනීම අරඹන්න
+                  </PixelBurstButton>
                   <a
                     href="https://wa.me/94719735601"
                     target="_blank"
@@ -304,7 +303,7 @@ export function LandingPage() {
                 නවතම තොරතුරු
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-3">
-                ප්‍රවර්ධන සහ දැන්වීම්
+                ප්‍රවර්ධන සහ දැන්වීම් <PixelReveal className="w-5 h-5 text-[#c20f24]" />
               </h2>
               <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-2xl mx-auto transition-colors">
                 නවතම පන්ති, විශේෂ දීමනා සහ වැදගත් නිවේදන මෙතැනින් බලාගන්න.
@@ -592,7 +591,7 @@ export function LandingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-6">
-                  Everything you need to succeed in A/L ICT
+                  Everything you need to succeed in A/L ICT <PixelReveal className="w-5 h-5 text-[#c20f24]" />
                 </h2>
                 <p className="text-lg text-apple-subtext dark:text-slate-400 transition-colors mb-8">
                   Our platform is built specifically for Sri Lankan A/L
