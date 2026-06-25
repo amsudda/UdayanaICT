@@ -166,7 +166,7 @@ export function ProfilePage() {
     >
       {/* ── page header ── */}
       <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-apple-blue">My Profile</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c20f24]">My Profile</p>
         <h1 className="text-3xl font-bold text-apple-text dark:text-apple-light mt-2 transition-colors">
           Manage your account
         </h1>
@@ -176,7 +176,7 @@ export function ProfilePage() {
       </div>
 
       {/* ── hero / identity card ── */}
-      <div className="rounded-3xl p-6 sm:p-8 bg-apple-blue dark:bg-slate-950 text-white shadow-[0_20px_50px_rgba(0,112,255,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-colors duration-300 flex flex-col sm:flex-row items-center gap-6">
+      <div className="rounded-3xl p-6 sm:p-8 bg-[#c20f24] dark:bg-slate-950 text-white shadow-[0_20px_50px_rgba(194,15,36,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-colors duration-300 flex flex-col sm:flex-row items-center gap-6">
         {/* avatar */}
         <div className="relative shrink-0">
           <div
@@ -192,7 +192,7 @@ export function ProfilePage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white text-apple-blue flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white text-[#c20f24] flex items-center justify-center shadow-md hover:scale-110 transition-transform"
           >
             <CameraIcon className="w-4 h-4" />
           </button>
@@ -208,14 +208,14 @@ export function ProfilePage() {
         {/* name / id */}
         <div className="text-center sm:text-left flex-1 min-w-0">
           <h2 className="text-2xl font-bold text-white">{user.name}</h2>
-          <p className="text-blue-100/80 text-sm mt-0.5">{user.email}</p>
+          <p className="text-rose-100/80 text-sm mt-0.5">{user.email}</p>
           <div className="mt-4 inline-flex items-center gap-2 bg-white/15 rounded-2xl px-4 py-2">
-            <ShieldCheckIcon className="w-4 h-4 text-blue-100" />
+            <ShieldCheckIcon className="w-4 h-4 text-rose-100" />
             <span className="text-sm font-semibold tracking-widest text-white">{user.studentId}</span>
           </div>
         </div>
 
-        <p className="text-xs text-blue-100/60 sm:self-end hidden sm:block">
+        <p className="text-xs text-rose-100/60 sm:self-end hidden sm:block">
           Click the avatar to change your photo
         </p>
       </div>
@@ -232,12 +232,12 @@ export function ProfilePage() {
           style={{ aspectRatio: '1.586 / 1' }}
         >
           {/* gradient background */}
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,#0a1628_0%,#0f2952_40%,#1a3a6e_70%,#0d2244_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,#5e0813_0%,#7a0a18_40%,#a50f24_70%,#4a0510_100%)]" />
 
           {/* decorative circles */}
           <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5 blur-sm" />
-          <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-blue-400/10 blur-md" />
-          <div className="absolute top-6 right-16 w-24 h-24 rounded-full bg-blue-500/10" />
+          <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-red-400/10 blur-md" />
+          <div className="absolute top-6 right-16 w-24 h-24 rounded-full bg-red-500/10" />
 
           {/* fine grid pattern overlay */}
           <div
@@ -249,14 +249,14 @@ export function ProfilePage() {
           />
 
           {/* holographic shimmer stripe */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-300/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-rose-300/60 to-transparent" />
 
           {/* content */}
           <div className="relative z-10 h-full flex flex-col justify-between p-5">
             {/* top row: institution + logo chip */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-blue-200/70">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-rose-200/70">
                   Sri Lanka
                 </p>
                 <p className="text-sm font-bold text-white leading-tight mt-0.5">
@@ -286,13 +286,13 @@ export function ProfilePage() {
 
               {/* name + id */}
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-blue-300/60 mb-1">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-rose-300/60 mb-1">
                   Student Name
                 </p>
                 <p className="text-base font-bold text-white leading-snug truncate">
                   {name || user.name}
                 </p>
-                <p className="text-[10px] text-blue-200/50 mt-2 uppercase tracking-widest">
+                <p className="text-[10px] text-rose-200/50 mt-2 uppercase tracking-widest">
                   Student ID
                 </p>
                 <p className="text-sm font-bold tracking-[0.22em] text-white/90 font-mono">
@@ -312,7 +312,7 @@ export function ProfilePage() {
                   />
                 ))}
               </div>
-              <p className="text-[8px] text-blue-200/40 font-mono tracking-widest ml-2 shrink-0">
+              <p className="text-[8px] text-rose-200/40 font-mono tracking-widest ml-2 shrink-0">
                 STUDENT
               </p>
             </div>
@@ -564,7 +564,7 @@ export function ProfilePage() {
           </div>
         </div>
         <div className="rounded-3xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 flex items-start gap-4 transition-colors duration-300">
-          <div className="rounded-2xl bg-blue-50 dark:bg-blue-500/10 p-3 text-apple-blue shrink-0">
+          <div className="rounded-2xl bg-red-50 dark:bg-red-500/10 p-3 text-[#c20f24] shrink-0">
             <MailIcon className="w-5 h-5" />
           </div>
           <div>

@@ -10,7 +10,7 @@ export function Badge({
   className = ''
 }: BadgeProps) {
   const variants = {
-    info: 'bg-blue-50 text-apple-blue border-blue-100',
+    info: 'bg-red-50 text-[#c20f24] border-red-100',
     success: 'bg-green-50 text-green-600 border-green-100',
     warning: 'bg-amber-50 text-amber-600 border-amber-100',
     danger: 'bg-red-50 text-red-600 border-red-100',

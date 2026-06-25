@@ -133,8 +133,8 @@ export function ExtraClassesPage() {
             </div>
           </div>
           <div className="flex sm:flex-col gap-2 sm:gap-2.5 sm:border-l sm:border-gray-100 sm:dark:border-slate-800 sm:pl-8 shrink-0">
-            <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-apple-text dark:text-apple-light"><InfinityIcon className="w-4 h-4 text-apple-blue shrink-0" /> One payment, watch anytime</span>
-            <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-apple-text dark:text-apple-light"><PlayCircleIcon className="w-4 h-4 text-apple-blue shrink-0" /> {totalVideos} videos · no deadline</span>
+            <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-apple-text dark:text-apple-light"><InfinityIcon className="w-4 h-4 text-[#c20f24] shrink-0" /> One payment, watch anytime</span>
+            <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-apple-text dark:text-apple-light"><PlayCircleIcon className="w-4 h-4 text-[#c20f24] shrink-0" /> {totalVideos} videos · no deadline</span>
           </div>
         </div>
         {daysLeft > 0 && (
@@ -153,8 +153,8 @@ export function ExtraClassesPage() {
             const isActive = activeCategory === cat;
             return (
               <button key={cat} onClick={() => setActiveCategory(cat)}
-                className={`group flex items-center gap-2 px-3.5 py-2 rounded-2xl text-sm font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-apple-blue/50 ${
-                  isActive ? 'bg-apple-blue text-white shadow-[0_6px_18px_rgba(0,112,255,0.3)]' : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-apple-subtext dark:text-slate-400 hover:border-apple-blue/40 hover:text-apple-blue dark:hover:text-blue-400'}`}>
+                className={`group flex items-center gap-2 px-3.5 py-2 rounded-2xl text-sm font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24]/50 ${
+                  isActive ? 'bg-[#c20f24] text-white shadow-[0_6px_18px_rgba(194,15,36,0.3)]' : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-apple-subtext dark:text-slate-400 hover:border-[#c20f24]/40 hover:text-[#c20f24] dark:hover:text-red-400'}`}>
                 {cat}
                 <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-slate-800 text-apple-subtext dark:text-slate-500'}`}>{countFor(cat)}</span>
               </button>
@@ -164,7 +164,7 @@ export function ExtraClassesPage() {
         <div className="relative w-full sm:w-64 shrink-0">
           <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-apple-subtext dark:text-slate-400 pointer-events-none" />
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search packs…"
-            className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-sm text-apple-text dark:text-apple-light placeholder-apple-subtext/50 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-apple-blue/40 focus:border-apple-blue/60 transition-all" />
+            className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-sm text-apple-text dark:text-apple-light placeholder-apple-subtext/50 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#c20f24]/40 focus:border-[#c20f24]/60 transition-all" />
         </div>
       </div>
 

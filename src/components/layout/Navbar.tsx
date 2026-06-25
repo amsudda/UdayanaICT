@@ -81,7 +81,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-apple-blue rounded-xl flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 bg-[#c20f24] rounded-xl flex items-center justify-center text-white font-bold">
               <BookOpenIcon className="w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight text-apple-text dark:text-apple-light transition-colors duration-300">
@@ -105,7 +105,7 @@ export function Navbar() {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="text-sm font-semibold text-apple-blue hover:underline"
+                    className="text-sm font-semibold text-[#c20f24] hover:underline"
                   >
                     Admin
                   </Link>
@@ -120,7 +120,7 @@ export function Navbar() {
                   {user?.avatar ? (
                     <img src={user.avatar} alt={displayName} className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-800 object-cover" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-apple-blue/10 dark:bg-white/10 border border-gray-200 dark:border-slate-800 flex items-center justify-center text-apple-blue dark:text-apple-light font-semibold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-[#c20f24]/10 dark:bg-white/10 border border-gray-200 dark:border-slate-800 flex items-center justify-center text-[#c20f24] dark:text-apple-light font-semibold text-sm">
                       {initials}
                     </div>
                   )}
@@ -180,7 +180,7 @@ export function Navbar() {
                     {user?.avatar ? (
                       <img src={user.avatar} alt={displayName} className="w-12 h-12 rounded-2xl object-cover" />
                     ) : (
-                      <div className="w-12 h-12 rounded-2xl bg-apple-blue/10 dark:bg-white/10 flex items-center justify-center text-apple-blue dark:text-apple-light font-bold">
+                      <div className="w-12 h-12 rounded-2xl bg-[#c20f24]/10 dark:bg-white/10 flex items-center justify-center text-[#c20f24] dark:text-apple-light font-bold">
                         {initials}
                       </div>
                     )}

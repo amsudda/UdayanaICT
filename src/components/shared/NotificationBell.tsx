@@ -35,7 +35,7 @@ export function NotificationBell() {
   const getIcon = (type: string) => {
     switch (type) {
       case 'video':
-        return <VideoIcon className="w-4 h-4 text-blue-500" />;
+        return <VideoIcon className="w-4 h-4 text-red-500" />;
       case 'live':
         return <RadioIcon className="w-4 h-4 text-red-500" />;
       default:
@@ -46,7 +46,7 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-apple-blue"
+        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#c20f24]"
         aria-label="Notifications">
 
         <BellIcon className="w-6 h-6 text-apple-text" />
@@ -88,7 +88,7 @@ export function NotificationBell() {
                 {unreadCount > 0 &&
               <button
                 onClick={markAllAsRead}
-                className="text-xs text-apple-blue font-medium hover:underline">
+                className="text-xs text-[#c20f24] font-medium hover:underline">
 
                     Mark all as read
                   </button>
@@ -102,7 +102,7 @@ export function NotificationBell() {
                 <div
                   key={notification.id}
                   onClick={() => markAsRead(notification.id)}
-                  className={`p-4 border-b border-gray-50 flex gap-3 cursor-pointer transition-colors hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50/30' : ''}`}>
+                  className={`p-4 border-b border-gray-50 flex gap-3 cursor-pointer transition-colors hover:bg-gray-50 ${!notification.isRead ? 'bg-red-50/30' : ''}`}>
 
                         <div
                     className={`mt-0.5 p-2 rounded-full h-fit flex-shrink-0 ${!notification.isRead ? 'bg-white shadow-sm' : 'bg-gray-100'}`}>
@@ -120,7 +120,7 @@ export function NotificationBell() {
                           </p>
                         </div>
                         {!notification.isRead &&
-                  <div className="w-2 h-2 bg-apple-blue rounded-full mt-1.5 flex-shrink-0" />
+                  <div className="w-2 h-2 bg-[#c20f24] rounded-full mt-1.5 flex-shrink-0" />
                   }
                       </div>
                 )}

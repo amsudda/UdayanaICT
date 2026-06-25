@@ -107,7 +107,7 @@ export function BuyPackModal({ pack, onClose, onSubmitted }: { pack: Pack; onClo
             <p className="text-sm text-apple-subtext dark:text-slate-400 max-w-xs mx-auto">
               Your payment for <span className="font-semibold text-apple-text dark:text-apple-light">{pack.title}</span> is now <span className="font-semibold">pending verification</span>. Once the tutor confirms it, the pack unlocks in <span className="font-semibold">My Classes</span>.
             </p>
-            <button type="button" onClick={onSubmitted} className="mt-6 w-full h-12 rounded-full bg-apple-blue text-white font-semibold hover:bg-blue-600 transition-colors">Done</button>
+            <button type="button" onClick={onSubmitted} className="mt-6 w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors">Done</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="px-5 py-5 space-y-5">
@@ -121,22 +121,22 @@ export function BuyPackModal({ pack, onClose, onSubmitted }: { pack: Pack; onClo
               </div>
               <div className="text-right shrink-0">
                 <p className="text-[10px] uppercase tracking-widest text-apple-subtext dark:text-slate-500">Price</p>
-                <p className="text-lg font-black text-apple-blue dark:text-blue-400 leading-none">Rs. {pack.price.toLocaleString()}</p>
+                <p className="text-lg font-black text-[#c20f24] dark:text-red-400 leading-none">Rs. {pack.price.toLocaleString()}</p>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-[linear-gradient(135deg,#0f2952,#1a3a6e)] text-white p-4">
+            <div className="rounded-2xl bg-[linear-gradient(135deg,#7a0a18,#a50f24)] text-white p-4">
               <div className="flex items-center gap-2 mb-3"><Building2Icon className="w-4 h-4" /><p className="text-sm font-bold">1. Transfer Rs. {pack.price.toLocaleString()} to:</p></div>
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between gap-3"><span className="text-blue-200/70">Bank</span><span className="font-semibold text-right">{bank.bank}</span></div>
-                <div className="flex justify-between gap-3"><span className="text-blue-200/70">Account</span><span className="font-semibold text-right">{bank.accountName}</span></div>
+                <div className="flex justify-between gap-3"><span className="text-rose-200/70">Bank</span><span className="font-semibold text-right">{bank.bank}</span></div>
+                <div className="flex justify-between gap-3"><span className="text-rose-200/70">Account</span><span className="font-semibold text-right">{bank.accountName}</span></div>
                 <div className="flex justify-between gap-3 items-center">
-                  <span className="text-blue-200/70">Number</span>
-                  <button type="button" onClick={copyAccount} className="font-mono font-semibold flex items-center gap-1.5 hover:text-blue-200 transition-colors">
+                  <span className="text-rose-200/70">Number</span>
+                  <button type="button" onClick={copyAccount} className="font-mono font-semibold flex items-center gap-1.5 hover:text-rose-200 transition-colors">
                     {bank.accountNumber}{copied ? <CheckCircleIcon className="w-3.5 h-3.5" /> : <CopyIcon className="w-3.5 h-3.5" />}
                   </button>
                 </div>
-                <div className="flex justify-between gap-3"><span className="text-blue-200/70">Branch</span><span className="font-semibold text-right">{bank.branch}</span></div>
+                <div className="flex justify-between gap-3"><span className="text-rose-200/70">Branch</span><span className="font-semibold text-right">{bank.branch}</span></div>
               </div>
             </div>
 
@@ -147,21 +147,21 @@ export function BuyPackModal({ pack, onClose, onSubmitted }: { pack: Pack; onClo
                 <div className="flex items-center gap-3 rounded-xl border border-apple-border dark:border-slate-700 bg-white dark:bg-slate-800 p-2">
                   <img src={slipPreview} alt="slip" className="h-14 w-20 object-cover rounded-lg" />
                   <span className="text-sm text-apple-text dark:text-apple-light flex-1 truncate">Slip attached</span>
-                  <button type="button" onClick={() => slipInputRef.current?.click()} className="text-xs font-medium text-apple-blue hover:underline">Change</button>
+                  <button type="button" onClick={() => slipInputRef.current?.click()} className="text-xs font-medium text-[#c20f24] hover:underline">Change</button>
                   <button type="button" onClick={() => { setSlipFile(null); setSlipPreview(undefined); }} className="text-apple-subtext hover:text-red-500 transition-colors" aria-label="Remove"><XIcon className="w-4 h-4" /></button>
                 </div>
               ) : (
-                <button type="button" onClick={() => slipInputRef.current?.click()} className="w-full h-20 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-apple-border dark:border-slate-700 bg-white dark:bg-slate-800 text-apple-subtext dark:text-slate-400 hover:border-apple-blue hover:text-apple-blue transition-colors text-sm">
+                <button type="button" onClick={() => slipInputRef.current?.click()} className="w-full h-20 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-apple-border dark:border-slate-700 bg-white dark:bg-slate-800 text-apple-subtext dark:text-slate-400 hover:border-[#c20f24] hover:text-[#c20f24] transition-colors text-sm">
                   <UploadCloudIcon className="w-5 h-5" /> Tap to upload slip photo
                 </button>
               )}
               <input type="text" value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Bank reference / note (optional)"
-                className="mt-2 w-full h-11 rounded-xl border border-apple-border dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 text-sm text-apple-text dark:text-apple-light placeholder:text-apple-subtext focus:outline-none focus:ring-2 focus:ring-apple-blue" />
+                className="mt-2 w-full h-11 rounded-xl border border-apple-border dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 text-sm text-apple-text dark:text-apple-light placeholder:text-apple-subtext focus:outline-none focus:ring-2 focus:ring-[#c20f24]" />
             </div>
 
             {error ? <p className="text-sm text-red-500">{error}</p> : null}
 
-            <button type="submit" disabled={submitting} className="w-full h-12 rounded-full bg-apple-blue text-white font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2">
+            <button type="submit" disabled={submitting} className="w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2">
               {submitting && <Loader2Icon className="w-4 h-4 animate-spin" />}{submitting ? 'Submitting…' : 'Submit for verification'}
             </button>
 

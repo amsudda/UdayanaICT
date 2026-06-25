@@ -29,7 +29,7 @@ export function ProgressBar({
           duration: 1,
           ease: 'easeOut'
         }}
-        className="h-full bg-apple-blue rounded-full" />
+        className="h-full bg-[#c20f24] rounded-full" />
 
     </div>);
 

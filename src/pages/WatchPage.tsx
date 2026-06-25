@@ -102,20 +102,20 @@ function PlaylistItem({ lesson, index, isActive, isWatched, onClick }: {
   return (
     <button type="button" onClick={onClick}
       className={`group/item w-full flex items-start gap-3 p-2.5 rounded-2xl text-left transition-all duration-150 ${
-        isActive ? 'bg-blue-500/15 ring-1 ring-blue-400/40' : 'ring-1 ring-transparent hover:bg-white/[0.06]'}`}>
+        isActive ? 'bg-red-500/15 ring-1 ring-red-400/40' : 'ring-1 ring-transparent hover:bg-white/[0.06]'}`}>
       <div className="relative w-[84px] h-[48px] rounded-xl shrink-0 overflow-hidden bg-white/5">
         <img src={ytThumb(lesson.youtubeId)} alt="" loading="lazy"
           className={`w-full h-full object-cover transition ${isWatched && !isActive ? 'opacity-45' : 'opacity-90 group-hover/item:opacity-100'}`} />
         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
           {isActive ? (
-            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500 shadow-lg"><PlayIcon className="w-3.5 h-3.5 text-white fill-current ml-0.5" /></span>
+            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#c20f24] shadow-lg"><PlayIcon className="w-3.5 h-3.5 text-white fill-current ml-0.5" /></span>
           ) : isWatched ? (
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/90"><CheckIcon className="w-3.5 h-3.5 text-white" /></span>
           ) : (
             <span className="text-xs font-bold text-white/80">{index + 1}</span>
           )}
         </div>
-        {isActive && <span className="absolute bottom-0 inset-x-0 text-center text-[8px] font-black text-white bg-blue-500/90 uppercase tracking-wider leading-[11px]">Now Playing</span>}
+        {isActive && <span className="absolute bottom-0 inset-x-0 text-center text-[8px] font-black text-white bg-[#c20f24]/90 uppercase tracking-wider leading-[11px]">Now Playing</span>}
       </div>
       <div className="flex-1 min-w-0 pt-0.5">
         <p className={`text-[13px] font-semibold leading-snug line-clamp-2 ${isActive ? 'text-white' : isWatched ? 'text-white/45' : 'text-white/85'}`}>{lesson.title}</p>
@@ -233,7 +233,7 @@ export function WatchPage() {
         <p className="text-white/60 max-w-xs">
           {notFound ? 'This content was not found.' : 'No videos available here yet — or this month is locked until its fee is verified.'}
         </p>
-        <button onClick={() => navigate('/dashboard/courses')} className="text-blue-400 text-sm font-semibold hover:underline">← My Classes</button>
+        <button onClick={() => navigate('/dashboard/courses')} className="text-red-400 text-sm font-semibold hover:underline">← My Classes</button>
       </div>
     );
   }
@@ -297,7 +297,7 @@ export function WatchPage() {
               <div className="bg-white/[0.05] border border-white/[0.09] rounded-2xl px-4 py-4 space-y-3">
                 <div className="flex items-center justify-between text-[13px]">
                   <span className="text-white/60 font-medium">Progress</span>
-                  <span className="font-bold text-blue-400">{progressPct}%</span>
+                  <span className="font-bold text-red-400">{progressPct}%</span>
                 </div>
                 <ProgressBar pct={progressPct} />
                 <p className="text-xs text-white/40">{watchedCount} of {total} watched</p>
@@ -309,7 +309,7 @@ export function WatchPage() {
                   <ChevronLeftIcon className="w-4 h-4" /> Previous
                 </button>
                 <button onClick={handleNext} disabled={activeIndex === total - 1}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-400 disabled:opacity-25 disabled:cursor-not-allowed shadow-[0_4px_18px_rgba(59,130,246,0.4)]">
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#c20f24] text-white text-sm font-semibold hover:bg-red-500 disabled:opacity-25 disabled:cursor-not-allowed shadow-[0_4px_18px_rgba(194,15,36,0.4)]">
                   Next <SkipForwardIcon className="w-4 h-4" />
                 </button>
               </div>
@@ -317,7 +317,7 @@ export function WatchPage() {
               {/* mobile playlist */}
               <div className="lg:hidden border border-white/[0.09] rounded-2xl overflow-hidden">
                 <button type="button" onClick={() => setMobilePlaylistOpen((o) => !o)} className="w-full flex items-center gap-3 px-4 py-4 bg-white/[0.05] hover:bg-white/[0.08] text-left">
-                  <LayoutListIcon className="w-4 h-4 text-blue-400 shrink-0" />
+                  <LayoutListIcon className="w-4 h-4 text-red-400 shrink-0" />
                   <span className="text-sm font-semibold text-white/85 flex-1">All Lessons</span>
                   <span className="text-xs text-white/45 mr-1">{watchedCount}/{total} done</span>
                   <motion.div animate={{ rotate: mobilePlaylistOpen ? 180 : 0 }}><ChevronDownIcon className="w-4 h-4 text-white/45" /></motion.div>
@@ -343,7 +343,7 @@ export function WatchPage() {
           className="hidden lg:flex w-[348px] xl:w-[380px] shrink-0 flex-col border-l border-white/[0.07]" style={{ background: 'linear-gradient(180deg,#13161d,#0e1117)' }}>
           <div className="px-4 py-5 border-b border-white/[0.07] shrink-0">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-lg border border-blue-500/30 bg-blue-500/15 flex items-center justify-center"><LayoutListIcon className="w-3.5 h-3.5 text-blue-400" /></div>
+              <div className="w-6 h-6 rounded-lg border border-red-500/30 bg-red-500/15 flex items-center justify-center"><LayoutListIcon className="w-3.5 h-3.5 text-red-400" /></div>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Playlist</p>
               <span className="ml-auto text-xs font-semibold text-white/45">{watchedCount}/{total}</span>
             </div>

@@ -14,9 +14,9 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-  'inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-apple-blue focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  'inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
   const variants = {
-    primary: 'bg-apple-blue text-white hover:bg-blue-600',
+    primary: 'bg-[#c20f24] text-white hover:bg-[#9c0c1d]',
     secondary: 'bg-gray-100 text-apple-text hover:bg-gray-200',
     ghost: 'bg-transparent text-apple-text hover:bg-gray-100'
   };

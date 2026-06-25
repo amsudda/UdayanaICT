@@ -20,7 +20,7 @@ export function HelpPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-apple-blue">Help</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c20f24]">Help</p>
         <h1 className="mt-2 text-3xl font-bold text-apple-text">Support and guidance</h1>
         <p className="mt-2 text-apple-subtext">
           Find answers to common student questions and contact support when you need help.
@@ -29,12 +29,12 @@ export function HelpPage() {
 
       <div className="grid gap-5 md:grid-cols-3">
         <Card className="p-6">
-          <div className="rounded-2xl bg-blue-50 p-3 text-apple-blue w-fit">
+          <div className="rounded-2xl bg-red-50 p-3 text-[#c20f24] w-fit">
             <MessageSquareIcon className="w-5 h-5" />
           </div>
           <h2 className="mt-4 font-semibold text-apple-text">WhatsApp Support</h2>
           <p className="mt-2 text-sm text-apple-subtext">Fast responses for class and payment issues.</p>
-          <p className="mt-4 text-sm font-medium text-apple-blue">071 973 5601</p>
+          <p className="mt-4 text-sm font-medium text-[#c20f24]">071 973 5601</p>
         </Card>
         <Card className="p-6">
           <div className="rounded-2xl bg-green-50 p-3 text-green-600 w-fit">
@@ -42,7 +42,7 @@ export function HelpPage() {
           </div>
           <h2 className="mt-4 font-semibold text-apple-text">Call Support</h2>
           <p className="mt-2 text-sm text-apple-subtext">Available on weekdays from 8:30 AM to 5:30 PM.</p>
-          <p className="mt-4 text-sm font-medium text-apple-blue">011 245 7788</p>
+          <p className="mt-4 text-sm font-medium text-[#c20f24]">011 245 7788</p>
         </Card>
         <Card className="p-6">
           <div className="rounded-2xl bg-amber-50 p-3 text-amber-600 w-fit">
@@ -50,7 +50,7 @@ export function HelpPage() {
           </div>
           <h2 className="mt-4 font-semibold text-apple-text">Email</h2>
           <p className="mt-2 text-sm text-apple-subtext">Best for account changes and detailed payment checks.</p>
-          <p className="mt-4 text-sm font-medium text-apple-blue">support@udayanaict.lk</p>
+          <p className="mt-4 text-sm font-medium text-[#c20f24]">support@udayanaict.lk</p>
         </Card>
       </div>
 

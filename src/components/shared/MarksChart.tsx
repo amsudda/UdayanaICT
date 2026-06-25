@@ -55,7 +55,7 @@ export function MarksChart({ marks }: { marks: Mark[] }) {
 
         {/* lines */}
         <polyline fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={lineFor('timing')} />
-        <polyline fill="none" stroke="#0070ff" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={lineFor('full')} />
+        <polyline fill="none" stroke="#c20f24" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={lineFor('full')} />
 
         {/* points */}
         {sorted.map((m, i) => (
@@ -64,7 +64,7 @@ export function MarksChart({ marks }: { marks: Mark[] }) {
             cx={x(i)}
             cy={y(pctOf(m))}
             r={hover === i ? 6 : 4}
-            fill={m.type === 'full' ? '#0070ff' : '#f59e0b'}
+            fill={m.type === 'full' ? '#c20f24' : '#f59e0b'}
             stroke="#fff"
             strokeWidth="2"
             style={{ cursor: 'pointer' }}
@@ -95,7 +95,7 @@ export function MarksChart({ marks }: { marks: Mark[] }) {
       </svg>
 
       <div className="flex gap-5 justify-center mt-2 text-xs text-apple-subtext dark:text-slate-400">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full" style={{ background: '#0070ff' }} /> Full Paper</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full" style={{ background: '#c20f24' }} /> Full Paper</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full" style={{ background: '#f59e0b' }} /> Timing Paper</span>
       </div>
     </div>

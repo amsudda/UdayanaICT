@@ -74,7 +74,7 @@ export function VideoPackCard({ pack, status = 'none', onBuy }: VideoPackProps) 
           {/* hover play affordance */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <span className="flex items-center justify-center w-14 h-14 rounded-full bg-white/90 backdrop-blur shadow-lg">
-              <PlayIcon className="w-7 h-7 text-apple-blue fill-current ml-0.5" />
+              <PlayIcon className="w-7 h-7 text-[#c20f24] fill-current ml-0.5" />
             </span>
           </div>
         </div>
@@ -112,7 +112,7 @@ export function VideoPackCard({ pack, status = 'none', onBuy }: VideoPackProps) 
             <button
               type="button"
               onClick={onBuy}
-              className="flex items-center gap-2 bg-apple-blue hover:bg-blue-600 active:scale-95 text-white text-sm font-semibold px-5 h-11 rounded-2xl shadow-[0_6px_20px_rgba(0,112,255,0.32)] hover:shadow-[0_8px_28px_rgba(0,112,255,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-apple-blue/50 focus-visible:ring-offset-2 transition-all duration-200"
+              className="flex items-center gap-2 bg-[#c20f24] hover:bg-[#9c0c1d] active:scale-95 text-white text-sm font-semibold px-5 h-11 rounded-2xl shadow-[0_6px_20px_rgba(194,15,36,0.32)] hover:shadow-[0_8px_28px_rgba(194,15,36,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24]/50 focus-visible:ring-offset-2 transition-all duration-200"
             >
               <ShoppingCartIcon className="w-4 h-4" />
               Buy

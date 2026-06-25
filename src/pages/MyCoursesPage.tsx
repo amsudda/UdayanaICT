@@ -51,7 +51,7 @@ export function MyCoursesPage() {
     >
       {/* header */}
       <div>
-        <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-apple-blue">Learning</p>
+        <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-[#c20f24]">Learning</p>
         <h1 className="text-2xl sm:text-3xl font-bold text-apple-text dark:text-apple-light mt-1.5 transition-colors">
           My Classes
         </h1>
@@ -68,8 +68,8 @@ export function MyCoursesPage() {
           { label: 'Total months', value: recordings.length, icon: BookOpenIcon }
         ].map((s) => (
           <div key={s.label} className="rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 sm:p-5">
-            <div className="w-9 h-9 rounded-xl bg-apple-blue/10 dark:bg-apple-blue/20 flex items-center justify-center mb-3">
-              <s.icon className="w-4 h-4 text-apple-blue" />
+            <div className="w-9 h-9 rounded-xl bg-[#c20f24]/10 dark:bg-[#c20f24]/20 flex items-center justify-center mb-3">
+              <s.icon className="w-4 h-4 text-[#c20f24]" />
             </div>
             <p className="text-xl sm:text-2xl font-black text-apple-text dark:text-apple-light leading-none">{s.value}</p>
             <p className="text-[11px] sm:text-xs text-apple-subtext dark:text-slate-400 mt-1.5">{s.label}</p>
@@ -85,7 +85,7 @@ export function MyCoursesPage() {
             onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-2xl text-sm font-semibold whitespace-nowrap transition-all ${
               tab === t
-                ? 'bg-apple-blue text-white shadow-[0_6px_18px_rgba(0,112,255,0.3)]'
+                ? 'bg-[#c20f24] text-white shadow-[0_6px_18px_rgba(194,15,36,0.3)]'
                 : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-apple-subtext dark:text-slate-400'
             }`}
           >
@@ -102,8 +102,8 @@ export function MyCoursesPage() {
           {(tab === 'All' || tab === 'Video Packs') && (
             <section className="space-y-5">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-apple-blue/10 dark:bg-apple-blue/20 flex items-center justify-center">
-                  <FilmIcon className="w-4 h-4 text-apple-blue" />
+                <div className="w-8 h-8 rounded-xl bg-[#c20f24]/10 dark:bg-[#c20f24]/20 flex items-center justify-center">
+                  <FilmIcon className="w-4 h-4 text-[#c20f24]" />
                 </div>
                 <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Purchased Video Packs</h2>
               </div>
@@ -111,7 +111,7 @@ export function MyCoursesPage() {
               {packs.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-8 text-center">
                   <p className="text-sm text-apple-subtext dark:text-slate-400 mb-3">You haven't bought any packs yet.</p>
-                  <button onClick={() => navigate('/dashboard/extra-classes')} className="inline-flex items-center gap-2 text-sm font-semibold text-apple-blue hover:underline">
+                  <button onClick={() => navigate('/dashboard/extra-classes')} className="inline-flex items-center gap-2 text-sm font-semibold text-[#c20f24] hover:underline">
                     <ShoppingCartIcon className="w-4 h-4" /> Browse the store
                   </button>
                 </div>
@@ -129,9 +129,9 @@ export function MyCoursesPage() {
                         <div className="relative overflow-hidden bg-slate-100" style={{ aspectRatio: '16/9' }}>
                           {p.thumbnailUrl && <img src={p.thumbnailUrl} alt={p.title} className="w-full h-full object-cover" />}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                          <span className="absolute top-3 left-3 text-[11px] font-semibold bg-apple-blue/90 text-white px-2.5 py-1 rounded-full">{p.type}</span>
+                          <span className="absolute top-3 left-3 text-[11px] font-semibold bg-[#c20f24]/90 text-white px-2.5 py-1 rounded-full">{p.type}</span>
                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center"><PlayCircleIcon className="w-7 h-7 text-apple-blue" /></span>
+                            <span className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center"><PlayCircleIcon className="w-7 h-7 text-[#c20f24]" /></span>
                           </div>
                         </div>
                         <div className="p-4">
@@ -139,7 +139,7 @@ export function MyCoursesPage() {
                           <p className="text-xs text-apple-subtext dark:text-slate-400">{p.videoCount} videos{p.duration ? ` · ${p.duration}` : ''}</p>
                           {progress > 0 && (
                             <div className="mt-2 h-1.5 w-full rounded-full bg-gray-100 dark:bg-slate-800 overflow-hidden">
-                              <div className="h-full rounded-full bg-apple-blue" style={{ width: `${progress}%` }} />
+                              <div className="h-full rounded-full bg-[#c20f24]" style={{ width: `${progress}%` }} />
                             </div>
                           )}
                         </div>

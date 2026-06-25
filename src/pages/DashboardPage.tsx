@@ -69,8 +69,8 @@ export function DashboardPage() {
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-7 sm:space-y-10">
       {/* identity hero */}
-      <motion.section variants={item} className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#0f2952,#1a3a6e,#0a2040)] dark:bg-[linear-gradient(135deg,#0b1b38,#13294e,#070f24)] p-5 sm:p-7 text-white shadow-[0_20px_45px_rgba(15,41,82,0.28)]">
-        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-blue-400/10 blur-2xl pointer-events-none" />
+      <motion.section variants={item} className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#7a0a18,#a50f24,#4a0510)] dark:bg-[linear-gradient(135deg,#4a0510,#7a0a18,#2a0307)] p-5 sm:p-7 text-white shadow-[0_20px_45px_rgba(122,10,24,0.30)]">
+        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-red-400/10 blur-2xl pointer-events-none" />
         <div className="relative z-10 flex items-center gap-4">
           {user?.avatar ? (
             <img src={user.avatar} alt={name} className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl object-cover ring-2 ring-white/25 shrink-0" />
@@ -78,16 +78,16 @@ export function DashboardPage() {
             <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white/15 ring-2 ring-white/25 flex items-center justify-center text-xl font-bold shrink-0">{initials}</div>
           )}
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-blue-200/70">Welcome back</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-rose-200/70">Welcome back</p>
             <h1 className="text-xl sm:text-3xl font-bold leading-tight truncate">Hi, {name} 👋</h1>
           </div>
         </div>
         <div className="relative z-10 mt-4 flex items-center justify-between gap-3 rounded-2xl bg-white/10 backdrop-blur-sm px-4 py-3 border border-white/10">
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-blue-200/70">Student ID</p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-rose-200/70">Student ID</p>
             <p className="text-lg sm:text-2xl font-bold tracking-wide truncate">{user?.studentId || '—'}</p>
           </div>
-          <span className="text-[11px] sm:text-xs text-blue-100/80 text-right leading-snug shrink-0">Use for class<br className="sm:hidden" /> attendance</span>
+          <span className="text-[11px] sm:text-xs text-rose-100/80 text-right leading-snug shrink-0">Use for class<br className="sm:hidden" /> attendance</span>
         </div>
       </motion.section>
 
@@ -132,7 +132,7 @@ export function DashboardPage() {
       {/* paper marks */}
       <motion.section variants={item}>
         <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <TrendingUpIcon className="w-5 h-5 text-apple-blue" />
+          <TrendingUpIcon className="w-5 h-5 text-[#c20f24]" />
           <h2 className="text-base sm:text-2xl font-bold text-apple-text dark:text-apple-light">Paper Marks</h2>
         </div>
         <div className="rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
@@ -144,7 +144,7 @@ export function DashboardPage() {
       <motion.section variants={item}>
         <div className="flex justify-between items-center mb-3 sm:mb-4">
           <h2 className="text-base sm:text-2xl font-bold text-apple-text dark:text-apple-light">Recent Payments</h2>
-          <button onClick={() => navigate('/dashboard/payments')} className="text-sm font-medium text-apple-blue hover:underline flex items-center gap-1 shrink-0">View all <ArrowRightIcon className="w-4 h-4" /></button>
+          <button onClick={() => navigate('/dashboard/payments')} className="text-sm font-medium text-[#c20f24] hover:underline flex items-center gap-1 shrink-0">View all <ArrowRightIcon className="w-4 h-4" /></button>
         </div>
         {payments.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-6 text-center text-sm text-apple-subtext dark:text-slate-400">No payments yet.</div>
@@ -153,7 +153,7 @@ export function DashboardPage() {
             {payments.map((p) => (
               <div key={p.id} className="p-4 sm:p-5 border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-3xl">
                 <div className="flex justify-between items-start gap-2 mb-3">
-                  <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-apple-blue/70">
+                  <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#c20f24]/70">
                     {p.kind === 'monthly_fee' ? `${p.period_month ?? ''} ${p.period_year ?? ''}` : p.kind}
                   </p>
                   <Badge variant={p.status === 'approved' ? 'success' : p.status === 'rejected' ? 'danger' : 'warning'}>

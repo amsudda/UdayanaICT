@@ -30,7 +30,7 @@ export function ClassHistoryPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-apple-blue">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c20f24]">
           Class History
         </p>
         <h1 className="mt-2 text-3xl font-bold text-apple-text">Past classes and attendance</h1>
@@ -41,7 +41,7 @@ export function ClassHistoryPage() {
 
       <Card className="p-6 sm:p-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="rounded-2xl bg-blue-50 p-3 text-apple-blue">
+          <div className="rounded-2xl bg-red-50 p-3 text-[#c20f24]">
             <HistoryIcon className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold text-apple-text">Recent attendance</h2>
@@ -55,7 +55,7 @@ export function ClassHistoryPage() {
             >
               <div>
                 <div className="flex items-center gap-2">
-                  <VideoIcon className="w-4 h-4 text-apple-blue" />
+                  <VideoIcon className="w-4 h-4 text-[#c20f24]" />
                   <p className="font-semibold text-apple-text">{item.title}</p>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-4 text-sm text-apple-subtext">

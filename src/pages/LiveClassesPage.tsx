@@ -83,7 +83,7 @@ export function LiveClassesPage() {
             </Button>
           </a>
           {c.backup_url && (
-            <a href={c.backup_url} target="_blank" rel="noopener noreferrer" className="text-xs text-center text-apple-blue hover:underline">
+            <a href={c.backup_url} target="_blank" rel="noopener noreferrer" className="text-xs text-center text-[#c20f24] hover:underline">
               Backup link
             </a>
           )}
@@ -95,7 +95,7 @@ export function LiveClassesPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-apple-blue">Live Classes</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c20f24]">Live Classes</p>
         <h1 className="mt-2 text-3xl font-bold text-apple-text dark:text-apple-light">Your online sessions</h1>
         <p className="mt-2 text-apple-subtext dark:text-slate-400">
           Join your scheduled classes here. Monthly classes appear once your fee for that month is verified.
@@ -116,7 +116,7 @@ export function LiveClassesPage() {
         <>
           <section className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="rounded-2xl bg-blue-50 dark:bg-blue-500/10 p-3 text-apple-blue"><CalendarRangeIcon className="w-5 h-5" /></div>
+              <div className="rounded-2xl bg-red-50 dark:bg-red-500/10 p-3 text-[#c20f24]"><CalendarRangeIcon className="w-5 h-5" /></div>
               <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Upcoming</h2>
             </div>
             {upcoming.length === 0 ? (

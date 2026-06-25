@@ -20,7 +20,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={`
               flex h-12 w-full appearance-none rounded-xl border border-apple-border bg-white px-4 py-2 pr-10 text-base
               transition-all
-              focus:outline-none focus:ring-2 focus:ring-apple-blue focus:border-transparent
+              focus:outline-none focus:ring-2 focus:ring-[#c20f24] focus:border-transparent
               disabled:cursor-not-allowed disabled:opacity-50
               ${props.value ? 'text-apple-text' : 'text-apple-subtext'}
               ${error ? 'border-red-500 focus:ring-red-500' : ''}
