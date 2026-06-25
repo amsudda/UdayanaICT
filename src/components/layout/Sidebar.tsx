@@ -93,7 +93,7 @@ export function Sidebar() {
               className="h-14 w-14 rounded-2xl object-cover shrink-0"
             />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-apple-blue/10 dark:bg-white/10 shrink-0 text-apple-blue dark:text-white font-bold">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#c20f24]/10 dark:bg-white/10 shrink-0 text-[#c20f24] dark:text-white font-bold">
               {initials || <UserIcon className="w-7 h-7" />}
             </div>
           )}
@@ -123,7 +123,7 @@ export function Sidebar() {
                   end={item.end}
                   className={({ isActive }) => `
                     flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200
-                    ${isActive ? 'bg-apple-blue/10 text-apple-blue dark:bg-apple-blue/20 dark:text-apple-light' : 'text-apple-subtext dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-900 hover:text-apple-text dark:hover:text-apple-light'}
+                    ${isActive ? 'bg-[#c20f24]/10 text-[#c20f24] dark:bg-[#c20f24]/20 dark:text-apple-light' : 'text-apple-subtext dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-900 hover:text-apple-text dark:hover:text-apple-light'}
                   `}
                 >
                   <item.icon className="w-5 h-5" />
