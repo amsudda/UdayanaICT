@@ -13,6 +13,7 @@ import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
 import { PixelBurstButton, PixelReveal } from '../components/shared/PixelFx';
+import { ReviewCard, type Review } from '../components/shared/ReviewCard';
 import { supabase } from '../lib/supabase';
 
 /* ── tiny 8-bit pixel sprites (SVG, crisp) ── */
@@ -52,17 +53,55 @@ const GUIDE_PROMO = {
   fontFamily: ''
 };
 
+/* Placeholder testimonials shown until the admin adds real reviews. */
+const FALLBACK_REVIEWS: Review[] = [
+  { name: 'කවිෂ්කා පෙරේරා', school: 'ආනන්ද විද්‍යාලය, කොළඹ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=11', stars: 5, quote: 'උදයන සර්ගේ පාඩම් නිසා ICT ගැන ඇත්ත දැනීමක් ලැබුණා. සෑම පාඩමක්ම ඇති තරම් විස්තරාත්මකව කියලා දෙනවා. A/L exam ට ගිය ගමන් ඒ ලකුණු ගන්නත් ලේසි වුණා!', year: '2024 A/L' },
+  { name: 'සේනාල් ද සිල්වා', school: 'ධර්මාශෝක විද්‍යාලය, අම්බලන්ගොඩ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=15', stars: 5, quote: 'ගම්පහ ඉදලා Colombo tuition class යන්න අමාරුයි. Udayana ICT ඒ ගැටලුව solve කළා. ගෙදරදිම ඉන්නකොට live class ලබන්න ලැබීම ලොකු වාසියක්.', year: '2024 A/L' },
+  { name: 'නිල්මිණී ජයසිංහ', school: 'විශාකා බාලිකා, කොළඹ', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=47', stars: 5, quote: 'Past paper discussions section එකෙන් ගොඩාක් help වුණා. Exam pattern ගැන හොඳ idea එකක් ගන්නඑ ලේසි වුණා. ඒ section නොමැතිව exam ready වෙන්නේ නෑ.', year: '2024 A/L' },
+  { name: 'රසාංජල් ගුණසේකර', school: 'රාහුල විද්‍යාලය, ගාල්ල', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=12', stars: 5, quote: 'Video lectures replay කරන්නත් පුළුවන් නිසා concepts clear කරගන්නට ලේසියි. Data structures, algorithms ගැන කිසිදා හොඳාකාරව නොතේරුණු දේ මෙතෙන් ඉගෙනගත්තා.', year: '2023 A/L' },
+  { name: 'ඉෂිකා විජේරත්න', school: 'මහින්ද රාජපක්ෂ විද්‍යාලය', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=44', stars: 5, quote: 'ICT ගැන කිසිම base එකක් නොතිබුණු මාට පවා මේ platform එක perfect. ඉතා සරළව basic ඉදලා advanced දක්වා explain කරනවා. දැන් university ට apply කරනවා!', year: '2024 A/L' },
+  { name: 'දිලෝෂ් ප්‍රනාන්දු', school: 'ශාන්ත සෙබස්තියාන්, මොරටුව', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=18', stars: 5, quote: 'WhatsApp group ඔස්සේ doubts clear කරගන්නෙත් ලේසි. Udayana sir always reply දෙනවා. Practical paper ට ඕනෑ coding knowledge ත් ඒ course ඇතුළෙ ලැබෙනවා.', year: '2023 A/L' },
+];
+
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
   const [promos, setPromos] = useState<any[]>([GUIDE_PROMO]);
   const [featured, setFeatured] = useState<any[]>([]);
   const [recruitNotice, setRecruitNotice] = useState<string>('2025 බඳවා ගැනීම් දැන් විවෘතයි');
+  const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
+  const [reviewCount, setReviewCount] = useState(6);
 
   useEffect(() => {
     supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
       if (data && data.recruitment_notice != null) setRecruitNotice(data.recruitment_notice);
+      if (data && data.landing_review_count != null) setReviewCount(data.landing_review_count);
     });
+  }, []);
+
+  useEffect(() => {
+    supabase
+      .from('reviews')
+      .select('*')
+      .eq('is_visible', true)
+      .order('sort_order')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        if (data && data.length) {
+          setReviews(
+            data.map((r: any) => ({
+              id: r.id,
+              name: r.name,
+              school: r.school,
+              grade: r.grade,
+              stars: r.stars ?? 5,
+              quote: r.quote,
+              year: r.exam_year,
+              avatar: r.avatar_url,
+            }))
+          );
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -454,116 +493,15 @@ export function LandingPage() {
 
             {/* Testimonial Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  name: 'කවිෂ්කා පෙරේරා',
-                  school: 'ආනන්ද විද්‍යාලය, කොළඹ',
-                  grade: 'A සාමාර්ථය',
-                  gradeColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-                  avatar: 'https://i.pravatar.cc/100?img=11',
-                  stars: 5,
-                  quote: 'උදයන සර්ගේ පාඩම් නිසා ICT ගැන ඇත්ත දැනීමක් ලැබුණා. සෑම පාඩමක්ම ඇති තරම් විස්තරාත්මකව කියලා දෙනවා. A/L exam ට ගිය ගමන් ඒ ලකුණු ගන්නත් ලේසි වුණා!',
-                  year: '2024 A/L',
-                },
-                {
-                  name: 'සේනාල් ද සිල්වා',
-                  school: 'ධර්මාශෝක විද්‍යාලය, අම්බලන්ගොඩ',
-                  grade: 'A සාමාර්ථය',
-                  gradeColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-                  avatar: 'https://i.pravatar.cc/100?img=15',
-                  stars: 5,
-                  quote: 'ගම්පහ ඉදලා Colombo tuition class යන්න අමාරුයි. Udayana ICT ඒ ගැටලුව solve කළා. ගෙදරදිම ඉන්නකොට live class ලබන්න ලැබීම ලොකු වාසියක්.',
-                  year: '2024 A/L',
-                },
-                {
-                  name: 'නිල්මිණී ජයසිංහ',
-                  school: 'විශාකා බාලිකා, කොළඹ',
-                  grade: 'B සාමාර්ථය',
-                  gradeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-                  avatar: 'https://i.pravatar.cc/100?img=47',
-                  stars: 5,
-                  quote: 'Past paper discussions section එකෙන් ගොඩාක් help වුණා. Exam pattern ගැන හොඳ idea එකක් ගන්නඑ ලේසි වුණා. ඒ section නොමැතිව exam ready වෙන්නේ නෑ.',
-                  year: '2024 A/L',
-                },
-                {
-                  name: 'රසාංජල් ගුණසේකර',
-                  school: 'රාහුල විද්‍යාලය, ගාල්ල',
-                  grade: 'A සාමාර්ථය',
-                  gradeColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-                  avatar: 'https://i.pravatar.cc/100?img=12',
-                  stars: 5,
-                  quote: 'Video lectures replay කරන්නත් පුළුවන් නිසා concepts clear කරගන්නට ලේසියි. Data structures, algorithms ගැන කිසිදා හොඳාකාරව නොතේරුණු දේ මෙතෙන් ඉගෙනගත්තා.',
-                  year: '2023 A/L',
-                },
-                {
-                  name: 'ඉෂිකා විජේරත්න',
-                  school: 'මහින්ද රාජපක්ෂ විද්‍යාලය',
-                  grade: 'A සාමාර්ථය',
-                  gradeColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-                  avatar: 'https://i.pravatar.cc/100?img=44',
-                  stars: 5,
-                  quote: 'ICT ගැන කිසිම base එකක් නොතිබුණු මාට පවා මේ platform එක perfect. ඉතා සරළව basic ඉදලා advanced දක්වා explain කරනවා. දැන් university ට apply කරනවා!',
-                  year: '2024 A/L',
-                },
-                {
-                  name: 'දිලෝෂ් ප්‍රනාන්දු',
-                  school: 'ශාන්ත සෙබස්තියාන්, මොරටුව',
-                  grade: 'B සාමාර්ථය',
-                  gradeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-                  avatar: 'https://i.pravatar.cc/100?img=18',
-                  stars: 5,
-                  quote: 'WhatsApp group ඔස්සේ doubts clear කරගන්නෙත් ලේසි. Udayana sir always reply දෙනවා. Practical paper ට ඕනෑ coding knowledge ත් ඒ course ඇතුළෙ ලැබෙනවා.',
-                  year: '2023 A/L',
-                },
-              ].map((t, idx) => (
+              {reviews.slice(0, reviewCount).map((t, idx) => (
                 <motion.div
-                  key={idx}
+                  key={t.id ?? idx}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.07)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-slate-700 flex flex-col gap-4 hover:shadow-[0_8px_32px_rgba(37,99,235,0.12)] dark:hover:shadow-[0_8px_32px_rgba(37,99,235,0.15)] transition-all duration-300 hover:-translate-y-1"
                 >
-                  {/* Stars */}
-                  <div className="flex gap-1">
-                    {Array.from({ length: t.stars }).map((_, i) => (
-                      <StarIcon key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    ))}
-                  </div>
-
-                  {/* Quote */}
-                  <p className="text-apple-text dark:text-slate-200 text-sm leading-relaxed flex-1 transition-colors">
-                    <span className="text-[#c20f24] text-xl font-serif leading-none mr-1">"</span>
-                    {t.quote}
-                    <span className="text-[#c20f24] text-xl font-serif leading-none ml-1">"</span>
-                  </p>
-
-                  {/* Divider */}
-                  <div className="border-t border-gray-100 dark:border-slate-700 pt-4 flex items-center gap-3">
-                    <img
-                      src={t.avatar}
-                      alt={t.name}
-                      className="w-11 h-11 rounded-full object-cover ring-2 ring-red-100 dark:ring-red-900"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-apple-text dark:text-apple-light text-sm truncate transition-colors">
-                        {t.name}
-                      </p>
-                      <p className="text-xs text-apple-subtext dark:text-slate-400 truncate transition-colors">
-                        {t.school}
-                      </p>
-                    </div>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${t.gradeColor}`}>
-                      {t.grade}
-                    </span>
-                  </div>
-
-                  {/* Year badge */}
-                  <div className="flex justify-end -mt-2">
-                    <span className="text-xs text-apple-subtext dark:text-slate-500 font-medium">
-                      {t.year}
-                    </span>
-                  </div>
+                  <ReviewCard review={t} />
                 </motion.div>
               ))}
             </div>

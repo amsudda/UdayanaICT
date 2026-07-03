@@ -362,6 +362,27 @@ drop policy if exists study_rw on public.study_logs;
 create policy study_rw on public.study_logs for all
   using (student_id = auth.uid() or public.is_admin()) with check (student_id = auth.uid());
 
+-- Student reviews shown on the landing page (admin-managed)
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  school text,
+  grade text,
+  stars int not null default 5 check (stars between 1 and 5),
+  quote text not null,
+  exam_year text,
+  avatar_url text,
+  is_visible boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.reviews enable row level security;
+drop policy if exists reviews_read on public.reviews;
+create policy reviews_read on public.reviews for select using (is_visible or public.is_admin());
+drop policy if exists reviews_admin on public.reviews;
+create policy reviews_admin on public.reviews for all using (public.is_admin()) with check (public.is_admin());
+alter table public.settings add column if not exists landing_review_count int not null default 6;
+
 -- ---------- GRANTS ----------
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;

@@ -10,6 +10,7 @@ import {
   UsersIcon,
   TrendingUpIcon,
   MegaphoneIcon,
+  MessageSquareQuoteIcon,
   GraduationCapIcon,
   SettingsIcon,
   LogOutIcon,
@@ -33,6 +34,7 @@ const nav = [
   { name: 'Students', path: '/admin/students', icon: UsersIcon },
   { name: 'Paper Marks', path: '/admin/marks', icon: TrendingUpIcon },
   { name: 'Promotions', path: '/admin/promotions', icon: MegaphoneIcon },
+  { name: 'Reviews', path: '/admin/reviews', icon: MessageSquareQuoteIcon },
   { name: 'Featured', path: '/admin/featured', icon: GraduationCapIcon },
   { name: 'Settings', path: '/admin/settings', icon: SettingsIcon }
 ];
