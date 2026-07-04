@@ -49,22 +49,6 @@ const heroSprites = [
   { Comp: PixelStar, cls: 'bottom-24 right-[2%] w-4 h-4 text-blue-400/40', delay: '1.7s' }
 ];
 
-/* Shown only until the tutor adds real promotions in the admin panel. */
-const GUIDE_PROMO = {
-  id: 'guide',
-  tag: 'නව සිසුන් සඳහා · GET STARTED',
-  title: 'Pasindu Dissanayake ICT වෙත සාදරයෙන් පිළිගනිමු!',
-  description: 'සිසුවෙකු ලෙස ලියාපදිංචි වී වීඩියෝ පාඩම්, සජීවී පන්ති සහ ඔබේ ලකුණු ලුහුබැඳීමට ප්‍රවේශය ලබාගන්න. ඉහත "Sign Up" බොත්තම click කරන්න.',
-  image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=600&fit=crop',
-  ctaText: 'දැන්ම ලියාපදිංචි වන්න',
-  ctaLink: '/signup',
-  imageFit: 'cover',
-  imagePosition: 'center',
-  fontFamily: '',
-  showOverlay: true,
-  overlayPosition: 'left'
-};
-
 /* Two-tone paper plane, decorative */
 const PaperPlane = ({ dark, light, className = '', style }: { dark: string; light: string; className?: string; style?: React.CSSProperties }) => (
   <svg viewBox="0 0 120 70" className={className} style={style} aria-hidden>
@@ -139,7 +123,7 @@ const FALLBACK_REVIEWS: Review[] = [
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [promos, setPromos] = useState<any[]>([GUIDE_PROMO]);
+  const [promos, setPromos] = useState<any[]>([]);
   const [featured, setFeatured] = useState<any[]>([]);
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [reviewCount, setReviewCount] = useState(6);
@@ -241,7 +225,7 @@ export function LandingPage() {
     setCurrentPromo((prev) => (prev - 1 + promos.length) % promos.length);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || promos.length === 0) return;
     const timer = setInterval(nextPromo, 5000);
     return () => clearInterval(timer);
   }, [paused, promos.length]);
