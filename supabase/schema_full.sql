@@ -385,6 +385,23 @@ drop policy if exists reviews_admin on public.reviews;
 create policy reviews_admin on public.reviews for all using (public.is_admin()) with check (public.is_admin());
 alter table public.settings add column if not exists landing_review_count int not null default 6;
 
+-- Books showcase (admin-managed, landing page 3D mockups)
+create table if not exists public.books (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  price text,
+  order_link text,
+  cover_url text,
+  is_visible boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.books enable row level security;
+drop policy if exists books_read on public.books;
+create policy books_read on public.books for select using (is_visible or public.is_admin());
+drop policy if exists books_admin on public.books;
+create policy books_admin on public.books for all using (public.is_admin()) with check (public.is_admin());
+
 -- ---------- GRANTS ----------
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;

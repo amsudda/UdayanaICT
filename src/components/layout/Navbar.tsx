@@ -92,6 +92,7 @@ export function Navbar() {
           {!isDashboard ? (
             <div className="hidden md:flex items-center gap-8">
               <a href="#promos" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Promotions</a>
+              <a href="#books" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Books</a>
               <a href="#reviews" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Reviews</a>
               <a href="#features" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Why Us</a>
               <a href="#contact" className="text-sm font-medium text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light transition-colors">Contact</a>
@@ -215,6 +216,7 @@ export function Navbar() {
               ) : (
                 <div className="px-4 pt-2 pb-6 space-y-2">
                   <a href="#promos" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Promotions</a>
+                  <a href="#books" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Books</a>
                   <a href="#reviews" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Reviews</a>
                   <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Why Us</a>
                   <a href="#contact" className="block px-3 py-2 rounded-md text-base font-medium text-apple-text dark:text-apple-light hover:bg-gray-50 dark:hover:bg-slate-800">Contact</a>

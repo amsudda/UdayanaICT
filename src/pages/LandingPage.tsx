@@ -22,6 +22,7 @@ import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
 import { PixelReveal } from '../components/shared/PixelFx';
 import { ReviewCard, type Review } from '../components/shared/ReviewCard';
+import { BookMockup } from '../components/shared/BookMockup';
 import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
 
@@ -142,6 +143,16 @@ export function LandingPage() {
   const [featured, setFeatured] = useState<any[]>([]);
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [reviewCount, setReviewCount] = useState(6);
+  const [books, setBooks] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from('books')
+      .select('*')
+      .eq('is_visible', true)
+      .order('sort_order')
+      .then(({ data }) => setBooks(data ?? []));
+  }, []);
 
   useEffect(() => {
     supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
@@ -620,6 +631,59 @@ export function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Books showcase — only when the admin has added visible books */}
+        {books.length > 0 && (
+          <section id="books" className="py-24 bg-white dark:bg-slate-900 transition-colors scroll-mt-20 overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-16"
+              >
+                <h2 className="text-3xl md:text-4xl font-bold uppercase text-apple-text dark:text-apple-light transition-colors">
+                  OUR BOOKS <PixelReveal className="w-5 h-5 text-[#c20f24]" />
+                </h2>
+                <p className="mt-3 text-base md:text-lg text-apple-subtext dark:text-slate-400 transition-colors">
+                  Short Notes, Model Papers සහ තවත් පොත් — ඔබේ විභාග සූදානමට.
+                </p>
+              </motion.div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 justify-items-center">
+                {books.map((b, idx) => (
+                  <motion.div
+                    key={b.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: (idx % 3) * 0.12 }}
+                    className="flex flex-col items-center w-full max-w-[240px]"
+                  >
+                    {b.cover_url && <BookMockup cover={b.cover_url} title={b.title} className="w-44 sm:w-48" />}
+                    <h3 className="mt-5 text-lg font-bold text-apple-text dark:text-apple-light text-center transition-colors">
+                      {b.title}
+                    </h3>
+                    {b.price && (
+                      <p className="mt-1 text-[#c20f24] font-extrabold tracking-wide">{b.price}</p>
+                    )}
+                    {b.order_link && (
+                      <a
+                        href={b.order_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-2 h-10 px-6 rounded-full bg-[#c20f24] hover:bg-[#9c0c1d] text-white text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.03] active:scale-95"
+                      >
+                        Order Now
+                      </a>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Our Process */}
         <section id="process" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors scroll-mt-20">
