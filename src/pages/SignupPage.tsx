@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { EyeIcon, EyeOffIcon, IdCardIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, IdCardIcon, MailCheckIcon } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -53,6 +53,7 @@ export function SignupPage() {
 
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const [verifyModal, setVerifyModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -106,7 +107,7 @@ export function SignupPage() {
     if (!result.success) {
       // Could be a real error, or the "confirm your email" notice.
       if (result.message?.toLowerCase().includes('confirm')) {
-        setInfo(result.message);
+        setVerifyModal(true);
       } else {
         setError(result.message || 'Unable to create account.');
       }
@@ -309,6 +310,46 @@ export function SignupPage() {
           Log in
         </Link>
       </p>
+
+      {/* email-verification popup — shown when Supabase requires confirmation */}
+      {verifyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8 text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+              <MailCheckIcon className="w-8 h-8 text-[#c20f24]" />
+            </div>
+
+            <h3 className="text-xl font-bold text-apple-text mb-2">
+              ගිණුම සෑදුවා! Email එක verify කරන්න 📧
+            </h3>
+
+            <div className="text-left space-y-3 mt-4 mb-2">
+              <p className="text-sm text-apple-text leading-relaxed">
+                අපි <span className="font-semibold break-all">{email}</span> ලිපිනයට
+                <span className="font-semibold"> verification email </span>එකක් එව්වා.
+                <span className="font-semibold text-[#c20f24]"> Login වීමට පෙර එය confirm කිරීම අනිවාර්යයි.</span>
+              </p>
+              <ol className="text-sm text-apple-text space-y-2 list-none">
+                <li className="flex gap-2.5"><span className="shrink-0 w-6 h-6 rounded-full bg-red-50 text-[#c20f24] text-xs font-bold flex items-center justify-center">1</span> ඔබේ email inbox එක බලන්න — <span className="font-semibold">Spam / Junk folder එකත් බලන්න!</span></li>
+                <li className="flex gap-2.5"><span className="shrink-0 w-6 h-6 rounded-full bg-red-50 text-[#c20f24] text-xs font-bold flex items-center justify-center">2</span> Email එකේ ඇති <span className="font-semibold">Confirm link</span> එක click කරන්න</li>
+                <li className="flex gap-2.5"><span className="shrink-0 w-6 h-6 rounded-full bg-red-50 text-[#c20f24] text-xs font-bold flex items-center justify-center">3</span> ආපසු ඇවිත් <span className="font-semibold">Log in</span> වෙන්න</li>
+              </ol>
+              <p className="text-xs text-apple-subtext leading-relaxed border-t border-gray-100 pt-3">
+                We sent a verification email to your address. You <span className="font-semibold">must click the link in that email before you can log in</span>. Don't forget to check the Spam folder.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="mt-4 w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors"
+            >
+              හරි, මම confirm කරන්නම් — Go to Login
+            </button>
+          </div>
+        </div>
+      )}
     </AuthLayout>
   );
 }
