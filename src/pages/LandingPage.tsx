@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  CheckCircleIcon,
   MessageCircleIcon,
-  StarIcon,
   ArrowRightIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -16,6 +14,7 @@ import {
   HistoryIcon,
   FileQuestionIcon,
   CalendarDaysIcon,
+  BookOpenIcon,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -61,6 +60,14 @@ const GUIDE_PROMO = {
   imagePosition: 'center',
   fontFamily: ''
 };
+
+/* Two-tone paper plane, decorative */
+const PaperPlane = ({ dark, light, className = '', style }: { dark: string; light: string; className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 120 70" className={className} style={style} aria-hidden>
+    <polygon points="0,52 115,2 62,42" fill={dark} />
+    <polygon points="62,42 115,2 78,62" fill={light} />
+  </svg>
+);
 
 /* "Our Process" cards — how the class programme works. */
 const PROCESS_STEPS = [
@@ -512,87 +519,77 @@ export function LandingPage() {
         </section>
 
         {/* Features / Why Choose Us */}
-        <section id="features" className="py-24 bg-white dark:bg-slate-900 transition-colors scroll-mt-20">
+        <section id="features" className="relative py-24 bg-white dark:bg-slate-900 overflow-hidden transition-colors scroll-mt-20">
+          {/* decorative paper planes */}
+          <div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden>
+            <PaperPlane dark="#9c0c1d" light="#e3142b" className="pixel-float absolute top-44 right-[14%] w-32" />
+            <PaperPlane dark="#94a3b8" light="#cbd5e1" className="pixel-float absolute top-80 right-[24%] w-24 opacity-70" style={{ animationDelay: '1.6s' }} />
+          </div>
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-6">
-                  Everything you need to succeed in A/L ICT <PixelReveal className="w-5 h-5 text-[#c20f24]" />
-                </h2>
-                <p className="text-lg text-apple-subtext dark:text-slate-400 transition-colors mb-8">
-                  Our platform is built specifically for Sri Lankan A/L
-                  students, combining modern technology with proven teaching
-                  methods.
+            {/* Section header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-14"
+            >
+              <h2 className="flex items-center justify-center gap-3 text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors">
+                <BookOpenIcon className="w-9 h-9 text-amber-400" strokeWidth={2.4} />
+                ආකර්ෂණීය ඉගැන්වීම් රටාව
+              </h2>
+              <p className="mt-3 text-base md:text-lg text-apple-subtext dark:text-slate-400 transition-colors">
+                - සරල, ආකර්ෂණීය, සහ ඵලදායී ඉගෙනුම් අත්දැකීමක් -
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              {/* Media card — swap this img for the class video when it's ready */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="w-full max-w-sm mx-auto"
+              >
+                <div className="rounded-3xl overflow-hidden aspect-[3/4] bg-slate-100 dark:bg-slate-800 shadow-[0_24px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
+                  <img
+                    src="/images/udayana-portrait.png"
+                    alt="Udayana ICT පන්තිය"
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                </div>
+              </motion.div>
+
+              {/* Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-apple-text dark:text-apple-light transition-colors mb-5">
+                  How We Structure Our Classes
+                </h3>
+                <p className="text-base md:text-lg leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors mb-8">
+                  අපගේ අනන්‍ය ඉගැන්වීම් ක්‍රමවේදය තුළින් සංකීර්ණ විෂයන් සරල හා රසවත්
+                  ලෙස හදාරන්න. විනෝදජනක ක්‍රියාකාරකම් සහ සජීවී උදාහරණ භාවිතයෙන් විෂය
+                  කරුණු ගැඹුරින් අවබෝධ කරගන්න. විභාග සුදානම සඳහා විශේෂ අවධානයක් යොමු
+                  කරමින්, නිතර පුහුණුවීම් තුළින් ඔබේ දැනුම ඉහළ නංවන්න. ධනාත්මක
+                  පරිසරයක ඔබේ හැකියාවන් වර්ධනය කරගනිමින්, සාර්ථකත්වය කරා යන ගමනේ
+                  සෑම පියවරකදීම අපි ඔබ සමඟයි.
                 </p>
-
-                <div className="space-y-6">
-                  {[
-                    {
-                      title: 'High-Quality Video Lessons',
-                      desc: 'Watch and re-watch comprehensive lessons at your own pace.',
-                    },
-                    {
-                      title: 'Interactive Live Classes',
-                      desc: 'Join weekly Zoom sessions for Q&A and practical demonstrations.',
-                    },
-                    {
-                      title: 'Structured Learning Path',
-                      desc: 'Follow a clear roadmap from basics to advanced topics.',
-                    },
-                    {
-                      title: 'Past Paper Discussions',
-                      desc: "In-depth analysis of previous years' examination papers.",
-                    },
-                  ].map((feature, idx) => (
-                    <div key={idx} className="flex gap-4">
-                      <div className="mt-1 bg-red-50 dark:bg-red-900/30 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors">
-                        <CheckCircleIcon className="w-5 h-5 text-[#c20f24]" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-apple-text dark:text-apple-light transition-colors mb-1">
-                          {feature.title}
-                        </h3>
-                        <p className="text-apple-subtext dark:text-slate-400 transition-colors">
-                          {feature.desc}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#c20f24]/20 to-rose-500/20 rounded-3xl transform rotate-3 scale-105 -z-10" />
-                <img
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop"
-                  alt="Students learning"
-                  className="rounded-3xl shadow-apple dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] object-cover w-full h-[500px]"
-                />
-
-                {/* Floating Badge */}
-                <div className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-apple-hover dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] flex items-center gap-4 transition-colors">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3, 4].map((i) => (
-                      <img
-                        key={i}
-                        src={`https://i.pravatar.cc/100?img=${i}`}
-                        className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 transition-colors"
-                        alt="Student"
-                      />
-                    ))}
-                  </div>
-                  <div>
-                    <div className="flex text-yellow-400">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <StarIcon key={i} className="w-4 h-4 fill-current" />
-                      ))}
-                    </div>
-                    <p className="text-sm font-medium text-apple-text dark:text-apple-light transition-colors mt-0.5">
-                      Loved by students
-                    </p>
-                  </div>
-                </div>
-              </div>
+                <a
+                  href="https://youtube.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 h-12 px-7 rounded-full bg-[#c20f24] hover:bg-[#9c0c1d] text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Learn More
+                </a>
+              </motion.div>
             </div>
           </div>
         </section>
