@@ -13,6 +13,7 @@ import {
   EyeOffIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { extractYouTubeId as parseYouTubeId } from '../../lib/youtube';
 import { Drawer } from '../components/Drawer';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 
@@ -20,15 +21,6 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 
 const TYPES = ['Paper Classes', 'Theory', 'Revision'];
 const inputCls = 'w-full h-11 rounded-xl border border-slate-200 px-3.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500';
-
-/** pull the video id out of any YouTube URL (or accept a raw id) */
-function parseYouTubeId(input: string) {
-  const s = input.trim();
-  const m = s.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
-  if (m) return m[1];
-  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-  return s;
-}
 
 const emptyPack = {
   title: '',

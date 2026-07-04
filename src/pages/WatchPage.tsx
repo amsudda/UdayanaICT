@@ -16,6 +16,7 @@ import {
   LockIcon
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { extractYouTubeId } from '../lib/youtube';
 
 type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string };
 
@@ -172,7 +173,7 @@ export function WatchPage() {
         return;
       }
       const mapped: VideoLesson[] = vids.map((v: any) => ({
-        id: v.id, title: v.title, youtubeId: v.youtube_id, duration: v.duration_label ?? '', description: v.description ?? ''
+        id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? ''
       }));
       let stored: string[] = [];
       try { stored = JSON.parse(localStorage.getItem(storageKey) ?? '[]'); } catch { stored = []; }
@@ -269,7 +270,7 @@ export function WatchPage() {
       <div className="flex-1 flex min-h-0 overflow-hidden">
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
           <div className="relative w-full bg-black shrink-0 lg:p-4 xl:p-5">
-            <div className="relative w-full mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', maxHeight: 'min(62vh, 100%)' }}>
+            <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
               <YouTubePlayer videoId={active.youtubeId} onEnded={handleNext} />
             </div>
           </div>
