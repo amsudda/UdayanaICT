@@ -32,7 +32,8 @@ const emptyForm = {
   image_url: '' as string | null,
   image_fit: 'cover',
   image_position: 'center',
-  font_family: ''
+  font_family: '',
+  show_overlay: true
 };
 
 const POSITIONS = [
@@ -91,7 +92,7 @@ export function AdminPromotionsPage() {
       audience_scope: p.audience_scope ?? 'public', audience_program: p.audience_program ?? 'A/L',
       batch_ids: p.batch_ids ?? [], is_active: p.is_active ?? true, image_url: p.image_url ?? '',
       image_fit: p.image_fit ?? 'cover', image_position: p.image_position ?? 'center',
-      font_family: p.font_family ?? ''
+      font_family: p.font_family ?? '', show_overlay: p.show_overlay ?? true
     });
     setImgFile(null);
     setImgPreview(p.image_url ?? undefined);
@@ -131,7 +132,8 @@ export function AdminPromotionsPage() {
       image_url: imageUrl || null,
       image_fit: form.image_fit,
       image_position: form.image_position,
-      font_family: form.font_family || null
+      font_family: form.font_family || null,
+      show_overlay: form.show_overlay
     };
     if (editing) await supabase.from('promotions').update(payload).eq('id', editing.id);
     else await supabase.from('promotions').insert({ ...payload, sort_order: promos.length });
@@ -231,14 +233,32 @@ export function AdminPromotionsPage() {
               {imgPreview && (
                 <img src={imgPreview} alt="" className="absolute inset-0 w-full h-full" style={{ objectFit: form.image_fit as any, objectPosition: form.image_position }} />
               )}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
-              <div className="absolute inset-0 flex flex-col justify-center items-start p-4" style={{ fontFamily: form.font_family || undefined }}>
-                {form.tag && <span className="inline-block py-0.5 px-2 rounded-full bg-blue-600 text-white text-[8px] font-bold mb-1.5">{form.tag}</span>}
-                <p className="text-white font-bold text-sm leading-tight line-clamp-2 max-w-[75%]">{form.title || 'Promotion title'}</p>
-                {form.description && <p className="text-gray-200 text-[10px] mt-1 leading-snug line-clamp-2 max-w-[70%]">{form.description}</p>}
-                {form.cta_text && <span className="mt-2 inline-block bg-blue-600 text-white text-[9px] font-semibold px-2.5 py-1 rounded-full">{form.cta_text}</span>}
-              </div>
+              {form.show_overlay && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
+                  <div className="absolute inset-0 flex flex-col justify-center items-start p-4" style={{ fontFamily: form.font_family || undefined }}>
+                    {form.tag && <span className="inline-block py-0.5 px-2 rounded-full bg-blue-600 text-white text-[8px] font-bold mb-1.5">{form.tag}</span>}
+                    <p className="text-white font-bold text-sm leading-tight line-clamp-2 max-w-[75%]">{form.title || 'Promotion title'}</p>
+                    {form.description && <p className="text-gray-200 text-[10px] mt-1 leading-snug line-clamp-2 max-w-[70%]">{form.description}</p>}
+                    {form.cta_text && <span className="mt-2 inline-block bg-blue-600 text-white text-[9px] font-semibold px-2.5 py-1 rounded-full">{form.cta_text}</span>}
+                  </div>
+                </>
+              )}
             </div>
+
+            {/* overlay toggle — off = the ad artwork shows clean */}
+            <label className="mt-2.5 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.show_overlay}
+                onChange={(e) => setForm({ ...form, show_overlay: e.target.checked })}
+                className="w-4 h-4 rounded accent-blue-600"
+              />
+              <span className="text-sm text-slate-700">
+                Show text overlay on the image
+                <span className="block text-[11px] text-slate-400">Turn off if your ad design already has its own text — the image shows clean and the whole slide links to the button link.</span>
+              </span>
+            </label>
             <div className="mt-1.5 space-y-1">
               <p className="text-xs text-slate-400">Text sits on the <strong>left</strong> — keep the important part of your image on the right.</p>
               <p className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">

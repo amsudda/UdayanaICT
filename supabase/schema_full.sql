@@ -127,6 +127,7 @@ create table if not exists public.promotions (
   audience_scope text not null default 'public' check (audience_scope in ('public','program','batches')),
   batch_ids uuid[] not null default '{}',
   audience_program text check (audience_program in ('O/L','A/L')),
+  show_overlay boolean not null default true,
   created_at timestamptz not null default now()
 );
 
