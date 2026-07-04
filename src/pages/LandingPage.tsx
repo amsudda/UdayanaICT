@@ -240,8 +240,21 @@ export function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative pt-20 pb-0 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
-          {/* Soft radial brand glow behind the text block */}
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_80%_at_35%_38%,rgba(194,15,36,0.09),transparent_65%)] dark:bg-[radial-gradient(ellipse_70%_80%_at_35%_38%,rgba(194,15,36,0.18),transparent_65%)] transition-colors" />
+          {/* Soft layered red wash — very subtle, warms up the white */}
+          <div
+            className="absolute inset-0 -z-10 dark:hidden"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(194,15,36,0.055) 0%, rgba(255,255,255,0) 40%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.10), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.075), transparent 70%)'
+            }}
+          />
+          <div
+            className="absolute inset-0 -z-10 hidden dark:block"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(194,15,36,0.12) 0%, rgba(2,6,23,0) 45%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.20), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.15), transparent 70%)'
+            }}
+          />
 
           {/* floating 8-bit sprites */}
           <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
