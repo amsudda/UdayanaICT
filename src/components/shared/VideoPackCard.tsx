@@ -12,6 +12,7 @@ interface VideoPackProps {
     thumbnailUrl?: string;
     duration: string;
     videoCount: number;
+    isFree?: boolean;
   };
   status?: PackStatus;
   onBuy?: () => void;
@@ -90,15 +91,28 @@ export function VideoPackCard({ pack, status = 'none', onBuy }: VideoPackProps) 
         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 flex items-end justify-between gap-3">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-apple-subtext dark:text-slate-500 font-semibold mb-0.5">
-              One-time
+              {pack.isFree ? 'For everyone' : 'One-time'}
             </p>
-            <p className="text-xl font-black text-apple-text dark:text-apple-light leading-none">
-              <span className="text-sm align-top mr-0.5">Rs.</span>
-              {pack.price.toLocaleString()}
-            </p>
+            {pack.isFree ? (
+              <p className="text-xl font-black text-emerald-500 leading-none">FREE</p>
+            ) : (
+              <p className="text-xl font-black text-apple-text dark:text-apple-light leading-none">
+                <span className="text-sm align-top mr-0.5">Rs.</span>
+                {pack.price.toLocaleString()}
+              </p>
+            )}
           </div>
 
-          {status === 'pending' ? (
+          {pack.isFree ? (
+            <button
+              type="button"
+              onClick={onBuy}
+              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white text-sm font-semibold px-5 h-11 rounded-2xl shadow-[0_6px_20px_rgba(16,185,129,0.32)] hover:shadow-[0_8px_28px_rgba(16,185,129,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 transition-all duration-200"
+            >
+              <PlayIcon className="w-4 h-4 fill-current" />
+              Watch Free
+            </button>
+          ) : status === 'pending' ? (
             <span className="flex items-center gap-1.5 bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 text-sm font-semibold px-4 h-11 rounded-2xl">
               <ClockAlertIcon className="w-4 h-4" />
               Pending

@@ -16,6 +16,7 @@ type StorePack = {
   thumbnailUrl?: string;
   duration: string;
   videoCount: number;
+  isFree?: boolean;
 };
 
 const DEFAULT_TERM_START = new Date(`${new Date().getFullYear()}-01-01`);
@@ -71,7 +72,7 @@ export function ExtraClassesPage() {
     setPacks(list.map((p: any) => ({
       id: p.id, title: p.title, type: p.type ?? '', price: Number(p.price ?? 0),
       thumbnailUrl: p.thumbnail_url ?? undefined, duration: p.duration_label ?? '',
-      videoCount: counts[p.id] ?? 0
+      videoCount: counts[p.id] ?? 0, isFree: p.is_free ?? false
     })));
     setLoading(false);
   }, []);
@@ -184,7 +185,7 @@ export function ExtraClassesPage() {
         <motion.div key={activeCategory + search} variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filtered.map((pack) => (
             <motion.div key={pack.id} variants={itemV}>
-              <VideoPackCard pack={pack} status={statusFor(pack.id)} onBuy={() => navigate(`/dashboard/buy/${pack.id}`)} />
+              <VideoPackCard pack={pack} status={statusFor(pack.id)} onBuy={() => navigate(pack.isFree ? `/dashboard/watch/${pack.id}` : `/dashboard/buy/${pack.id}`)} />
             </motion.div>
           ))}
         </motion.div>

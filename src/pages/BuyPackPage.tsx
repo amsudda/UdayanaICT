@@ -57,6 +57,7 @@ export function BuyPackPage() {
         supabase.from('payments').select('status').eq('student_id', user.id).eq('pack_id', packId).in('status', ['pending', 'approved']).order('created_at', { ascending: false }).limit(1)
       ]);
       if (!p) { setNotFound(true); setLoading(false); return; }
+      if (p.is_free) { navigate(`/dashboard/watch/${p.id}`, { replace: true }); return; }
       setPack(p);
       setVideoCount(count ?? 0);
       if (st) {

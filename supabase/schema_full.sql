@@ -41,6 +41,7 @@ create table if not exists public.packs (
   batch_ids uuid[] not null default '{}',
   audience_program text check (audience_program in ('O/L','A/L')),
   is_published boolean not null default false,
+  is_free boolean not null default false,
   created_at timestamptz not null default now()
 );
 

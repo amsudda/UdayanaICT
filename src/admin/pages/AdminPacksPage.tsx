@@ -32,6 +32,7 @@ const emptyPack = {
   audience_program: 'A/L',
   batch_ids: [] as string[],
   is_published: false,
+  is_free: false,
   thumbnail_url: '' as string | null
 };
 
@@ -104,6 +105,7 @@ export function AdminPacksPage() {
       audience_program: p.audience_program ?? 'A/L',
       batch_ids: p.batch_ids ?? [],
       is_published: p.is_published ?? false,
+      is_free: p.is_free ?? false,
       thumbnail_url: p.thumbnail_url ?? ''
     });
     setThumbFile(null);
@@ -134,7 +136,8 @@ export function AdminPacksPage() {
     const payload = {
       title: form.title.trim(),
       type: form.type,
-      price: form.price ? Number(form.price) : 0,
+      price: form.is_free ? 0 : (form.price ? Number(form.price) : 0),
+      is_free: form.is_free,
       duration_label: form.duration_label || null,
       description: form.description || null,
       audience_scope: form.audience_scope,
@@ -239,7 +242,7 @@ export function AdminPacksPage() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {p.type} · Rs. {Number(p.price).toLocaleString()} · {counts[p.id] ?? 0} videos · {audienceText(p)}
+                  {p.type} · {p.is_free ? 'FREE' : `Rs. ${Number(p.price).toLocaleString()}`} · {counts[p.id] ?? 0} videos · {audienceText(p)}
                 </p>
               </div>
               <div className="flex items-center gap-1 shrink-0">
@@ -295,9 +298,17 @@ export function AdminPacksPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Price (Rs.)</label>
-              <input type="number" className={inputCls} value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="1500" />
+              <input type="number" className={`${inputCls} disabled:bg-slate-100 disabled:text-slate-400`} value={form.is_free ? '' : form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder={form.is_free ? 'Free' : '1500'} disabled={form.is_free} />
             </div>
           </div>
+
+          <label className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 cursor-pointer">
+            <input type="checkbox" checked={form.is_free} onChange={(e) => setForm({ ...form, is_free: e.target.checked })} className="w-4 h-4 rounded accent-emerald-600" />
+            <span className="text-sm text-slate-700">
+              <span className="font-semibold">Free pack</span>
+              <span className="block text-[11px] text-slate-500">Any student can watch without paying — shows in the store with a FREE tag and a "Watch Free" button.</span>
+            </span>
+          </label>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Duration label</label>
