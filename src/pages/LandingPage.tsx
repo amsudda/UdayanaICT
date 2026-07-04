@@ -573,14 +573,19 @@ export function LandingPage() {
                 <h3 className="text-2xl md:text-3xl font-bold text-apple-text dark:text-apple-light transition-colors mb-5">
                   How We Structure Our Classes
                 </h3>
-                <p className="text-base md:text-lg leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors mb-8">
-                  අපගේ අනන්‍ය ඉගැන්වීම් ක්‍රමවේදය තුළින් සංකීර්ණ විෂයන් සරල හා රසවත්
-                  ලෙස හදාරන්න. විනෝදජනක ක්‍රියාකාරකම් සහ සජීවී උදාහරණ භාවිතයෙන් විෂය
-                  කරුණු ගැඹුරින් අවබෝධ කරගන්න. විභාග සුදානම සඳහා විශේෂ අවධානයක් යොමු
-                  කරමින්, නිතර පුහුණුවීම් තුළින් ඔබේ දැනුම ඉහළ නංවන්න. ධනාත්මක
-                  පරිසරයක ඔබේ හැකියාවන් වර්ධනය කරගනිමින්, සාර්ථකත්වය කරා යන ගමනේ
-                  සෑම පියවරකදීම අපි ඔබ සමඟයි.
-                </p>
+                <div className="space-y-4 text-base md:text-lg leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors mb-8">
+                  <p>
+                    අපගේ අනන්‍ය ඉගැන්වීම් ක්‍රමවේදය තුළින් A/L ICT සංකීර්ණ විෂය කරුණු
+                    සරලව හා ප්‍රායෝගිකව ඉගැන්වීම සිදු කරයි.
+                  </p>
+                  <p>
+                    පාඩම් වළ ඇති ප්‍රායෝගික විෂය කරුණු සියල්ලම පන්තිය තුළදීම සිදු කරයි.
+                  </p>
+                  <p>
+                    Past Papers සහ Model Papers නිරන්තරයෙන් සාකච්ඡා කරමින් විභාගයට
+                    ඉහළම සූදානම් කිරීමක් සිදු කරයි.
+                  </p>
+                </div>
                 <a
                   href="https://youtube.com/"
                   target="_blank"
