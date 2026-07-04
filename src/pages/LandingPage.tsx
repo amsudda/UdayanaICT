@@ -221,8 +221,8 @@ export function LandingPage() {
                 <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors">
                   Pasindu Dissanayake
                 </h1>
-                <p className="mt-3 text-[11px] md:text-xs font-semibold tracking-[0.4em] uppercase text-apple-subtext dark:text-slate-400 transition-colors">
-                  Udayana ICT · A/L & O/L
+                <p className="mt-3 text-[11px] md:text-xs font-semibold tracking-[0.22em] md:tracking-[0.32em] uppercase text-apple-subtext dark:text-slate-400 transition-colors">
+                  Advanced Level Information Technology
                 </p>
 
                 {/* Tagline */}
