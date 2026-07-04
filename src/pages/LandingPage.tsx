@@ -551,14 +551,16 @@ export function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="w-full max-w-sm mx-auto"
+                className="w-full max-w-[320px] mx-auto"
               >
-                <div className="rounded-3xl overflow-hidden aspect-[3/4] bg-slate-100 dark:bg-slate-800 shadow-[0_24px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
-                  <img
-                    src="/images/udayana-portrait.png"
-                    alt="Udayana ICT පන්තිය"
-                    className="w-full h-full object-cover"
-                    draggable={false}
+                {/* muted looping class video — oversized + pointer-events-none hides YouTube overlays */}
+                <div className="relative rounded-3xl overflow-hidden aspect-[9/16] bg-slate-900 shadow-[0_24px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
+                  <iframe
+                    src="https://www.youtube.com/embed/JPyY1Qrjy0I?autoplay=1&mute=1&loop=1&playlist=JPyY1Qrjy0I&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&iv_load_policy=3"
+                    title="Udayana ICT පන්තිය"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[103%] h-[103%] pointer-events-none"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    frameBorder="0"
                   />
                 </div>
               </motion.div>
@@ -587,7 +589,7 @@ export function LandingPage() {
                   </p>
                 </div>
                 <a
-                  href="https://youtube.com/"
+                  href="https://www.youtube.com/@Pasindu_Dissanayake-ICT"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 h-12 px-7 rounded-full bg-[#c20f24] hover:bg-[#9c0c1d] text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"

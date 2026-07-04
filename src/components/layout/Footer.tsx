@@ -130,7 +130,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" className={`${linkCls} flex items-center gap-2.5`}>
+                <a href="https://www.youtube.com/@Pasindu_Dissanayake-ICT" target="_blank" rel="noopener noreferrer" className={`${linkCls} flex items-center gap-2.5`}>
                   <span className="w-6 h-6 rounded-full bg-[#FF0000] flex items-center justify-center shrink-0">
                     <YouTubeIcon className="w-3.5 h-3.5 text-white" />
                   </span>
