@@ -85,7 +85,7 @@ export function Navbar() {
               <BookOpenIcon className="w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight text-apple-text dark:text-apple-light transition-colors duration-300">
-              Udayana ICT
+              Pasindu Dissanayake ICT
             </span>
           </Link>
 

@@ -53,7 +53,7 @@ const heroSprites = [
 const GUIDE_PROMO = {
   id: 'guide',
   tag: 'නව සිසුන් සඳහා · GET STARTED',
-  title: 'Udayana ICT වෙත සාදරයෙන් පිළිගනිමු!',
+  title: 'Pasindu Dissanayake ICT වෙත සාදරයෙන් පිළිගනිමු!',
   description: 'සිසුවෙකු ලෙස ලියාපදිංචි වී වීඩියෝ පාඩම්, සජීවී පන්ති සහ ඔබේ ලකුණු ලුහුබැඳීමට ප්‍රවේශය ලබාගන්න. ඉහත "Sign Up" බොත්තම click කරන්න.',
   image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=600&fit=crop',
   ctaText: 'දැන්ම ලියාපදිංචි වන්න',
@@ -128,12 +128,12 @@ const PROCESS_STEPS = [
 
 /* Placeholder testimonials shown until the admin adds real reviews. */
 const FALLBACK_REVIEWS: Review[] = [
-  { name: 'කවිෂ්කා පෙරේරා', school: 'ආනන්ද විද්‍යාලය, කොළඹ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=11', stars: 5, quote: 'උදයන සර්ගේ පාඩම් නිසා ICT ගැන ඇත්ත දැනීමක් ලැබුණා. සෑම පාඩමක්ම ඇති තරම් විස්තරාත්මකව කියලා දෙනවා. A/L exam ට ගිය ගමන් ඒ ලකුණු ගන්නත් ලේසි වුණා!', year: '2024 A/L' },
-  { name: 'සේනාල් ද සිල්වා', school: 'ධර්මාශෝක විද්‍යාලය, අම්බලන්ගොඩ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=15', stars: 5, quote: 'ගම්පහ ඉදලා Colombo tuition class යන්න අමාරුයි. Udayana ICT ඒ ගැටලුව solve කළා. ගෙදරදිම ඉන්නකොට live class ලබන්න ලැබීම ලොකු වාසියක්.', year: '2024 A/L' },
+  { name: 'කවිෂ්කා පෙරේරා', school: 'ආනන්ද විද්‍යාලය, කොළඹ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=11', stars: 5, quote: 'පසිඳු සර්ගේ පාඩම් නිසා ICT ගැන ඇත්ත දැනීමක් ලැබුණා. සෑම පාඩමක්ම ඇති තරම් විස්තරාත්මකව කියලා දෙනවා. A/L exam ට ගිය ගමන් ඒ ලකුණු ගන්නත් ලේසි වුණා!', year: '2024 A/L' },
+  { name: 'සේනාල් ද සිල්වා', school: 'ධර්මාශෝක විද්‍යාලය, අම්බලන්ගොඩ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=15', stars: 5, quote: 'ගම්පහ ඉදලා Colombo tuition class යන්න අමාරුයි. Pasindu Dissanayake ICT ඒ ගැටලුව solve කළා. ගෙදරදිම ඉන්නකොට live class ලබන්න ලැබීම ලොකු වාසියක්.', year: '2024 A/L' },
   { name: 'නිල්මිණී ජයසිංහ', school: 'විශාකා බාලිකා, කොළඹ', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=47', stars: 5, quote: 'Past paper discussions section එකෙන් ගොඩාක් help වුණා. Exam pattern ගැන හොඳ idea එකක් ගන්නඑ ලේසි වුණා. ඒ section නොමැතිව exam ready වෙන්නේ නෑ.', year: '2024 A/L' },
   { name: 'රසාංජල් ගුණසේකර', school: 'රාහුල විද්‍යාලය, ගාල්ල', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=12', stars: 5, quote: 'Video lectures replay කරන්නත් පුළුවන් නිසා concepts clear කරගන්නට ලේසියි. Data structures, algorithms ගැන කිසිදා හොඳාකාරව නොතේරුණු දේ මෙතෙන් ඉගෙනගත්තා.', year: '2023 A/L' },
   { name: 'ඉෂිකා විජේරත්න', school: 'මහින්ද රාජපක්ෂ විද්‍යාලය', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=44', stars: 5, quote: 'ICT ගැන කිසිම base එකක් නොතිබුණු මාට පවා මේ platform එක perfect. ඉතා සරළව basic ඉදලා advanced දක්වා explain කරනවා. දැන් university ට apply කරනවා!', year: '2024 A/L' },
-  { name: 'දිලෝෂ් ප්‍රනාන්දු', school: 'ශාන්ත සෙබස්තියාන්, මොරටුව', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=18', stars: 5, quote: 'WhatsApp group ඔස්සේ doubts clear කරගන්නෙත් ලේසි. Udayana sir always reply දෙනවා. Practical paper ට ඕනෑ coding knowledge ත් ඒ course ඇතුළෙ ලැබෙනවා.', year: '2023 A/L' },
+  { name: 'දිලෝෂ් ප්‍රනාන්දු', school: 'ශාන්ත සෙබස්තියාන්, මොරටුව', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=18', stars: 5, quote: 'WhatsApp group ඔස්සේ doubts clear කරගන්නෙත් ලේසි. Pasindu sir always reply දෙනවා. Practical paper ට ඕනෑ coding knowledge ත් ඒ course ඇතුළෙ ලැබෙනවා.', year: '2023 A/L' },
 ];
 
 export function LandingPage() {
@@ -513,7 +513,7 @@ export function LandingPage() {
                 අපගේ සිසුන් පවසන දේ
               </h2>
               <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-xl mx-auto transition-colors">
-                Udayana ICT හරහා A/L තොරතුරු තාක්ෂණය ජය ගත් සිසුන් ගේ අත්දැකීම්
+                Pasindu Dissanayake ICT හරහා A/L තොරතුරු තාක්ෂණය ජය ගත් සිසුන් ගේ අත්දැකීම්
               </p>
             </motion.div>
 
@@ -588,7 +588,7 @@ export function LandingPage() {
                 <div className="relative rounded-3xl overflow-hidden aspect-[9/16] bg-slate-900 shadow-[0_24px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
                   <iframe
                     src="https://www.youtube.com/embed/JPyY1Qrjy0I?autoplay=1&mute=1&loop=1&playlist=JPyY1Qrjy0I&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&iv_load_policy=3"
-                    title="Udayana ICT පන්තිය"
+                    title="Pasindu Dissanayake ICT පන්තිය"
                     className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[103%] h-[103%] pointer-events-none"
                     allow="autoplay; encrypted-media; picture-in-picture"
                     frameBorder="0"

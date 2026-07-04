@@ -51,7 +51,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
             <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center">
               <GraduationCapIcon className="w-6 h-6 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">Udayana ICT</span>
+            <span className="font-bold text-xl tracking-tight">Pasindu Dissanayake ICT</span>
           </Link>
 
           <div>
@@ -76,7 +76,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
 
           <p className="text-sm text-rose-100/70">
             “ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!”
-            <span className="block mt-1 font-semibold text-white/90">— උදයන පසිඳු</span>
+            <span className="block mt-1 font-semibold text-white/90">— පසිඳු දිසානායක</span>
           </p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
           <div className="w-10 h-10 bg-[#c20f24] rounded-xl flex items-center justify-center text-white">
             <GraduationCapIcon className="w-6 h-6" />
           </div>
-          <span className="font-bold text-2xl tracking-tight text-apple-text">Udayana ICT</span>
+          <span className="font-bold text-2xl tracking-tight text-apple-text">Pasindu Dissanayake ICT</span>
         </Link>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className={`w-full ${formWidth} relative z-10`}>

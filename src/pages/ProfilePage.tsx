@@ -260,7 +260,7 @@ export function ProfilePage() {
                   Sri Lanka
                 </p>
                 <p className="text-sm font-bold text-white leading-tight mt-0.5">
-                  Udayana ICT
+                  Pasindu Dissanayake ICT
                 </p>
               </div>
               {/* chip graphic */}

@@ -136,7 +136,7 @@ export function AdminLayout() {
           <BookOpenIcon className="w-5 h-5" />
         </div>
         <div className="leading-tight">
-          <p className="font-bold text-slate-900 text-[15px]">Udayana ICT</p>
+          <p className="font-bold text-slate-900 text-[15px]">Pasindu Dissanayake ICT</p>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Admin</p>
         </div>
       </div>
