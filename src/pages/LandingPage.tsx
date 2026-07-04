@@ -14,6 +14,7 @@ import {
   ClipboardCheckIcon,
   MoonIcon,
   HistoryIcon,
+  FileQuestionIcon,
   CalendarDaysIcon,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
@@ -67,7 +68,7 @@ const PROCESS_STEPS = [
     icon: GraduationCapIcon,
     color: 'text-emerald-500',
     title: 'Theory and Revision',
-    text: 'ICT විෂය නිර්දේශයේ සෑම කොටසක්ම විභාගයට මාසයකට පෙර ආකර්ශනීය ඉගැන්වීම් රටාවකට අවසන් කිරීම.',
+    text: 'ආකර්ෂණීය ඉගැන්වීම් රටාව මගින් සංකීර්ණ විෂය සරලව උගන්වා විභාගයට මසකට පෙර සම්පූර්ණ විෂය නිර්දේශය ආවරණය කිරීම.',
   },
   {
     icon: TimerIcon,
@@ -96,8 +97,14 @@ const PROCESS_STEPS = [
   {
     icon: HistoryIcon,
     color: 'text-indigo-500',
-    title: 'සතිමතක',
-    text: 'පෙර ඉගැන්වූ පාඩම් සතියකට වරක් නැවත මතක් කිරීම සඳහා ලබාදෙන කෙටි නිබන්ධන මාලාව.',
+    title: 'Memory Recharge Papers',
+    text: 'සෑම මසකම විෂය කරුණු අමතක වීමට ඉඩ නොදී විභාග ප්‍රශ්න වළට හුරු කරවීම මෙහිදි සිදු කරයි.',
+  },
+  {
+    icon: FileQuestionIcon,
+    color: 'text-orange-500',
+    title: 'Guess Paper Class',
+    text: 'විභාගයට මාසෙකට පෙර ආරම්භ වන මෙම වැඩසටහන හරහා අනුමාන ප්‍රශ්න ලියවීම හා සාකච්ඡා කිරීම මෙහිදී සිදු කරයි.',
   },
   {
     icon: CalendarDaysIcon,
@@ -616,7 +623,7 @@ export function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
-                  className={`bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_32px_rgba(194,15,36,0.10)] hover:-translate-y-1 transition-all duration-300 ${step.wide ? 'md:col-span-2 lg:col-span-3' : ''}`}
+                  className={`bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_32px_rgba(194,15,36,0.10)] hover:-translate-y-1 transition-all duration-300 ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
                 >
                   <step.icon className={`w-9 h-9 mx-auto ${step.color}`} strokeWidth={2.2} />
                   <h3 className="mt-4 mb-3 text-lg font-bold text-apple-text dark:text-apple-light transition-colors">
