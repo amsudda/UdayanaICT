@@ -172,9 +172,9 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-24 pb-16 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
-          {/* Subtle background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 via-white to-white dark:from-slate-900/60 dark:via-slate-950 dark:to-slate-950 -z-10 transition-colors" />
+        <section className="relative pt-20 pb-12 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
+          {/* Soft radial brand glow behind the text block */}
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_80%_at_35%_38%,rgba(194,15,36,0.09),transparent_65%)] dark:bg-[radial-gradient(ellipse_70%_80%_at_35%_38%,rgba(194,15,36,0.18),transparent_65%)] transition-colors" />
 
           {/* floating 8-bit sprites */}
           <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
@@ -186,16 +186,17 @@ export function LandingPage() {
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-end">
 
-              {/* LEFT: Text Content */}
+              {/* LEFT: brand block — poster style */}
               <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
+                className="flex flex-col items-center text-center pb-10 lg:pb-20 pt-4"
               >
                 {/* Pixel "level up" chip */}
-                <div className="font-pixel inline-flex items-center gap-2 mb-4 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900">
+                <div className="font-pixel inline-flex items-center gap-2 mb-5 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900">
                   <PixelStar className="w-3 h-3 text-amber-400" />
                   LEVEL UP YOUR ICT
                   <span className="pixel-cursor">_</span>
@@ -203,29 +204,36 @@ export function LandingPage() {
 
                 {/* Recruitment notice — editable in Admin → Settings */}
                 {recruitNotice.trim() && (
-                  <span className="block sm:inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-6 border border-red-100 dark:border-red-900 transition-colors">
+                  <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-7 border border-red-100 dark:border-red-900 transition-colors">
                     {recruitNotice}
                   </span>
                 )}
 
-                {/* Heading */}
-                <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6 transition-colors">
-                  <span className="text-[#E86C0A] dark:text-[#FF8A3D]">ප්‍රවීණ උපදේශනයෙන්</span>
-                  <br />
-                  <span className="text-apple-text dark:text-apple-light">තොරතුරු තාක්ෂණය</span>
-                  <br />
-                  <span className="text-apple-text dark:text-apple-light">ජය ගන්න</span>
-                </h1>
+                {/* Brand mark */}
+                <img
+                  src="/favicon.svg"
+                  alt="Udayana ICT"
+                  className="w-16 h-16 md:w-20 md:h-20 mb-5 pixel-svg drop-shadow-[0_12px_28px_rgba(194,15,36,0.35)]"
+                  draggable={false}
+                />
 
-                {/* Description */}
-                <p className="text-base md:text-lg text-apple-subtext dark:text-slate-400 mb-9 max-w-lg leading-relaxed transition-colors">
-                  A/L තොරතුරු තාක්ෂණය සඳහා වන වඩාත් සම්පූර්ණ මාර්ගගත
-                  ඉගෙනුම් වේදිකාවට සම්බන්ධ වන්න. උසස් තත්වයේ වීඩියෝ පාඩම්, සජීවී
-                  අන්තර් ක්‍රියාකාරී පන්ති සහ සම්පූර්ණ විෂය නිර්දේශ ආවරණය ලබාගන්න.
+                {/* Name */}
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors">
+                  Pasindu Dissanayake
+                </h1>
+                <p className="mt-3 text-[11px] md:text-xs font-semibold tracking-[0.4em] uppercase text-apple-subtext dark:text-slate-400 transition-colors">
+                  Udayana ICT · A/L & O/L
+                </p>
+
+                {/* Tagline */}
+                <p className="mt-7 text-lg md:text-xl font-medium text-apple-text dark:text-apple-light leading-relaxed max-w-md transition-colors">
+                  <span className="text-[#c20f24] text-2xl font-serif leading-none mr-1">"</span>
+                  ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
+                  <span className="text-[#c20f24] text-2xl font-serif leading-none ml-1">"</span>
                 </p>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="mt-9 flex flex-col sm:flex-row items-center gap-4">
                   <PixelBurstButton to="/signup" className="w-full sm:w-auto text-base">
                     ඉගෙනීම අරඹන්න
                   </PixelBurstButton>
@@ -233,7 +241,7 @@ export function LandingPage() {
                     href="https://wa.me/94719735601"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 h-14 px-8 text-lg rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                    className="inline-flex items-center gap-2.5 h-12 px-7 text-base rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
@@ -243,57 +251,21 @@ export function LandingPage() {
                 </div>
               </motion.div>
 
-              {/* RIGHT: Teacher Photo + Quote Card */}
+              {/* RIGHT: cutout portrait rising from the section edge */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.7, delay: 0.15 }}
-                className="relative flex justify-center lg:justify-end"
+                transition={{ duration: 0.8, delay: 0.15 }}
+                className="relative flex justify-center lg:justify-end items-end"
               >
-                {/* Photo container with circuit-board style background */}
-                <div className="relative w-full max-w-sm lg:max-w-md">
-                  {/* Background card */}
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-rose-50 to-rose-100 dark:from-slate-800 dark:to-slate-700 transform translate-x-2 translate-y-2 transition-colors" />
-
-                  {/* Decorative circuit pattern */}
-                  <div className="absolute inset-0 rounded-3xl overflow-hidden opacity-10">
-                    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                      <pattern id="circuit" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                        <path d="M 10 0 L 10 10 L 0 10" fill="none" stroke="#c20f24" strokeWidth="0.8" />
-                        <path d="M 30 40 L 30 30 L 40 30" fill="none" stroke="#c20f24" strokeWidth="0.8" />
-                        <path d="M 0 30 L 10 30 L 10 40" fill="none" stroke="#c20f24" strokeWidth="0.8" />
-                        <circle cx="10" cy="10" r="2" fill="#c20f24" />
-                        <circle cx="30" cy="30" r="2" fill="#c20f24" />
-                        <circle cx="10" cy="30" r="2" fill="#c20f24" />
-                      </pattern>
-                      <rect width="100%" height="100%" fill="url(#circuit)" />
-                    </svg>
-                  </div>
-
-                  {/* Teacher photo */}
-                  <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-gradient-to-b from-rose-100 to-rose-200 dark:from-slate-700 dark:to-slate-800 flex items-end justify-center min-h-[380px] md:min-h-[460px]">
-                    <img
-                      src="/images/udayana-portrait.png"
-                      alt="උදයන පසිඳු - ICT ගුරුවරයා"
-                      className="w-full h-full object-cover object-center absolute inset-0"
-                    />
-                    {/* Gradient overlay at bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-rose-50/80 dark:from-slate-900/80 to-transparent" />
-                  </div>
-
-                  {/* Floating Quote Card */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="absolute -bottom-5 right-2 md:-right-6 bg-white dark:bg-slate-800 rounded-2xl shadow-apple-hover dark:shadow-[0_10px_40px_rgba(0,0,0,0.4)] p-4 max-w-[210px] transition-colors border border-gray-100 dark:border-slate-700"
-                  >
-                    <p className="text-sm font-medium text-apple-text dark:text-apple-light leading-snug mb-2 transition-colors">
-                      "ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!"
-                    </p>
-                    <p className="text-xs text-[#c20f24] font-semibold">- උදයන පසිඳු</p>
-                  </motion.div>
-                </div>
+                {/* soft glow behind the portrait */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 lg:left-auto lg:right-6 lg:translate-x-0 w-[420px] h-[420px] max-w-full rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.13),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(194,15,36,0.28),transparent_65%)] pointer-events-none" aria-hidden />
+                <img
+                  src="/images/pasindu-hero.png"
+                  alt="Pasindu Dissanayake — ICT ගුරුවරයා"
+                  className="relative w-[300px] sm:w-[380px] lg:w-[440px] max-w-full select-none pointer-events-none drop-shadow-[0_18px_40px_rgba(194,15,36,0.18)]"
+                  draggable={false}
+                />
               </motion.div>
             </div>
 
@@ -302,7 +274,7 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.35 }}
-              className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-gray-200 dark:border-slate-800 pt-10 transition-colors"
+              className="mt-0 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-gray-200 dark:border-slate-800 pt-10 transition-colors"
             >
               <div className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-1">5k+</p>
