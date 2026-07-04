@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { SearchIcon, CalendarClockIcon, InfinityIcon, PlayCircleIcon } from 'lucide-react';
 import { VideoPackCard } from '../components/shared/VideoPackCard';
-import { BuyPackModal } from '../components/shared/BuyPackModal';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 
@@ -35,10 +35,10 @@ function daysBetween(a: Date, b: Date) {
 
 export function ExtraClassesPage() {
   const reduce = useReducedMotion();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [search, setSearch] = useState('');
-  const [buyingPack, setBuyingPack] = useState<StorePack | null>(null);
 
   const [packs, setPacks] = useState<StorePack[]>([]);
   const [owned, setOwned] = useState<Set<string>>(new Set());
@@ -184,7 +184,7 @@ export function ExtraClassesPage() {
         <motion.div key={activeCategory + search} variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filtered.map((pack) => (
             <motion.div key={pack.id} variants={itemV}>
-              <VideoPackCard pack={pack} status={statusFor(pack.id)} onBuy={() => setBuyingPack(pack)} />
+              <VideoPackCard pack={pack} status={statusFor(pack.id)} onBuy={() => navigate(`/dashboard/buy/${pack.id}`)} />
             </motion.div>
           ))}
         </motion.div>
@@ -198,15 +198,6 @@ export function ExtraClassesPage() {
         </motion.div>
       )}
 
-      <AnimatePresence>
-        {buyingPack && (
-          <BuyPackModal
-            pack={buyingPack}
-            onClose={() => setBuyingPack(null)}
-            onSubmitted={() => { setBuyingPack(null); load(); }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

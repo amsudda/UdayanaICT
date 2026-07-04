@@ -15,6 +15,7 @@ import { SignupPage } from './pages/SignupPage';
 import { ExtraClassesPage } from './pages/ExtraClassesPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
 import { WatchPage } from './pages/WatchPage';
+import { BuyPackPage } from './pages/BuyPackPage';
 import { AdminLayout } from './admin/AdminLayout';
 import { AdminOverviewPage } from './admin/pages/AdminOverviewPage';
 import { AdminBatchesPage } from './admin/pages/AdminBatchesPage';
@@ -88,6 +89,16 @@ function AnimatedRoutes() {
           element={
             <ProtectedRoute>
               <WatchPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Standalone checkout page for a pack */}
+        <Route
+          path="/dashboard/buy/:packId"
+          element={
+            <ProtectedRoute>
+              <BuyPackPage />
             </ProtectedRoute>
           }
         />
