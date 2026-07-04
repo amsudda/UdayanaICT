@@ -128,6 +128,7 @@ create table if not exists public.promotions (
   batch_ids uuid[] not null default '{}',
   audience_program text check (audience_program in ('O/L','A/L')),
   show_overlay boolean not null default true,
+  overlay_position text not null default 'left',
   created_at timestamptz not null default now()
 );
 

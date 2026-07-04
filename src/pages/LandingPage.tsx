@@ -22,6 +22,7 @@ import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
 import { PixelReveal } from '../components/shared/PixelFx';
 import { ReviewCard, type Review } from '../components/shared/ReviewCard';
+import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
 
 /* ── tiny 8-bit pixel sprites (SVG, crisp) ── */
@@ -59,7 +60,8 @@ const GUIDE_PROMO = {
   imageFit: 'cover',
   imagePosition: 'center',
   fontFamily: '',
-  showOverlay: true
+  showOverlay: true,
+  overlayPosition: 'left'
 };
 
 /* Two-tone paper plane, decorative */
@@ -214,7 +216,8 @@ export function LandingPage() {
               imageFit: p.image_fit ?? 'cover',
               imagePosition: p.image_position ?? 'center',
               fontFamily: p.font_family ?? '',
-              showOverlay: p.show_overlay ?? true
+              showOverlay: p.show_overlay ?? true,
+              overlayPosition: p.overlay_position ?? 'left'
             }))
           );
           setCurrentPromo(0);
@@ -370,34 +373,40 @@ export function LandingPage() {
                     }}
                   />
                   {(activePromo as any).showOverlay !== false ? (
-                    <>
-                      {/* Left-to-right dark gradient for text legibility */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20 z-10" />
+                    (() => {
+                      const ov = overlayClasses((activePromo as any).overlayPosition ?? 'left');
+                      return (
+                        <>
+                          {/* dark shading follows the text position for legibility */}
+                          <div className={`absolute inset-0 z-10 ${ov.gradient}`} />
 
-                      {/* Content */}
-                      <div className="absolute inset-0 z-20 flex flex-col justify-center items-start text-left p-8 sm:p-12 md:p-16 max-w-2xl" style={{ fontFamily: (activePromo as any).fontFamily || undefined }}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: 0.15 }}
-                        >
-                          <span className="inline-block py-1 px-3.5 rounded-full bg-[#c20f24] text-white font-semibold text-xs sm:text-sm mb-4 shadow-lg">
-                            {activePromo.tag}
-                          </span>
-                          <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
-                            {activePromo.title}
-                          </h3>
-                          <p className="text-base md:text-lg text-gray-200 mb-7 max-w-lg leading-relaxed">
-                            {activePromo.description}
-                          </p>
-                          <Link to={activePromo.ctaLink}>
-                            <Button size="lg" className="font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
-                              {activePromo.ctaText}
-                            </Button>
-                          </Link>
-                        </motion.div>
-                      </div>
-                    </>
+                          {/* Content */}
+                          <div className={`absolute inset-0 z-20 flex flex-col p-8 sm:p-12 md:p-16 ${ov.justify} ${ov.items}`} style={{ fontFamily: (activePromo as any).fontFamily || undefined }}>
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.5, delay: 0.15 }}
+                              className="max-w-2xl"
+                            >
+                              <span className="inline-block py-1 px-3.5 rounded-full bg-[#c20f24] text-white font-semibold text-xs sm:text-sm mb-4 shadow-lg">
+                                {activePromo.tag}
+                              </span>
+                              <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
+                                {activePromo.title}
+                              </h3>
+                              <p className={`text-base md:text-lg text-gray-200 mb-7 max-w-lg leading-relaxed ${ov.blockAlign}`}>
+                                {activePromo.description}
+                              </p>
+                              <Link to={activePromo.ctaLink}>
+                                <Button size="lg" className="font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
+                                  {activePromo.ctaText}
+                                </Button>
+                              </Link>
+                            </motion.div>
+                          </div>
+                        </>
+                      );
+                    })()
                   ) : (
                     /* Image-only ad — the whole slide is the link */
                     activePromo.ctaLink ? (

@@ -12,6 +12,7 @@ import {
   ChevronDownIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { overlayClasses } from '../../lib/overlay';
 import { Drawer } from '../components/Drawer';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 
@@ -33,7 +34,8 @@ const emptyForm = {
   image_fit: 'cover',
   image_position: 'center',
   font_family: '',
-  show_overlay: true
+  show_overlay: true,
+  overlay_position: 'left'
 };
 
 const POSITIONS = [
@@ -92,7 +94,8 @@ export function AdminPromotionsPage() {
       audience_scope: p.audience_scope ?? 'public', audience_program: p.audience_program ?? 'A/L',
       batch_ids: p.batch_ids ?? [], is_active: p.is_active ?? true, image_url: p.image_url ?? '',
       image_fit: p.image_fit ?? 'cover', image_position: p.image_position ?? 'center',
-      font_family: p.font_family ?? '', show_overlay: p.show_overlay ?? true
+      font_family: p.font_family ?? '', show_overlay: p.show_overlay ?? true,
+      overlay_position: p.overlay_position ?? 'left'
     });
     setImgFile(null);
     setImgPreview(p.image_url ?? undefined);
@@ -133,11 +136,17 @@ export function AdminPromotionsPage() {
       image_fit: form.image_fit,
       image_position: form.image_position,
       font_family: form.font_family || null,
-      show_overlay: form.show_overlay
+      show_overlay: form.show_overlay,
+      overlay_position: form.overlay_position
     };
-    if (editing) await supabase.from('promotions').update(payload).eq('id', editing.id);
-    else await supabase.from('promotions').insert({ ...payload, sort_order: promos.length });
+    let error;
+    if (editing) ({ error } = await supabase.from('promotions').update(payload).eq('id', editing.id));
+    else ({ error } = await supabase.from('promotions').insert({ ...payload, sort_order: promos.length }));
     setSaving(false);
+    if (error) {
+      alert(`Could not save the promotion:\n${error.message}\n\nIf this mentions a missing column, run supabase/migration_promo_overlay.sql in the Supabase SQL editor.`);
+      return;
+    }
     setEditorOpen(false);
     load();
   };
@@ -160,6 +169,8 @@ export function AdminPromotionsPage() {
     setDeleteTarget(null);
     load();
   };
+
+  const ov = overlayClasses(form.overlay_position);
 
   return (
     <div>
@@ -235,11 +246,11 @@ export function AdminPromotionsPage() {
               )}
               {form.show_overlay && (
                 <>
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
-                  <div className="absolute inset-0 flex flex-col justify-center items-start p-4" style={{ fontFamily: form.font_family || undefined }}>
+                  <div className={`absolute inset-0 ${ov.gradient}`} />
+                  <div className={`absolute inset-0 flex flex-col p-4 ${ov.justify} ${ov.items}`} style={{ fontFamily: form.font_family || undefined }}>
                     {form.tag && <span className="inline-block py-0.5 px-2 rounded-full bg-blue-600 text-white text-[8px] font-bold mb-1.5">{form.tag}</span>}
                     <p className="text-white font-bold text-sm leading-tight line-clamp-2 max-w-[75%]">{form.title || 'Promotion title'}</p>
-                    {form.description && <p className="text-gray-200 text-[10px] mt-1 leading-snug line-clamp-2 max-w-[70%]">{form.description}</p>}
+                    {form.description && <p className={`text-gray-200 text-[10px] mt-1 leading-snug line-clamp-2 max-w-[70%] ${ov.blockAlign}`}>{form.description}</p>}
                     {form.cta_text && <span className="mt-2 inline-block bg-blue-600 text-white text-[9px] font-semibold px-2.5 py-1 rounded-full">{form.cta_text}</span>}
                   </div>
                 </>
@@ -259,6 +270,27 @@ export function AdminPromotionsPage() {
                 <span className="block text-[11px] text-slate-400">Turn off if your ad design already has its own text — the image shows clean and the whole slide links to the button link.</span>
               </span>
             </label>
+
+            {/* overlay position — where the text block sits */}
+            {form.show_overlay && (
+              <div className="mt-2.5">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Text position</label>
+                <div className="inline-grid grid-cols-3 gap-1">
+                  {POSITIONS.flat().map((pos) => (
+                    <button
+                      key={pos}
+                      type="button"
+                      title={pos}
+                      onClick={() => setForm({ ...form, overlay_position: pos })}
+                      className={`w-7 h-7 rounded border transition-colors ${form.overlay_position === pos ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 hover:border-blue-400'}`}
+                    >
+                      <span className={`block w-1.5 h-1.5 rounded-full mx-auto ${form.overlay_position === pos ? 'bg-white' : 'bg-slate-300'}`} />
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Where the text sits on the banner — text alignment, dark shading and the button follow the position automatically. Check the preview above.</p>
+              </div>
+            )}
             <div className="mt-1.5 space-y-1">
               <p className="text-xs text-slate-400">Text sits on the <strong>left</strong> — keep the important part of your image on the right.</p>
               <p className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
