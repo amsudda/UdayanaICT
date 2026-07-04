@@ -288,9 +288,6 @@ export function LandingPage() {
               <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900 transition-colors">
                 නවතම තොරතුරු
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-3">
-                ප්‍රවර්ධන සහ දැන්වීම් <PixelReveal className="w-5 h-5 text-[#c20f24]" />
-              </h2>
               <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-2xl mx-auto transition-colors">
                 නවතම පන්ති, විශේෂ දීමනා සහ වැදගත් නිවේදන මෙතැනින් බලාගන්න.
               </p>
