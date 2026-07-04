@@ -14,6 +14,8 @@ import {
   LayoutListIcon,
   SparklesIcon,
   SkipForwardIcon,
+  Volume2Icon,
+  VolumeXIcon,
   Loader2Icon,
   LockIcon
 } from 'lucide-react';
@@ -46,12 +48,14 @@ function loadYouTubeApi(): Promise<void> {
   return ytApiPromise;
 }
 
-function YouTubePlayer({ videoId, onEnded }: { videoId: string; onEnded: () => void }) {
+function YouTubePlayer({ videoId, onEnded, onPlayer }: { videoId: string; onEnded: () => void; onPlayer?: (p: any) => void }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const readyRef = useRef(false);
   const onEndedRef = useRef(onEnded);
   onEndedRef.current = onEnded;
+  const onPlayerRef = useRef(onPlayer);
+  onPlayerRef.current = onPlayer;
 
   useEffect(() => {
     let cancelled = false;
@@ -67,7 +71,7 @@ function YouTubePlayer({ videoId, onEnded }: { videoId: string; onEnded: () => v
         videoId,
         playerVars: { rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1 },
         events: {
-          onReady: () => { readyRef.current = true; },
+          onReady: () => { readyRef.current = true; onPlayerRef.current?.(playerRef.current); },
           onStateChange: (e: any) => {
             if (window.YT && e.data === window.YT.PlayerState.ENDED) onEndedRef.current();
           }
@@ -142,6 +146,35 @@ export function WatchPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
   const [mobilePlaylistOpen, setMobilePlaylistOpen] = useState(false);
+
+  // volume — the embedded player hides its slider on touch devices, so we expose our own
+  const [player, setPlayer] = useState<any>(null);
+  const [volume, setVolume] = useState(100);
+  const [muted, setMuted] = useState(false);
+
+  const handlePlayerReady = (p: any) => {
+    setPlayer(p);
+    try {
+      setVolume(Math.round(p.getVolume?.() ?? 100));
+      setMuted(!!p.isMuted?.());
+    } catch { /* ignore */ }
+  };
+  const changeVolume = (v: number) => {
+    setVolume(v);
+    if (!player) return;
+    try {
+      player.setVolume(v);
+      if (v > 0 && player.isMuted?.()) { player.unMute(); setMuted(false); }
+      if (v === 0) { player.mute(); setMuted(true); }
+    } catch { /* ignore */ }
+  };
+  const toggleMute = () => {
+    if (!player) return;
+    try {
+      if (player.isMuted?.()) { player.unMute(); setMuted(false); }
+      else { player.mute(); setMuted(true); }
+    } catch { /* ignore */ }
+  };
 
   const storageKey = `ict-watched-${packId}`;
 
@@ -273,7 +306,7 @@ export function WatchPage() {
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
           <div className="relative w-full bg-black shrink-0 lg:p-4 xl:p-5">
             <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
-              <YouTubePlayer videoId={active.youtubeId} onEnded={handleNext} />
+              <YouTubePlayer videoId={active.youtubeId} onEnded={handleNext} onPlayer={handlePlayerReady} />
             </div>
           </div>
 
@@ -322,7 +355,7 @@ export function WatchPage() {
                 <p className="text-xs text-white/40">{watchedCount} of {total} watched</p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <button onClick={() => goTo(activeIndex - 1)} disabled={activeIndex === 0}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/15 text-sm font-semibold text-white/70 hover:border-white/35 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed">
                   <ChevronLeftIcon className="w-4 h-4" /> Previous
@@ -331,6 +364,23 @@ export function WatchPage() {
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#c20f24] text-white text-sm font-semibold hover:bg-red-500 disabled:opacity-25 disabled:cursor-not-allowed shadow-[0_4px_18px_rgba(194,15,36,0.4)]">
                   Next <SkipForwardIcon className="w-4 h-4" />
                 </button>
+
+                {/* volume */}
+                <div className="flex items-center gap-2 ml-auto rounded-xl border border-white/15 px-3 py-2">
+                  <button type="button" onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'}
+                    className="text-white/70 hover:text-white transition-colors">
+                    {muted || volume === 0 ? <VolumeXIcon className="w-4 h-4" /> : <Volume2Icon className="w-4 h-4" />}
+                  </button>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={muted ? 0 : volume}
+                    onChange={(e) => changeVolume(Number(e.target.value))}
+                    aria-label="Volume"
+                    className="w-24 sm:w-28 accent-[#c20f24] cursor-pointer"
+                  />
+                </div>
               </div>
 
               {/* mobile playlist */}
