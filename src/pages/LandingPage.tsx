@@ -69,13 +69,11 @@ export function LandingPage() {
   const [paused, setPaused] = useState(false);
   const [promos, setPromos] = useState<any[]>([GUIDE_PROMO]);
   const [featured, setFeatured] = useState<any[]>([]);
-  const [recruitNotice, setRecruitNotice] = useState<string>('2025 බඳවා ගැනීම් දැන් විවෘතයි');
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [reviewCount, setReviewCount] = useState(6);
 
   useEffect(() => {
     supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
-      if (data && data.recruitment_notice != null) setRecruitNotice(data.recruitment_notice);
       if (data && data.landing_review_count != null) setReviewCount(data.landing_review_count);
     });
   }, []);
@@ -202,21 +200,6 @@ export function LandingPage() {
                   LEVEL UP YOUR ICT
                   <span className="pixel-cursor">_</span>
                 </div>
-
-                {/* Recruitment notice — editable in Admin → Settings */}
-                {recruitNotice.trim() && (
-                  <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-7 border border-red-100 dark:border-red-900 transition-colors">
-                    {recruitNotice}
-                  </span>
-                )}
-
-                {/* Brand mark */}
-                <img
-                  src="/favicon.svg"
-                  alt="Udayana ICT"
-                  className="w-16 h-16 md:w-20 md:h-20 mb-5 pixel-svg drop-shadow-[0_12px_28px_rgba(194,15,36,0.35)]"
-                  draggable={false}
-                />
 
                 {/* Name */}
                 <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors">
