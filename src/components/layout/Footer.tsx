@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 /** WhatsApp glyph */
 function WhatsAppIcon({ className = '' }: { className?: string }) {
   return (
@@ -25,99 +27,124 @@ function YouTubeIcon({ className = '' }: { className?: string }) {
   );
 }
 
+const headingCls =
+  'text-lg font-bold text-apple-text dark:text-apple-light pb-2.5 mb-4 border-b border-gray-200 dark:border-slate-800 transition-colors';
+const linkCls =
+  'text-sm text-apple-subtext dark:text-slate-400 hover:text-[#c20f24] dark:hover:text-red-400 transition-colors';
+
 export function Footer() {
   return (
-    <footer id="contact" className="bg-apple-light dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors scroll-mt-20">
-      <div className="max-w-7xl mx-auto">
-        {/* Red banner card */}
-        <div className="relative overflow-hidden rounded-3xl px-6 py-10 sm:px-12 sm:py-12 shadow-[0_20px_50px_rgba(180,15,30,0.35)] bg-[radial-gradient(ellipse_110%_150%_at_30%_15%,#e3142b_0%,#b51022_28%,#6e0b16_58%,#2a0508_82%,#150103_100%)]">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+    <footer
+      id="contact"
+      className="bg-white dark:bg-slate-950 border-t border-gray-100 dark:border-slate-800 transition-colors scroll-mt-20"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr_1fr] gap-12 lg:gap-10">
 
-            {/* LEFT: Brand lockup */}
-            <div className="flex items-center gap-4 sm:gap-5">
-              <div className="flex flex-col items-start">
-                <span className="text-white text-[0.6rem] sm:text-xs font-bold tracking-[0.28em] mb-0.5">
-                  ADVANCED LEVEL
-                </span>
-                <span className="text-[#FFC107] font-extrabold italic text-5xl sm:text-7xl leading-[0.8] drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
-                  ICT
-                </span>
-              </div>
-
-              {/* Divider */}
-              <div className="w-[3px] h-16 sm:h-[4.5rem] bg-white/85 rounded-full" />
-
-              <div className="flex flex-col justify-center leading-none">
-                <span className="text-[#FFC107] font-extrabold italic text-2xl sm:text-4xl tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
-                  PASINDU
-                </span>
-                <span className="text-white font-bold italic text-xl sm:text-3xl tracking-[0.12em] mt-1">
-                  DISSANAYAKE
-                </span>
-              </div>
+          {/* Brand block — photo, name, tagline */}
+          <div className="flex flex-col items-center text-center">
+            <div className="w-28 h-28 rounded-full overflow-hidden bg-[radial-gradient(circle_at_32%_22%,#e3142b_0%,#a50f24_55%,#5e0813_100%)] shadow-[0_12px_32px_rgba(194,15,36,0.28)] mb-4">
+              <img
+                src="/images/pasindu-hero.png"
+                alt="Pasindu Dissanayake"
+                className="w-full h-full object-cover object-top scale-110"
+                draggable={false}
+              />
             </div>
+            <p className="font-extrabold text-xl uppercase tracking-tight text-apple-text dark:text-apple-light transition-colors">
+              Pasindu Dissanayake
+            </p>
+            <p className="mt-1 text-[10px] font-semibold tracking-[0.3em] uppercase text-[#c20f24]">
+              Advanced Level ICT
+            </p>
+            <p className="mt-4 text-sm text-apple-subtext dark:text-slate-400 leading-relaxed max-w-[280px] transition-colors">
+              🔥 ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..! 👊
+            </p>
+            <p className="mt-1.5 text-xs text-apple-subtext/70 dark:text-slate-500 transition-colors">
+              - පසිඳු දිසානායක -
+            </p>
+          </div>
 
-            {/* RIGHT: Tagline + contacts */}
-            <div className="flex flex-col items-center lg:items-end gap-4">
-              {/* Tagline speech bubble */}
-              <div className="flex items-start gap-2.5">
-                <p className="text-[#FFC107] font-bold text-sm sm:text-base leading-snug text-center lg:text-right drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
-                  ඉගෙනගන්න, ඉගෙනගත්ත<br />
-                  කෙනෙක්ගෙන් අහලා බලන්න...
-                </p>
-                <span className="mt-1 w-7 h-7 rounded-full bg-[#FFC107] shadow-[0_0_18px_rgba(255,193,7,0.55)] flex-shrink-0" />
-              </div>
+          {/* Quick Links */}
+          <div>
+            <h3 className={headingCls}>Quick Links</h3>
+            <ul className="space-y-3">
+              <li><a href="/#promos" className={linkCls}>Promotions</a></li>
+              <li><a href="/#reviews" className={linkCls}>Reviews</a></li>
+              <li><a href="/#features" className={linkCls}>Why Us</a></li>
+              <li><Link to="/login" className={linkCls}>Log In</Link></li>
+              <li><Link to="/signup" className={linkCls}>Sign Up</Link></li>
+            </ul>
+          </div>
 
-              {/* Contacts */}
-              <div className="flex flex-col items-center lg:items-end gap-2.5">
+          {/* WhatsApp Channel */}
+          <div>
+            <h3 className={`${headingCls} flex items-center gap-2`}>
+              <span className="w-6 h-6 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+                <WhatsAppIcon className="w-3.5 h-3.5 text-white" />
+              </span>
+              WhatsApp
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="https://whatsapp.com/channel/0029Vb6zVpy4tRrtEpCZ7n1i"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkCls}
+                >
+                  Official WhatsApp Channel
+                </a>
+              </li>
+              <li>
                 <a
                   href="https://wa.me/94719735601"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 group"
+                  className={linkCls}
                 >
-                  <span className="w-7 h-7 rounded-full bg-[#25D366] flex items-center justify-center flex-shrink-0">
-                    <WhatsAppIcon className="w-4 h-4 text-white" />
-                  </span>
-                  <span className="text-white font-bold text-lg tracking-wide group-hover:text-[#FFC107] transition-colors">
-                    071 973 5601
-                  </span>
+                  පන්ති පිළිබඳ විමසීම්
                 </a>
+              </li>
+            </ul>
+          </div>
 
-                <a
-                  href="https://facebook.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 group"
-                >
-                  <span className="w-7 h-7 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0">
-                    <FacebookIcon className="w-4 h-4 text-white" />
+          {/* Contact Us */}
+          <div>
+            <h3 className={headingCls}>Contact Us</h3>
+            <ul className="space-y-3">
+              <li>
+                <a href="https://wa.me/94719735601" target="_blank" rel="noopener noreferrer" className={`${linkCls} flex items-center gap-2.5`}>
+                  <span className="w-6 h-6 rounded-full bg-[#25D366] flex items-center justify-center shrink-0">
+                    <WhatsAppIcon className="w-3.5 h-3.5 text-white" />
                   </span>
-                  <span className="text-white font-semibold text-sm tracking-wide group-hover:text-[#FFC107] transition-colors">
-                    PASINDU DISSANAYAKE
-                  </span>
+                  071 973 5601
                 </a>
-
-                <a
-                  href="https://youtube.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 group"
-                >
-                  <span className="w-7 h-7 rounded-full bg-[#FF0000] flex items-center justify-center flex-shrink-0">
-                    <YouTubeIcon className="w-4 h-4 text-white" />
+              </li>
+              <li>
+                <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" className={`${linkCls} flex items-center gap-2.5`}>
+                  <span className="w-6 h-6 rounded-full bg-[#1877F2] flex items-center justify-center shrink-0">
+                    <FacebookIcon className="w-3.5 h-3.5 text-white" />
                   </span>
-                  <span className="text-white font-semibold text-sm tracking-wide group-hover:text-[#FFC107] transition-colors">
-                    PASINDU DISSANAYAKE
-                  </span>
+                  Pasindu Dissanayake
                 </a>
-              </div>
-            </div>
+              </li>
+              <li>
+                <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" className={`${linkCls} flex items-center gap-2.5`}>
+                  <span className="w-6 h-6 rounded-full bg-[#FF0000] flex items-center justify-center shrink-0">
+                    <YouTubeIcon className="w-3.5 h-3.5 text-white" />
+                  </span>
+                  Pasindu Dissanayake
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
+      </div>
 
-        {/* Copyright */}
-        <p className="text-center text-gray-500 dark:text-slate-500 text-xs mt-6">
+      {/* Copyright */}
+      <div className="border-t border-gray-100 dark:border-slate-800 transition-colors">
+        <p className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 text-center text-gray-500 dark:text-slate-500 text-xs">
           © {new Date().getFullYear()} Udayana ICT · Pasindu Dissanayake. All rights reserved.
         </p>
       </div>
