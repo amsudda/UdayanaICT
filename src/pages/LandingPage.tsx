@@ -8,6 +8,13 @@ import {
   ArrowRightIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  GraduationCapIcon,
+  TimerIcon,
+  GaugeIcon,
+  ClipboardCheckIcon,
+  MoonIcon,
+  HistoryIcon,
+  CalendarDaysIcon,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -53,6 +60,53 @@ const GUIDE_PROMO = {
   imagePosition: 'center',
   fontFamily: ''
 };
+
+/* "Our Process" cards — how the class programme works. */
+const PROCESS_STEPS = [
+  {
+    icon: GraduationCapIcon,
+    color: 'text-emerald-500',
+    title: 'Theory and Revision',
+    text: 'ICT විෂය නිර්දේශයේ සෑම කොටසක්ම විභාගයට මාසයකට පෙර ආකර්ශනීය ඉගැන්වීම් රටාවකට අවසන් කිරීම.',
+  },
+  {
+    icon: TimerIcon,
+    color: 'text-blue-500',
+    title: 'Timing Paper',
+    text: 'ප්‍රශ්න වලට පිළිතුරු ලිවීමේ වේගය හුරු කිරීම වෙනුවෙන් පලමු දින සිටම විභාගය දක්වාම සෑම දිනකම පැවැත්වෙන කෙටි ප්‍රශ්න පත්‍ර මාලාව.',
+  },
+  {
+    icon: GaugeIcon,
+    color: 'text-[#c20f24]',
+    title: 'Speed Revision',
+    text: 'ප්‍රතිඵල පැමිණි විගස ආරම්භ වන, අසාර්ථක වූවන් විශිෂ්ඨයන් බවට පත්කරන හා පන්ති පැමිණෙන නොපැමිණෙන සියලු සිසුන්ට නොමිලේ සම්බන්ධ විය හැකි අධිවේගී Revision පන්තිය.',
+  },
+  {
+    icon: ClipboardCheckIcon,
+    color: 'text-violet-500',
+    title: 'Final Paper Class',
+    text: 'Online Zoom තාක්ෂණය හරහා ලමුන්ට ප්‍රශ්න පත්‍ර ලිවීම හා සතියක් ඇතුලත ප්‍රශ්න පත්‍ර සාකච්ඡාව පැවැත්වීම මගින් ලමුන්ව ප්‍රශ්න පත්‍ර ලිවීමට හුරු කිරීම.',
+  },
+  {
+    icon: MoonIcon,
+    color: 'text-amber-400',
+    title: 'Night Class',
+    text: 'රාත්‍රී 7 සිට පසුදා උදෑසන වනතෙක් පැවැත්වෙන දුර්වල සිසුන් පුහුණු කරවන විශේෂ වැඩසටහන.',
+  },
+  {
+    icon: HistoryIcon,
+    color: 'text-indigo-500',
+    title: 'සතිමතක',
+    text: 'පෙර ඉගැන්වූ පාඩම් සතියකට වරක් නැවත මතක් කිරීම සඳහා ලබාදෙන කෙටි නිබන්ධන මාලාව.',
+  },
+  {
+    icon: CalendarDaysIcon,
+    color: 'text-teal-500',
+    title: 'Monthly Meeting',
+    text: 'අධෛර්යමත් වූ සිසුන් ධෛර්යමත් කිරීම සඳහා තාක්ෂණවේදයෙන් සාර්ථක වූ විශිෂ්ඨයන් සමග අධ්‍යාපන මෙන්ම බාහිර ගැටලු නිරාකරණයට පැවැත්වෙන විශේෂ වැඩසටහන.',
+    wide: true,
+  },
+];
 
 /* Placeholder testimonials shown until the admin adds real reviews. */
 const FALLBACK_REVIEWS: Review[] = [
@@ -532,6 +586,47 @@ export function LandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Our Process */}
+        <section id="process" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors scroll-mt-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900 transition-colors">
+                අපි උගන්වන ක්‍රමය
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors">
+                Our Process <PixelReveal className="w-5 h-5 text-[#c20f24]" />
+              </h2>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PROCESS_STEPS.map((step, idx) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
+                  className={`bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_32px_rgba(194,15,36,0.10)] hover:-translate-y-1 transition-all duration-300 ${step.wide ? 'md:col-span-2 lg:col-span-3' : ''}`}
+                >
+                  <step.icon className={`w-9 h-9 mx-auto ${step.color}`} strokeWidth={2.2} />
+                  <h3 className="mt-4 mb-3 text-lg font-bold text-apple-text dark:text-apple-light transition-colors">
+                    {step.title}
+                  </h3>
+                  <p className={`text-sm leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors ${step.wide ? 'max-w-3xl mx-auto' : ''}`}>
+                    {step.text}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
