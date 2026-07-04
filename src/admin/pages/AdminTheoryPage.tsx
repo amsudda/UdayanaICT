@@ -158,7 +158,8 @@ export function AdminTheoryPage() {
   /* videos */
   const openVideos = async (m: any) => {
     setVideosMonth(m);
-    setVForm({ id: '', title: '', youtube: '', duration: '' });
+    setVForm({ id: '', title: '', youtube: '', duration: '', tute_url: '' });
+    setTuteFile(null);
     const { data } = await supabase.from('theory_videos').select('*').eq('theory_month_id', m.id).order('sort_order');
     setVideos(data ?? []);
   };
