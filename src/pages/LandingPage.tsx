@@ -607,11 +607,8 @@ export function LandingPage() {
               transition={{ duration: 0.6 }}
               className="text-center mb-12"
             >
-              <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900 transition-colors">
-                අපි උගන්වන ක්‍රමය
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors">
-                Our Process <PixelReveal className="w-5 h-5 text-[#c20f24]" />
+              <h2 className="text-3xl md:text-4xl font-bold uppercase text-apple-text dark:text-apple-light transition-colors">
+                OUR PROCESS <PixelReveal className="w-5 h-5 text-[#c20f24]" />
               </h2>
             </motion.div>
 
