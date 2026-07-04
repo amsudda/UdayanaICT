@@ -1,18 +1,21 @@
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { EyeIcon, EyeOffIcon, LockIcon, MailIcon } from 'lucide-react';
+import { ArrowLeftIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
+import { supabase } from '../lib/supabase';
 import { Input } from '../components/ui/Input';
 import { AuthLayout } from '../components/layout/AuthLayout';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, isAdmin } = useAuth();
+  const [mode, setMode] = useState<'login' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -35,6 +38,77 @@ export function LoginPage() {
     }
     // the effect above redirects (admins → /admin, students → /dashboard)
   };
+
+  const handleForgot = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+    if (!email.trim()) {
+      setError('Enter your email address first.');
+      return;
+    }
+    setSubmitting(true);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`
+    });
+    setSubmitting(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
+    setInfo('Password reset link sent! Check your email inbox (and the spam folder) and follow the link to set a new password.');
+  };
+
+  if (mode === 'forgot') {
+    return (
+      <AuthLayout>
+        <button
+          type="button"
+          onClick={() => { setMode('login'); setError(''); setInfo(''); }}
+          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-apple-subtext hover:text-apple-text transition-colors"
+        >
+          <ArrowLeftIcon className="w-4 h-4" /> Back to login
+        </button>
+
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">
+            මුරපදය අමතක වුණාද?
+          </h2>
+          <p className="text-sm text-apple-subtext">
+            ඔබේ email එක ඇතුළත් කරන්න — මුරපදය නැවත සැකසීමට link එකක් අපි එවන්නෙමු.
+          </p>
+        </div>
+
+        <form className="space-y-5" onSubmit={handleForgot}>
+          <div className="relative">
+            <MailIcon className="absolute left-4 top-[42px] w-4 h-4 text-apple-subtext pointer-events-none z-10" />
+            <Input
+              label="Email address"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="pl-11"
+              required
+            />
+          </div>
+
+          {error ? <p className="text-sm text-red-500">{error}</p> : null}
+          {info ? (
+            <p className="text-sm text-green-600 bg-green-50 border border-green-100 rounded-2xl px-4 py-3">{info}</p>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors disabled:opacity-50 shadow-[0_8px_24px_rgba(194,15,36,0.35)]"
+          >
+            {submitting ? 'Sending…' : 'Send reset link'}
+          </button>
+        </form>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout>
@@ -83,9 +157,13 @@ export function LoginPage() {
             </button>
           </div>
           <div className="flex justify-end mt-2">
-            <a href="#" className="text-sm font-medium text-[#c20f24] hover:underline">
+            <button
+              type="button"
+              onClick={() => { setMode('forgot'); setError(''); setInfo(''); }}
+              className="text-sm font-medium text-[#c20f24] hover:underline"
+            >
               Forgot password?
-            </a>
+            </button>
           </div>
         </div>
 
