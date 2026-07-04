@@ -159,11 +159,11 @@ export function StudyTimeCard() {
               <span className="text-2xl font-black text-[#c20f24] tabular-nums">{hours}</span>
             </div>
             <input
-              type="range" min={0} max={12} step={0.5} value={hours}
+              type="range" min={0} max={24} step={0.5} value={hours}
               onChange={(e) => setHours(Number(e.target.value))}
               className="w-full accent-[#c20f24]"
             />
-            <div className="flex justify-between text-[10px] text-apple-subtext dark:text-slate-500 mt-1"><span>0</span><span>6</span><span>12</span></div>
+            <div className="flex justify-between text-[10px] text-apple-subtext dark:text-slate-500 mt-1"><span>0</span><span>12</span><span>24</span></div>
 
             <div className="mt-6 flex gap-3">
               <button onClick={dismiss} className="flex-1 h-11 rounded-xl border border-gray-200 dark:border-slate-700 font-semibold text-apple-subtext hover:bg-gray-50 dark:hover:bg-slate-800">Close</button>

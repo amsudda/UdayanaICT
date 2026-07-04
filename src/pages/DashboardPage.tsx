@@ -22,12 +22,12 @@ import { StudyTimeCard } from '../components/shared/StudyTimeCard';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const quickActions = [
-  { title: 'My Classes', subtitle: 'Watch your classes', icon: BookOpenIcon, path: '/dashboard/courses', tone: 'bg-[linear-gradient(135deg,#8b5cf6,#6d5bd0)]' },
-  { title: 'Live Classes', subtitle: 'Join sessions', icon: VideoIcon, path: '/dashboard/live', tone: 'bg-[linear-gradient(135deg,#7c3aed,#8b5cf6)]' },
-  { title: 'Extra Classes', subtitle: 'Browse packs', icon: ShoppingCartIcon, path: '/dashboard/extra-classes', tone: 'bg-[linear-gradient(135deg,#8b5cf6,#6366f1)]' },
-  { title: 'Payments', subtitle: 'Slips & history', icon: ReceiptTextIcon, path: '/dashboard/payments', tone: 'bg-[linear-gradient(135deg,#9f67ff,#7c3aed)]' },
-  { title: 'My Profile', subtitle: 'Your details', icon: UserIcon, path: '/dashboard/profile', tone: 'bg-[linear-gradient(135deg,#5b67f1,#4f46e5)]' },
-  { title: 'Get Help', subtitle: 'Support', icon: CircleHelpIcon, path: '/dashboard/help', tone: 'bg-[linear-gradient(135deg,#6d5bd0,#8b5cf6)]' }
+  { title: 'My Classes', subtitle: 'Watch your classes', icon: BookOpenIcon, path: '/dashboard/courses', tone: 'bg-[linear-gradient(135deg,#ef2b42,#c20f24)]' },
+  { title: 'Live Classes', subtitle: 'Join sessions', icon: VideoIcon, path: '/dashboard/live', tone: 'bg-[linear-gradient(135deg,#e3142b,#a50f24)]' },
+  { title: 'Extra Classes', subtitle: 'Browse packs', icon: ShoppingCartIcon, path: '/dashboard/extra-classes', tone: 'bg-[linear-gradient(135deg,#d81a30,#9c0c1d)]' },
+  { title: 'Payments', subtitle: 'Slips & history', icon: ReceiptTextIcon, path: '/dashboard/payments', tone: 'bg-[linear-gradient(135deg,#c20f24,#8a0c1c)]' },
+  { title: 'My Profile', subtitle: 'Your details', icon: UserIcon, path: '/dashboard/profile', tone: 'bg-[linear-gradient(135deg,#b0122a,#7a0a18)]' },
+  { title: 'Get Help', subtitle: 'Support', icon: CircleHelpIcon, path: '/dashboard/help', tone: 'bg-[linear-gradient(135deg,#a50f24,#5e0813)]' }
 ];
 
 const isLiveNow = (iso: string) => {
@@ -113,7 +113,7 @@ export function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {quickActions.map((action) => (
             <button key={action.title} type="button" onClick={() => navigate(action.path)}
-              className={`group flex flex-col justify-between min-h-[108px] sm:min-h-[124px] rounded-3xl p-4 text-left text-white shadow-[0_10px_24px_rgba(139,92,246,0.18)] active:scale-[0.97] transition-transform touch-manipulation ${action.tone}`}>
+              className={`group flex flex-col justify-between min-h-[108px] sm:min-h-[124px] rounded-3xl p-4 text-left text-white shadow-[0_10px_24px_rgba(194,15,36,0.20)] active:scale-[0.97] transition-transform touch-manipulation ${action.tone}`}>
               <span className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-white/20"><action.icon className="w-5 h-5 sm:w-6 sm:h-6" /></span>
               <span>
                 <span className="block text-sm sm:text-base font-bold leading-tight">{action.title}</span>
