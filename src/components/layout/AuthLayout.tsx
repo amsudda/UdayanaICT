@@ -61,7 +61,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
             </div>
 
             <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-3xl xl:text-4xl font-extrabold leading-tight mb-8 drop-shadow">
-              A/L තොරතුරු තාක්ෂණය<br />ජය ගැනීමේ ගමන මෙතැනින්.
+              ඉගෙනීම ආරම්භ කරන්න.
             </motion.h1>
 
             <ul className="space-y-4">
