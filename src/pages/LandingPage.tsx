@@ -173,7 +173,7 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-20 pb-12 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
+        <section className="relative pt-20 pb-0 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
           {/* Soft radial brand glow behind the text block */}
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_80%_at_35%_38%,rgba(194,15,36,0.09),transparent_65%)] dark:bg-[radial-gradient(ellipse_70%_80%_at_35%_38%,rgba(194,15,36,0.18),transparent_65%)] transition-colors" />
 
@@ -276,38 +276,6 @@ export function LandingPage() {
               </motion.div>
             </div>
 
-            {/* Stats Bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.35 }}
-              className="mt-0 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-gray-200 dark:border-slate-800 pt-10 transition-colors"
-            >
-              <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-1">5k+</p>
-                <p className="text-sm text-apple-subtext dark:text-slate-400 font-medium transition-colors">
-                  සක්‍රීය සිසුන්
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-1">150+</p>
-                <p className="text-sm text-apple-subtext dark:text-slate-400 font-medium transition-colors">
-                  වීඩියෝ පාඩම්
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-1">98%</p>
-                <p className="text-sm text-apple-subtext dark:text-slate-400 font-medium transition-colors">
-                  සමත් වීමේ අනුපාතය
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-1">24/7</p>
-                <p className="text-sm text-apple-subtext dark:text-slate-400 font-medium transition-colors">
-                  24/7 සහාය
-                </p>
-              </div>
-            </motion.div>
           </div>
         </section>
 
