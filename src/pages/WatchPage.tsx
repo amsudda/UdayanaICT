@@ -8,6 +8,8 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   ClockIcon,
+  FileTextIcon,
+  FileXIcon,
   PlayIcon,
   LayoutListIcon,
   SparklesIcon,
@@ -18,7 +20,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { extractYouTubeId } from '../lib/youtube';
 
-type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string };
+type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tuteUrl?: string | null };
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
 
@@ -173,7 +175,7 @@ export function WatchPage() {
         return;
       }
       const mapped: VideoLesson[] = vids.map((v: any) => ({
-        id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? ''
+        id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? '', tuteUrl: v.tute_url ?? null
       }));
       let stored: string[] = [];
       try { stored = JSON.parse(localStorage.getItem(storageKey) ?? '[]'); } catch { stored = []; }
@@ -292,6 +294,22 @@ export function WatchPage() {
                   <span>Lesson {activeIndex + 1} of {total}</span>
                 </div>
               </div>
+
+              {/* lesson tute PDF */}
+              {active.tuteUrl ? (
+                <a
+                  href={active.tuteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500/25 hover:text-red-200 text-sm font-semibold transition-colors"
+                >
+                  <FileTextIcon className="w-4 h-4" /> Download Tute (PDF)
+                </a>
+              ) : (
+                <p className="inline-flex items-center gap-2 text-xs font-medium text-white/35">
+                  <FileXIcon className="w-4 h-4" /> No tute PDF for this lesson
+                </p>
+              )}
 
               {active.description && <p className="text-sm text-white/60 leading-relaxed">{active.description}</p>}
 

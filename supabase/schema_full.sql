@@ -49,7 +49,8 @@ create table if not exists public.pack_videos (
   id uuid primary key default gen_random_uuid(),
   pack_id uuid not null references public.packs(id) on delete cascade,
   title text not null, youtube_id text not null,
-  duration_label text, sort_order int not null default 0, description text
+  duration_label text, sort_order int not null default 0, description text,
+  tute_url text
 );
 
 create table if not exists public.theory_months (
@@ -67,7 +68,8 @@ create table if not exists public.theory_videos (
   id uuid primary key default gen_random_uuid(),
   theory_month_id uuid not null references public.theory_months(id) on delete cascade,
   title text not null, youtube_id text not null,
-  duration_label text, sort_order int not null default 0, description text
+  duration_label text, sort_order int not null default 0, description text,
+  tute_url text
 );
 
 create table if not exists public.live_classes (
@@ -428,6 +430,16 @@ drop policy if exists avatar_read on storage.objects;
 create policy avatar_read on storage.objects for select using (bucket_id = 'avatars' and (owner = auth.uid() or public.is_admin()));
 drop policy if exists avatar_write on storage.objects;
 create policy avatar_write on storage.objects for insert with check (bucket_id = 'avatars' and owner = auth.uid());
+
+insert into storage.buckets (id, name, public) values ('tutes','tutes', true) on conflict (id) do nothing;
+drop policy if exists tutes_read on storage.objects;
+create policy tutes_read on storage.objects for select using (bucket_id = 'tutes');
+drop policy if exists tutes_write on storage.objects;
+create policy tutes_write on storage.objects for insert with check (bucket_id = 'tutes' and public.is_admin());
+drop policy if exists tutes_update on storage.objects;
+create policy tutes_update on storage.objects for update using (bucket_id = 'tutes' and public.is_admin());
+drop policy if exists tutes_delete on storage.objects;
+create policy tutes_delete on storage.objects for delete using (bucket_id = 'tutes' and public.is_admin());
 
 drop policy if exists slip_read on storage.objects;
 create policy slip_read on storage.objects for select using (bucket_id = 'slips' and (owner = auth.uid() or public.is_admin()));

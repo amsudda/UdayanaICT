@@ -4,6 +4,7 @@ import {
   PencilIcon,
   Trash2Icon,
   FilmIcon,
+  FileTextIcon,
   UploadCloudIcon,
   GripVerticalIcon,
   ChevronUpIcon,
@@ -54,7 +55,9 @@ export function AdminPacksPage() {
   // videos
   const [videosPack, setVideosPack] = useState<any | null>(null);
   const [videos, setVideos] = useState<any[]>([]);
-  const [vForm, setVForm] = useState({ id: '', title: '', youtube: '', duration: '', description: '' });
+  const [vForm, setVForm] = useState({ id: '', title: '', youtube: '', duration: '', description: '', tute_url: '' });
+  const [tuteFile, setTuteFile] = useState<File | null>(null);
+  const tuteRef = useRef<HTMLInputElement>(null);
 
   // delete
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
@@ -168,7 +171,8 @@ export function AdminPacksPage() {
   /* ---- videos ---- */
   const openVideos = async (p: any) => {
     setVideosPack(p);
-    setVForm({ id: '', title: '', youtube: '', duration: '', description: '' });
+    setVForm({ id: '', title: '', youtube: '', duration: '', description: '', tute_url: '' });
+    setTuteFile(null);
     const { data } = await supabase.from('pack_videos').select('*').eq('pack_id', p.id).order('sort_order');
     setVideos(data ?? []);
   };
@@ -179,11 +183,22 @@ export function AdminPacksPage() {
   };
   const saveVideo = async () => {
     if (!videosPack || !vForm.title.trim() || !vForm.youtube.trim()) return;
+    let tuteUrl: string | null = vForm.tute_url || null;
+    if (tuteFile) {
+      const path = `packs/${videosPack.id}/${Date.now()}.pdf`;
+      const { error: upErr } = await supabase.storage.from('tutes').upload(path, tuteFile, { upsert: true, contentType: 'application/pdf' });
+      if (upErr) {
+        alert(`Could not upload the tute PDF:\n${upErr.message}\n\nIf the bucket is missing, run supabase/migration_tutes.sql in the Supabase SQL editor.`);
+        return;
+      }
+      tuteUrl = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+    }
     const payload = {
       title: vForm.title.trim(),
       youtube_id: parseYouTubeId(vForm.youtube),
       duration_label: vForm.duration || null,
-      description: vForm.description || null
+      description: vForm.description || null,
+      tute_url: tuteUrl
     };
     if (vForm.id) {
       await supabase.from('pack_videos').update(payload).eq('id', vForm.id);
@@ -191,11 +206,14 @@ export function AdminPacksPage() {
       const nextOrder = videos.length ? Math.max(...videos.map((v) => v.sort_order ?? 0)) + 1 : 0;
       await supabase.from('pack_videos').insert({ ...payload, pack_id: videosPack.id, sort_order: nextOrder });
     }
-    setVForm({ id: '', title: '', youtube: '', duration: '', description: '' });
+    setVForm({ id: '', title: '', youtube: '', duration: '', description: '', tute_url: '' });
+    setTuteFile(null);
     reloadVideos(videosPack.id);
   };
-  const editVideo = (v: any) =>
-    setVForm({ id: v.id, title: v.title, youtube: v.youtube_id, duration: v.duration_label ?? '', description: v.description ?? '' });
+  const editVideo = (v: any) => {
+    setVForm({ id: v.id, title: v.title, youtube: v.youtube_id, duration: v.duration_label ?? '', description: v.description ?? '', tute_url: v.tute_url ?? '' });
+    setTuteFile(null);
+  };
   const deleteVideo = async (id: string) => {
     await supabase.from('pack_videos').delete().eq('id', id);
     if (videosPack) reloadVideos(videosPack.id);
@@ -366,9 +384,22 @@ export function AdminPacksPage() {
           <input className={inputCls} value={vForm.title} onChange={(e) => setVForm({ ...vForm, title: e.target.value })} placeholder="Video title" />
           <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID" />
           <input className={inputCls} value={vForm.duration} onChange={(e) => setVForm({ ...vForm, duration: e.target.value })} placeholder="Duration e.g. 45 mins" />
+
+          {/* tute PDF */}
+          <input ref={tuteRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => setTuteFile(e.target.files?.[0] ?? null)} />
+          <div className="flex gap-2">
+            <button type="button" onClick={() => tuteRef.current?.click()} className="flex-1 h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2 truncate px-3">
+              <FileTextIcon className="w-4 h-4 shrink-0" />
+              <span className="truncate">{tuteFile ? tuteFile.name : vForm.tute_url ? 'Change tute PDF' : 'Attach tute PDF (optional)'}</span>
+            </button>
+            {(tuteFile || vForm.tute_url) && (
+              <button type="button" onClick={() => { setTuteFile(null); setVForm({ ...vForm, tute_url: '' }); }} className="h-10 px-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50">Remove</button>
+            )}
+          </div>
+
           <div className="flex gap-2">
             {vForm.id && (
-              <button onClick={() => setVForm({ id: '', title: '', youtube: '', duration: '', description: '' })} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>
+              <button onClick={() => { setVForm({ id: '', title: '', youtube: '', duration: '', description: '', tute_url: '' }); setTuteFile(null); }} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>
             )}
             <button onClick={saveVideo} disabled={!vForm.title.trim() || !vForm.youtube.trim()} className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50">
               {vForm.id ? 'Update video' : 'Add video'}
@@ -388,7 +419,7 @@ export function AdminPacksPage() {
               <GripVerticalIcon className="w-4 h-4 text-slate-300 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-900 truncate">{v.title}</p>
-                <p className="text-xs text-slate-400 truncate">{v.duration_label || '—'} · {v.youtube_id}</p>
+                <p className="text-xs text-slate-400 truncate">{v.duration_label || '—'} · {v.youtube_id}{v.tute_url ? ' · PDF ✓' : ''}</p>
               </div>
               <button onClick={() => editVideo(v)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><PencilIcon className="w-4 h-4" /></button>
               <button onClick={() => deleteVideo(v.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"><Trash2Icon className="w-4 h-4" /></button>
