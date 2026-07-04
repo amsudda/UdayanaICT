@@ -11,7 +11,7 @@ const statusBadge: Record<string, string> = {
   approved: 'bg-emerald-100 text-emerald-700',
   rejected: 'bg-red-100 text-red-700'
 };
-const PROGRAMS = ['A/L', 'O/L'];
+const PROGRAMS = ['A/L'];
 
 export function AdminStudentsPage() {
   const [students, setStudents] = useState<any[]>([]);

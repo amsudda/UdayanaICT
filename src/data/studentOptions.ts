@@ -8,7 +8,7 @@ export const districts = [
   'Monaragala', 'Ratnapura', 'Kegalle',
 ];
 
-export const programs = ['O/L', 'A/L'];
+export const programs = ['A/L'];
 
 /** Exam year (cohort) — current year forward. */
 export const examYears = (() => {

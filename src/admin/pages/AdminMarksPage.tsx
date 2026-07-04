@@ -13,7 +13,7 @@ const now = new Date();
 const pad = (x: number) => String(x).padStart(2, '0');
 const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 const emptyForm = { id: '', title: '', paper_no: '', type: 'full', marks: '', max_marks: '100', exam_date: today };
-const PROGRAMS = ['A/L', 'O/L'];
+const PROGRAMS = ['A/L'];
 
 export function AdminMarksPage() {
   const [batches, setBatches] = useState<any[]>([]);

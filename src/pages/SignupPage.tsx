@@ -41,7 +41,7 @@ export function SignupPage() {
   // academic
   const [school, setSchool] = useState('');
   const [medium, setMedium] = useState('');
-  const [program, setProgram] = useState('');
+  const [program, setProgram] = useState('A/L');
   const [examYear, setExamYear] = useState('');
 
   // guardian
@@ -71,7 +71,7 @@ export function SignupPage() {
       return;
     }
     if (!program) {
-      setError('Please choose your program (O/L or A/L).');
+      setError('Please choose your program.');
       return;
     }
     if (password.length < 6) {
@@ -226,7 +226,7 @@ export function SignupPage() {
         <FieldGroup title="අධ්‍යාපන විස්තර / Academic">
           <Select
             label="Program *"
-            placeholder="O/L or A/L"
+            placeholder="A/L"
             options={programs}
             value={program}
             onChange={(e) => setProgram(e.target.value)}

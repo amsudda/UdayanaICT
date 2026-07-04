@@ -119,10 +119,6 @@ export function AdminSettingsPage() {
               <input type="date" className={inputCls} value={form.al_exam_date} onChange={(e) => set('al_exam_date', e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">O/L exam date</label>
-              <input type="date" className={inputCls} value={form.ol_exam_date} onChange={(e) => set('ol_exam_date', e.target.value)} />
-            </div>
-            <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Term start date</label>
               <input type="date" className={inputCls} value={form.term_start_date} onChange={(e) => set('term_start_date', e.target.value)} />
             </div>

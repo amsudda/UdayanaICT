@@ -192,7 +192,7 @@ export function AdminBatchesPage() {
           <PlusIcon className="w-4 h-4" /> New batch
         </button>
       </div>
-      <p className="text-sm text-slate-500 mb-6">Create cohorts (O/L 2027, A/L 2026…) and assign students.</p>
+      <p className="text-sm text-slate-500 mb-6">Create cohorts (A/L 2026, A/L 2027…) and assign students.</p>
 
       {loading ? (
         <p className="text-sm text-slate-400">Loading…</p>
@@ -257,7 +257,6 @@ export function AdminBatchesPage() {
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Program</label>
               <select className={inputCls} value={form.program} onChange={(e) => setForm({ ...form, program: e.target.value })}>
                 <option value="A/L">A/L</option>
-                <option value="O/L">O/L</option>
               </select>
             </div>
             <div>

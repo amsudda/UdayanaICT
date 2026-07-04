@@ -278,7 +278,6 @@ export function AdminLivePage() {
             {form.audience_scope === 'program' && (
               <select className={`${inputCls} mt-2`} value={form.audience_program} onChange={(e) => setForm({ ...form, audience_program: e.target.value })}>
                 <option value="A/L">All A/L</option>
-                <option value="O/L">All O/L</option>
               </select>
             )}
             {form.audience_scope === 'batches' && (

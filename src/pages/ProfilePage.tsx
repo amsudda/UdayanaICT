@@ -372,7 +372,7 @@ export function ProfilePage() {
           <div className="grid gap-5 sm:grid-cols-2">
             <Select
               label="Program"
-              placeholder="O/L or A/L"
+              placeholder="A/L"
               options={programs}
               value={program}
               onChange={(e) => setProgram(e.target.value)}

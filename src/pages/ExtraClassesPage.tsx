@@ -82,7 +82,7 @@ export function ExtraClassesPage() {
   useEffect(() => {
     supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
       if (!data) return;
-      const d = user?.program === 'O/L' ? data.ol_exam_date : data.al_exam_date;
+      const d = data.al_exam_date;
       if (d) setExamDate(new Date(d));
       if (data.term_start_date) setTermStart(new Date(data.term_start_date));
     });

@@ -343,14 +343,13 @@ export function AdminPacksPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Who can see &amp; buy this?</label>
             <select className={inputCls} value={form.audience_scope} onChange={(e) => setForm({ ...form, audience_scope: e.target.value as any })}>
               <option value="batches">Specific batches</option>
-              <option value="program">A whole program (all O/L or all A/L)</option>
+              <option value="program">A whole program (all A/L)</option>
               <option value="public">Everyone</option>
             </select>
 
             {form.audience_scope === 'program' && (
               <select className={`${inputCls} mt-2`} value={form.audience_program} onChange={(e) => setForm({ ...form, audience_program: e.target.value })}>
                 <option value="A/L">All A/L students</option>
-                <option value="O/L">All O/L students</option>
               </select>
             )}
 
