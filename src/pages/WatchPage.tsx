@@ -117,6 +117,7 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const seekingRef = useRef(false);
+  const lastSeekRef = useRef(0); // grace period so the poll doesn't snap the bar back mid-seek
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -132,7 +133,7 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
       const p = playerRef.current;
       if (!p?.getCurrentTime) return;
       try {
-        if (!seekingRef.current) setCurrent(p.getCurrentTime() ?? 0);
+        if (!seekingRef.current && Date.now() - lastSeekRef.current > 1200) setCurrent(p.getCurrentTime() ?? 0);
         const d = p.getDuration?.() ?? 0;
         if (d) setDuration(d);
       } catch { /* ignore */ }
@@ -170,12 +171,15 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
     if (!p?.seekTo) return;
     try {
       const t = Math.min(Math.max((p.getCurrentTime?.() ?? 0) + d, 0), duration || Number.MAX_SAFE_INTEGER);
+      lastSeekRef.current = Date.now();
       p.seekTo(t, true);
       setCurrent(t);
     } catch { /* ignore */ }
   };
   const seekCommit = (v: number) => {
     seekingRef.current = false;
+    lastSeekRef.current = Date.now();
+    setCurrent(v);
     try { playerRef.current?.seekTo?.(v, true); } catch { /* ignore */ }
   };
   const changeRate = (r: number) => {
@@ -418,7 +422,8 @@ export function WatchPage() {
 
   const active = lessons[activeIndex];
   const total = lessons.length;
-  const watchedCount = watchedIds.size;
+  // count only lessons that still exist — stale localStorage ids must not inflate progress
+  const watchedCount = lessons.filter((l) => watchedIds.has(l.id)).length;
   const progressPct = total > 0 ? Math.round((watchedCount / total) * 100) : 0;
 
   const markWatched = useCallback((id: string) => setWatchedIds((p) => (p.has(id) ? p : new Set([...p, id]))), []);
