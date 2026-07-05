@@ -50,7 +50,8 @@ create table if not exists public.pack_videos (
   pack_id uuid not null references public.packs(id) on delete cascade,
   title text not null, youtube_id text not null,
   duration_label text, sort_order int not null default 0, description text,
-  tute_url text
+  tute_url text,
+  tutes jsonb not null default '[]'::jsonb
 );
 
 create table if not exists public.theory_months (
@@ -69,7 +70,8 @@ create table if not exists public.theory_videos (
   theory_month_id uuid not null references public.theory_months(id) on delete cascade,
   title text not null, youtube_id text not null,
   duration_label text, sort_order int not null default 0, description text,
-  tute_url text
+  tute_url text,
+  tutes jsonb not null default '[]'::jsonb
 );
 
 create table if not exists public.live_classes (

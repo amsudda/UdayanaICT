@@ -12,7 +12,8 @@ import {
   Loader2Icon,
   EyeIcon,
   EyeOffIcon,
-  CalendarIcon
+  CalendarIcon,
+  XIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { extractYouTubeId as parseYouTubeId } from '../../lib/youtube';
@@ -52,8 +53,8 @@ export function AdminTheoryPage() {
 
   const [videosMonth, setVideosMonth] = useState<any | null>(null);
   const [videos, setVideos] = useState<any[]>([]);
-  const [vForm, setVForm] = useState({ id: '', title: '', youtube: '', duration: '', tute_url: '' });
-  const [tuteFile, setTuteFile] = useState<File | null>(null);
+  const [vForm, setVForm] = useState<{ id: string; title: string; youtube: string; duration: string; tutes: { name: string; url: string }[] }>({ id: '', title: '', youtube: '', duration: '', tutes: [] });
+  const [tuteFiles, setTuteFiles] = useState<File[]>([]);
   const tuteRef = useRef<HTMLInputElement>(null);
 
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
@@ -158,8 +159,8 @@ export function AdminTheoryPage() {
   /* videos */
   const openVideos = async (m: any) => {
     setVideosMonth(m);
-    setVForm({ id: '', title: '', youtube: '', duration: '', tute_url: '' });
-    setTuteFile(null);
+    setVForm({ id: '', title: '', youtube: '', duration: '', tutes: [] });
+    setTuteFiles([]);
     const { data } = await supabase.from('theory_videos').select('*').eq('theory_month_id', m.id).order('sort_order');
     setVideos(data ?? []);
   };
@@ -171,29 +172,37 @@ export function AdminTheoryPage() {
   };
   const saveVideo = async () => {
     if (!videosMonth || !vForm.title.trim() || !vForm.youtube.trim()) return;
-    let tuteUrl: string | null = vForm.tute_url || null;
-    if (tuteFile) {
-      const path = `theory/${videosMonth.id}/${Date.now()}.pdf`;
-      const { error: upErr } = await supabase.storage.from('tutes').upload(path, tuteFile, { upsert: true, contentType: 'application/pdf' });
+    const tutes = [...vForm.tutes];
+    for (const f of tuteFiles) {
+      const path = `theory/${videosMonth.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.pdf`;
+      const { error: upErr } = await supabase.storage.from('tutes').upload(path, f, { upsert: true, contentType: 'application/pdf' });
       if (upErr) {
-        alert(`Could not upload the tute PDF:\n${upErr.message}\n\nIf the bucket is missing, run supabase/migration_tutes.sql in the Supabase SQL editor.`);
+        alert(`Could not upload "${f.name}":\n${upErr.message}\n\nIf the bucket is missing, run supabase/migration_tutes.sql in the Supabase SQL editor.`);
         return;
       }
-      tuteUrl = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+      tutes.push({ name: f.name, url: supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl });
     }
-    const payload = { title: vForm.title.trim(), youtube_id: parseYouTubeId(vForm.youtube), duration_label: vForm.duration || null, tute_url: tuteUrl };
-    if (vForm.id) await supabase.from('theory_videos').update(payload).eq('id', vForm.id);
+    const payload = { title: vForm.title.trim(), youtube_id: parseYouTubeId(vForm.youtube), duration_label: vForm.duration || null, tutes };
+    let error;
+    if (vForm.id) ({ error } = await supabase.from('theory_videos').update(payload).eq('id', vForm.id));
     else {
       const nextOrder = videos.length ? Math.max(...videos.map((v) => v.sort_order ?? 0)) + 1 : 0;
-      await supabase.from('theory_videos').insert({ ...payload, theory_month_id: videosMonth.id, sort_order: nextOrder });
+      ({ error } = await supabase.from('theory_videos').insert({ ...payload, theory_month_id: videosMonth.id, sort_order: nextOrder }));
     }
-    setVForm({ id: '', title: '', youtube: '', duration: '', tute_url: '' });
-    setTuteFile(null);
+    if (error) {
+      alert(`Could not save the session:\n${error.message}\n\nIf this mentions a missing "tutes" column, run supabase/migration_tutes_multi.sql in the Supabase SQL editor.`);
+      return;
+    }
+    setVForm({ id: '', title: '', youtube: '', duration: '', tutes: [] });
+    setTuteFiles([]);
     reloadVideos(videosMonth.id);
   };
   const editVideo = (v: any) => {
-    setVForm({ id: v.id, title: v.title, youtube: v.youtube_id, duration: v.duration_label ?? '', tute_url: v.tute_url ?? '' });
-    setTuteFile(null);
+    setVForm({
+      id: v.id, title: v.title, youtube: v.youtube_id, duration: v.duration_label ?? '',
+      tutes: Array.isArray(v.tutes) && v.tutes.length ? v.tutes : v.tute_url ? [{ name: 'Tute PDF', url: v.tute_url }] : []
+    });
+    setTuteFiles([]);
   };
   const deleteVideo = async (id: string) => {
     await supabase.from('theory_videos').delete().eq('id', id);
@@ -341,19 +350,32 @@ export function AdminTheoryPage() {
           <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID" />
           <input className={inputCls} value={vForm.duration} onChange={(e) => setVForm({ ...vForm, duration: e.target.value })} placeholder="Duration e.g. 1 hr 20 mins" />
 
-          {/* tute PDF */}
-          <input ref={tuteRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => setTuteFile(e.target.files?.[0] ?? null)} />
+          {/* tute PDFs (multiple) */}
+          <input ref={tuteRef} type="file" accept="application/pdf,.pdf" multiple className="sr-only"
+            onChange={(e) => { setTuteFiles((f) => [...f, ...Array.from(e.target.files ?? [])]); e.target.value = ''; }} />
+          <button type="button" onClick={() => tuteRef.current?.click()} className="w-full h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2 px-3">
+            <FileTextIcon className="w-4 h-4 shrink-0" /> Attach tute PDFs (optional, multiple)
+          </button>
+          {(vForm.tutes.length > 0 || tuteFiles.length > 0) && (
+            <div className="flex flex-wrap gap-1.5">
+              {vForm.tutes.map((t, i) => (
+                <span key={`s${i}`} className="inline-flex items-center gap-1.5 max-w-full rounded-lg bg-slate-100 border border-slate-200 pl-2 pr-1 py-1 text-xs text-slate-700">
+                  <FileTextIcon className="w-3 h-3 shrink-0 text-slate-400" />
+                  <span className="truncate max-w-[160px]">{t.name}</span>
+                  <button type="button" aria-label={`Remove ${t.name}`} onClick={() => setVForm({ ...vForm, tutes: vForm.tutes.filter((_, j) => j !== i) })} className="p-0.5 rounded text-slate-400 hover:text-red-500"><XIcon className="w-3 h-3" /></button>
+                </span>
+              ))}
+              {tuteFiles.map((f, i) => (
+                <span key={`q${i}`} className="inline-flex items-center gap-1.5 max-w-full rounded-lg bg-blue-50 border border-blue-100 pl-2 pr-1 py-1 text-xs text-blue-700">
+                  <FileTextIcon className="w-3 h-3 shrink-0 text-blue-400" />
+                  <span className="truncate max-w-[160px]">{f.name}</span>
+                  <button type="button" aria-label={`Remove ${f.name}`} onClick={() => setTuteFiles((fs) => fs.filter((_, j) => j !== i))} className="p-0.5 rounded text-blue-400 hover:text-red-500"><XIcon className="w-3 h-3" /></button>
+                </span>
+              ))}
+            </div>
+          )}
           <div className="flex gap-2">
-            <button type="button" onClick={() => tuteRef.current?.click()} className="flex-1 h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2 truncate px-3">
-              <FileTextIcon className="w-4 h-4 shrink-0" />
-              <span className="truncate">{tuteFile ? tuteFile.name : vForm.tute_url ? 'Change tute PDF' : 'Attach tute PDF (optional)'}</span>
-            </button>
-            {(tuteFile || vForm.tute_url) && (
-              <button type="button" onClick={() => { setTuteFile(null); setVForm({ ...vForm, tute_url: '' }); }} className="h-10 px-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50">Remove</button>
-            )}
-          </div>
-          <div className="flex gap-2">
-            {vForm.id && <button onClick={() => { setVForm({ id: '', title: '', youtube: '', duration: '', tute_url: '' }); setTuteFile(null); }} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>}
+            {vForm.id && <button onClick={() => { setVForm({ id: '', title: '', youtube: '', duration: '', tutes: [] }); setTuteFiles([]); }} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>}
             <button onClick={saveVideo} disabled={!vForm.title.trim() || !vForm.youtube.trim()} className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50">
               {vForm.id ? 'Update session' : 'Add session'}
             </button>
@@ -371,7 +393,7 @@ export function AdminTheoryPage() {
               <GripVerticalIcon className="w-4 h-4 text-slate-300 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-900 truncate">{v.title}</p>
-                <p className="text-xs text-slate-400 truncate">{v.duration_label || '—'} · {v.youtube_id}{v.tute_url ? ' · PDF ✓' : ''}</p>
+                <p className="text-xs text-slate-400 truncate">{v.duration_label || '—'} · {v.youtube_id}{(() => { const n = Array.isArray(v.tutes) && v.tutes.length ? v.tutes.length : v.tute_url ? 1 : 0; return n ? ` · ${n} PDF${n > 1 ? 's' : ''}` : ''; })()}</p>
               </div>
               <button onClick={() => editVideo(v)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><PencilIcon className="w-4 h-4" /></button>
               <button onClick={() => deleteVideo(v.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"><Trash2Icon className="w-4 h-4" /></button>

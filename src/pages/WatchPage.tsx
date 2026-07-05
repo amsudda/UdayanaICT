@@ -27,7 +27,8 @@ import {
 import { supabase } from '../lib/supabase';
 import { extractYouTubeId } from '../lib/youtube';
 
-type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tuteUrl?: string | null };
+type Tute = { name: string; url: string };
+type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[] };
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
 
@@ -399,7 +400,8 @@ export function WatchPage() {
         return;
       }
       const mapped: VideoLesson[] = vids.map((v: any) => ({
-        id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? '', tuteUrl: v.tute_url ?? null
+        id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? '',
+        tutes: Array.isArray(v.tutes) && v.tutes.length ? v.tutes : v.tute_url ? [{ name: 'Tute PDF', url: v.tute_url }] : []
       }));
       let stored: string[] = [];
       try { stored = JSON.parse(localStorage.getItem(storageKey) ?? '[]'); } catch { stored = []; }
@@ -520,16 +522,22 @@ export function WatchPage() {
                 </div>
               </div>
 
-              {/* lesson tute PDF */}
-              {active.tuteUrl ? (
-                <a
-                  href={active.tuteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500/25 hover:text-red-200 text-sm font-semibold transition-colors"
-                >
-                  <FileTextIcon className="w-4 h-4" /> Download Tute (PDF)
-                </a>
+              {/* lesson tute PDFs */}
+              {active.tutes.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {active.tutes.map((t, i) => (
+                    <a
+                      key={i}
+                      href={t.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 h-10 px-4 max-w-full rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500/25 hover:text-red-200 text-sm font-semibold transition-colors"
+                    >
+                      <FileTextIcon className="w-4 h-4 shrink-0" />
+                      <span className="truncate max-w-[220px]">{t.name || `Tute ${i + 1} (PDF)`}</span>
+                    </a>
+                  ))}
+                </div>
               ) : (
                 <p className="inline-flex items-center gap-2 text-xs font-medium text-white/35">
                   <FileXIcon className="w-4 h-4" /> No tute PDF for this lesson
