@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SearchIcon, CalendarClockIcon, InfinityIcon, PlayCircleIcon } from 'lucide-react';
+import { SearchIcon, InfinityIcon } from 'lucide-react';
 import { VideoPackCard } from '../components/shared/VideoPackCard';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
@@ -19,9 +19,6 @@ type StorePack = {
   isFree?: boolean;
 };
 
-const DEFAULT_TERM_START = new Date(`${new Date().getFullYear()}-01-01`);
-const DEFAULT_EXAM = new Date(`${new Date().getFullYear() + 1}-08-10`);
-
 const categories = ['All', 'Paper Classes', 'Theory', 'Revision'] as const;
 const categoryDesc: Record<string, string> = {
   All: 'Every video pack available to you right now',
@@ -29,10 +26,6 @@ const categoryDesc: Record<string, string> = {
   Theory: 'In-depth theory and concept classes',
   Revision: 'Focused, intensive revision packs'
 };
-
-function daysBetween(a: Date, b: Date) {
-  return Math.round((b.getTime() - a.getTime()) / 86_400_000);
-}
 
 export function ExtraClassesPage() {
   const reduce = useReducedMotion();
@@ -46,8 +39,6 @@ export function ExtraClassesPage() {
   const [pending, setPending] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
-  const [examDate, setExamDate] = useState<Date>(DEFAULT_EXAM);
-  const [termStart, setTermStart] = useState<Date>(DEFAULT_TERM_START);
   const examLabel = `${user?.program ?? 'A/L'}${user?.examYear ? ` ${user.examYear}` : ''}`;
 
   const load = useCallback(async () => {
@@ -79,15 +70,6 @@ export function ExtraClassesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  useEffect(() => {
-    supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
-      if (!data) return;
-      const d = data.al_exam_date;
-      if (d) setExamDate(new Date(d));
-      if (data.term_start_date) setTermStart(new Date(data.term_start_date));
-    });
-  }, [user?.program]);
-
   const statusFor = (id: string): 'none' | 'pending' | 'owned' =>
     owned.has(id) ? 'owned' : pending.has(id) ? 'pending' : 'none';
 
@@ -100,10 +82,6 @@ export function ExtraClassesPage() {
     return matchCat && matchSearch;
   });
 
-  const now = new Date();
-  const daysLeft = daysBetween(now, examDate);
-  const windowDays = Math.max(daysBetween(termStart, examDate), 1);
-  const elapsedPct = Math.min(Math.max(((windowDays - daysLeft) / windowDays) * 100, 0), 100);
   const totalVideos = packs.reduce((s, c) => s + c.videoCount, 0);
 
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: reduce ? 0 : 0.06 } } };
@@ -113,38 +91,31 @@ export function ExtraClassesPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 pb-24 lg:pb-0">
-      {/* countdown */}
-      <section className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-[0_10px_40px_rgba(15,23,42,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
-        <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#f59e0b,#f97316,#f59e0b)]" />
-        <div className="p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
-          <div className="flex items-center gap-4 sm:gap-5 sm:flex-1">
-            <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
-              <CalendarClockIcon className="w-7 h-7 sm:w-8 sm:h-8" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">{examLabel} exam</p>
-              {daysLeft > 0 ? (
-                <p className="text-2xl sm:text-4xl font-black text-apple-text dark:text-apple-light leading-none mt-1 tabular-nums">
-                  {daysLeft} <span className="text-base sm:text-xl font-bold text-apple-subtext dark:text-slate-400">days left</span>
-                </p>
-              ) : (
-                <p className="text-2xl sm:text-3xl font-black text-apple-text dark:text-apple-light leading-tight mt-1">Exam time — best of luck! 💪</p>
-              )}
-              <p className="text-sm text-apple-subtext dark:text-slate-400 mt-1.5">Pick up the packs that close your gaps before the exam.</p>
-            </div>
+      {/* store banner */}
+      <section className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#7a0a18,#a50f24,#c20f24)] text-white shadow-[0_14px_44px_rgba(194,15,36,0.28)]">
+        <div className="absolute -top-14 -right-14 w-60 h-60 rounded-full bg-white/10 blur-2xl pointer-events-none" aria-hidden />
+        <div className="absolute -bottom-16 -left-10 w-48 h-48 rounded-full bg-amber-300/10 blur-2xl pointer-events-none" aria-hidden />
+        <div className="relative p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
+          <div className="sm:flex-1 min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-200/80">{examLabel} · Pack Store</p>
+            <h1 className="text-2xl sm:text-3xl font-black leading-tight mt-1">ඔබට අවශ්‍ය පාඩම් pack එක තෝරන්න</h1>
+            <p className="flex items-center gap-2 text-sm text-rose-100/75 mt-2">
+              <InfinityIcon className="w-4 h-4 shrink-0" /> One-time payment · watch anytime · no deadline
+            </p>
           </div>
-          <div className="flex sm:flex-col gap-2 sm:gap-2.5 sm:border-l sm:border-gray-100 sm:dark:border-slate-800 sm:pl-8 shrink-0">
-            <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-apple-text dark:text-apple-light"><InfinityIcon className="w-4 h-4 text-[#c20f24] shrink-0" /> One payment, watch anytime</span>
-            <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-apple-text dark:text-apple-light"><PlayCircleIcon className="w-4 h-4 text-[#c20f24] shrink-0" /> {totalVideos} videos · no deadline</span>
+          <div className="flex gap-3 shrink-0">
+            {[
+              { n: packs.length, label: 'Packs' },
+              { n: totalVideos, label: 'Videos' },
+              { n: owned.size, label: 'You own' }
+            ].map((s) => (
+              <div key={s.label} className="min-w-[76px] rounded-2xl bg-white/10 backdrop-blur px-4 py-3 text-center border border-white/10">
+                <p className="text-2xl font-black leading-none tabular-nums">{s.n}</p>
+                <p className="text-[11px] text-rose-100/70 font-medium mt-1">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
-        {daysLeft > 0 && (
-          <div className="px-5 sm:px-7 pb-5">
-            <div className="h-1.5 w-full rounded-full bg-gray-100 dark:bg-slate-800 overflow-hidden">
-              <motion.div className="h-full rounded-full bg-[linear-gradient(90deg,#f59e0b,#f97316)]" initial={{ width: 0 }} animate={{ width: `${elapsedPct}%` }} transition={{ duration: reduce ? 0 : 0.8, ease: 'easeOut' }} />
-            </div>
-          </div>
-        )}
       </section>
 
       {/* filters */}
