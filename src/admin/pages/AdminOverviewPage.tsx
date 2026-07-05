@@ -69,12 +69,16 @@ function TrendAreaChart({ buckets, color, id, label }: { buckets: { label: strin
       ))}
       <polygon points={area} fill={`url(#${id})`} />
       <polyline points={line} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-      {buckets.map((b, i) => (
-        <g key={b.label}>
-          <circle cx={x(i)} cy={y(b.total)} r="3.5" fill={color} />
-          <text x={x(i)} y={H - 10} textAnchor="middle" fontSize="11" fill="#94a3b8">{b.label}</text>
-        </g>
-      ))}
+      {buckets.map((b, i) => {
+        const step = Math.max(1, Math.ceil(buckets.length / 7));
+        const showLabel = i % step === 0 || i === buckets.length - 1;
+        return (
+          <g key={`${b.label}-${i}`}>
+            <circle cx={x(i)} cy={y(b.total)} r={buckets.length > 14 ? 2 : 3.5} fill={color} />
+            {showLabel && <text x={x(i)} y={H - 10} textAnchor="middle" fontSize="11" fill="#94a3b8">{b.label}</text>}
+          </g>
+        );
+      })}
     </svg>
   );
 }
@@ -172,6 +176,49 @@ export function AdminOverviewPage() {
   }, [approved]);
 
   const revenueSpark = revenueBuckets.map((b) => b.total);
+
+  // revenue chart range filter
+  const [revRange, setRevRange] = useState<'30d' | '3m' | '6m' | '12m' | 'all'>('6m');
+  const revenueSeries = useMemo(() => {
+    if (revRange === '30d') {
+      const out: { label: string; total: number; key: string }[] = [];
+      const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 29);
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(start.getTime() + i * 86_400_000);
+        out.push({ label: `${d.getDate()}/${d.getMonth() + 1}`, total: 0, key: d.toDateString() });
+      }
+      approved.forEach((p) => {
+        const b = out.find((x) => x.key === new Date(p.created_at).toDateString());
+        if (b) b.total += Number(p.amount ?? 0);
+      });
+      return out;
+    }
+    let months: number;
+    if (revRange === 'all') {
+      const first = approved.length ? new Date(Math.min(...approved.map((p) => +new Date(p.created_at)))) : new Date();
+      const n = new Date();
+      months = Math.max((n.getFullYear() - first.getFullYear()) * 12 + (n.getMonth() - first.getMonth()) + 1, 2);
+    } else {
+      months = revRange === '3m' ? 3 : revRange === '6m' ? 6 : 12;
+    }
+    const out: { label: string; total: number; key: string }[] = [];
+    const d = new Date(); d.setDate(1);
+    for (let i = months - 1; i >= 0; i--) {
+      const m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+      out.push({
+        label: m.toLocaleString('en', { month: 'short' }) + (months > 12 ? ` '${String(m.getFullYear()).slice(2)}` : ''),
+        total: 0,
+        key: monthKey(m)
+      });
+    }
+    approved.forEach((p) => {
+      const b = out.find((x) => x.key === monthKey(new Date(p.created_at)));
+      if (b) b.total += Number(p.amount ?? 0);
+    });
+    return out;
+  }, [approved, revRange]);
+  const revRangeTotal = revenueSeries.reduce((s, b) => s + b.total, 0);
+  const revRangeDesc = { '30d': 'last 30 days', '3m': 'last 3 months', '6m': 'last 6 months', '12m': 'last 12 months', all: 'lifetime' }[revRange];
 
   // student growth: new registrations per month, last 7 months
   const growthBuckets = useMemo(() => {
@@ -343,12 +390,25 @@ export function AdminOverviewPage() {
         <div className="space-y-6 min-w-0">
           {/* revenue */}
           <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
               <h2 className="font-bold text-slate-900">Revenue Overview</h2>
-              <span className="text-xs text-slate-400">last 6 months · approved payments</span>
+              <div className="flex rounded-lg bg-slate-100 p-0.5">
+                {([['30d', '30D'], ['3m', '3M'], ['6m', '6M'], ['12m', '12M'], ['all', 'All']] as const).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setRevRange(key)}
+                    className={`h-7 px-2.5 rounded-md text-xs font-semibold transition-colors ${revRange === key ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <p className="text-2xl font-black text-slate-900 mb-3">{fmtLKR(revenueThisMonth)} <span className="text-sm font-medium text-slate-400">this month</span></p>
-            <TrendAreaChart buckets={revenueBuckets} color="#2563eb" id="revfill" label="Monthly revenue" />
+            <p className="text-2xl font-black text-slate-900 mb-3">
+              {fmtLKR(revRangeTotal)} <span className="text-sm font-medium text-slate-400">{revRangeDesc} · approved payments</span>
+            </p>
+            <TrendAreaChart buckets={revenueSeries} color="#2563eb" id="revfill" label="Revenue" />
           </div>
 
           {/* student growth */}
