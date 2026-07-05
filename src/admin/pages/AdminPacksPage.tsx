@@ -393,11 +393,11 @@ export function AdminPacksPage() {
           <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID" />
           <input className={inputCls} value={vForm.duration} onChange={(e) => setVForm({ ...vForm, duration: e.target.value })} placeholder="Duration e.g. 45 mins" />
 
-          {/* tute PDFs (multiple) */}
+          {/* tute PDFs — click again to add more, one by one or several at once */}
           <input ref={tuteRef} type="file" accept="application/pdf,.pdf" multiple className="sr-only"
             onChange={(e) => { setTuteFiles((f) => [...f, ...Array.from(e.target.files ?? [])]); e.target.value = ''; }} />
           <button type="button" onClick={() => tuteRef.current?.click()} className="w-full h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2 px-3">
-            <FileTextIcon className="w-4 h-4 shrink-0" /> Attach tute PDFs (optional, multiple)
+            <PlusIcon className="w-4 h-4 shrink-0" /> Add PDF{(vForm.tutes.length + tuteFiles.length) > 0 ? ` (${vForm.tutes.length + tuteFiles.length} attached — click to add another)` : ' (tute / paper — optional)'}
           </button>
           {(vForm.tutes.length > 0 || tuteFiles.length > 0) && (
             <div className="flex flex-wrap gap-1.5">

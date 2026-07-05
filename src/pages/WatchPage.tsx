@@ -28,7 +28,7 @@ import { supabase } from '../lib/supabase';
 import { extractYouTubeId } from '../lib/youtube';
 
 type Tute = { name: string; url: string };
-type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[] };
+type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind?: 'lesson' | 'paper' };
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
 
@@ -346,7 +346,8 @@ function PlaylistItem({ lesson, index, isActive, isWatched, onClick }: {
       </div>
       <div className="flex-1 min-w-0 pt-0.5">
         <p className={`text-[13px] font-semibold leading-snug line-clamp-2 ${isActive ? 'text-white' : isWatched ? 'text-white/45' : 'text-white/85'}`}>{lesson.title}</p>
-        <p className="flex items-center gap-1.5 text-[11px] text-white/45 mt-1">
+        <p className="flex items-center gap-1.5 text-[11px] text-white/45 mt-1 flex-wrap">
+          {lesson.kind === 'paper' && <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 rounded px-1.5 py-0.5">Paper</span>}
           <ClockIcon className="w-3 h-3 shrink-0" />{lesson.duration}
           {isWatched && !isActive && <span className="text-emerald-400/70 ml-1 font-medium">· Watched</span>}
         </p>
@@ -401,6 +402,7 @@ export function WatchPage() {
       }
       const mapped: VideoLesson[] = vids.map((v: any) => ({
         id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? '',
+        kind: v.kind === 'paper' ? 'paper' : 'lesson',
         tutes: Array.isArray(v.tutes) && v.tutes.length ? v.tutes : v.tute_url ? [{ name: 'Tute PDF', url: v.tute_url }] : []
       }));
       let stored: string[] = [];
@@ -516,6 +518,9 @@ export function WatchPage() {
                   </button>
                 </div>
                 <div className="flex items-center gap-3 mt-2.5 text-sm text-white/50 flex-wrap">
+                  {active.kind === 'paper' && (
+                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 rounded-md px-2 py-0.5">Paper Discussion</span>
+                  )}
                   <span className="flex items-center gap-1.5"><ClockIcon className="w-3.5 h-3.5" />{active.duration}</span>
                   <span className="text-white/25">·</span>
                   <span>Lesson {activeIndex + 1} of {total}</span>

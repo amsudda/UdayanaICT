@@ -71,7 +71,8 @@ create table if not exists public.theory_videos (
   title text not null, youtube_id text not null,
   duration_label text, sort_order int not null default 0, description text,
   tute_url text,
-  tutes jsonb not null default '[]'::jsonb
+  tutes jsonb not null default '[]'::jsonb,
+  kind text not null default 'lesson' check (kind in ('lesson','paper'))
 );
 
 create table if not exists public.live_classes (
