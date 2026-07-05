@@ -62,6 +62,7 @@ export function AdminPacksPage() {
 
   // delete
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [videoSavedMsg, setVideoSavedMsg] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -214,6 +215,8 @@ export function AdminPacksPage() {
     }
     setVForm({ id: '', title: '', youtube: '', duration: '', description: '', tutes: [] });
     setTuteFiles([]);
+    setVideoSavedMsg(`"${payload.title}" saved ✓ — ${tutes.length} PDF${tutes.length === 1 ? '' : 's'} attached`);
+    window.setTimeout(() => setVideoSavedMsg(''), 6000);
     reloadVideos(videosPack.id);
   };
   const editVideo = (v: any) => {
@@ -426,6 +429,7 @@ export function AdminPacksPage() {
               {vForm.id ? 'Update video' : 'Add video'}
             </button>
           </div>
+          {videoSavedMsg && <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">{videoSavedMsg}</p>}
         </div>
 
         {/* video list */}
