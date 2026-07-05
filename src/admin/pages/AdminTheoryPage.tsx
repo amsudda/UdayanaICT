@@ -366,7 +366,12 @@ export function AdminTheoryPage() {
 
           {/* tute PDFs — click again to add more, one by one or several at once */}
           <input ref={tuteRef} type="file" accept="application/pdf,.pdf" multiple className="sr-only"
-            onChange={(e) => { setTuteFiles((f) => [...f, ...Array.from(e.target.files ?? [])]); e.target.value = ''; }} />
+            onChange={(e) => {
+              // snapshot BEFORE clearing — FileList is live and empties when value resets
+              const picked = Array.from(e.target.files ?? []);
+              e.target.value = '';
+              if (picked.length) setTuteFiles((f) => [...f, ...picked]);
+            }} />
           <button type="button" onClick={() => tuteRef.current?.click()} className="w-full h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2 px-3">
             <PlusIcon className="w-4 h-4 shrink-0" /> Add PDF{(vForm.tutes.length + tuteFiles.length) > 0 ? ` (${vForm.tutes.length + tuteFiles.length} attached — click to add another)` : ' (tute / paper — optional)'}
           </button>
