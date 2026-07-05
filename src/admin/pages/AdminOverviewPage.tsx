@@ -49,7 +49,7 @@ function Sparkline({ data, stroke = '#2563eb' }: { data: number[]; stroke?: stri
 }
 
 /* monthly revenue area chart */
-function RevenueChart({ buckets }: { buckets: { label: string; total: number }[] }) {
+function TrendAreaChart({ buckets, color, id, label }: { buckets: { label: string; total: number }[]; color: string; id: string; label: string }) {
   const W = 620, H = 200, PAD = 34;
   const max = Math.max(...buckets.map((b) => b.total), 1);
   const x = (i: number) => PAD + (i / Math.max(buckets.length - 1, 1)) * (W - PAD * 2);
@@ -57,21 +57,21 @@ function RevenueChart({ buckets }: { buckets: { label: string; total: number }[]
   const line = buckets.map((b, i) => `${x(i)},${y(b.total)}`).join(' ');
   const area = `${PAD},${H - 30} ${line} ${x(buckets.length - 1)},${H - 30}`;
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Monthly revenue">
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={label}>
       <defs>
-        <linearGradient id="revfill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2563eb" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#2563eb" stopOpacity="0.02" />
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.22" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
         </linearGradient>
       </defs>
       {[0.25, 0.5, 0.75, 1].map((t) => (
         <line key={t} x1={PAD} x2={W - PAD} y1={y(max * t)} y2={y(max * t)} stroke="#e2e8f0" strokeDasharray="3 4" strokeWidth="1" />
       ))}
-      <polygon points={area} fill="url(#revfill)" />
-      <polyline points={line} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+      <polygon points={area} fill={`url(#${id})`} />
+      <polyline points={line} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
       {buckets.map((b, i) => (
         <g key={b.label}>
-          <circle cx={x(i)} cy={y(b.total)} r="3.5" fill="#2563eb" />
+          <circle cx={x(i)} cy={y(b.total)} r="3.5" fill={color} />
           <text x={x(i)} y={H - 10} textAnchor="middle" fontSize="11" fill="#94a3b8">{b.label}</text>
         </g>
       ))}
@@ -173,6 +173,31 @@ export function AdminOverviewPage() {
 
   const revenueSpark = revenueBuckets.map((b) => b.total);
 
+  // student growth: new registrations per month, last 7 months
+  const growthBuckets = useMemo(() => {
+    const out: { label: string; total: number; key: string }[] = [];
+    const d = new Date(); d.setDate(1);
+    for (let i = 6; i >= 0; i--) {
+      const m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+      out.push({ label: m.toLocaleString('en', { month: 'short' }), total: 0, key: monthKey(m) });
+    }
+    profiles.forEach((p) => {
+      const k = monthKey(new Date(p.created_at));
+      const b = out.find((x) => x.key === k);
+      if (b) b.total++;
+    });
+    return out;
+  }, [profiles]);
+
+  // trend chips (real month-over-month / day-over-day deltas)
+  const regsThisMonth = growthBuckets[growthBuckets.length - 1]?.total ?? 0;
+  const revNow = revenueBuckets[revenueBuckets.length - 1]?.total ?? 0;
+  const revPrev = revenueBuckets[revenueBuckets.length - 2]?.total ?? 0;
+  const revTrend = revPrev > 0 ? `${revNow >= revPrev ? '+' : ''}${Math.round(((revNow - revPrev) / revPrev) * 100)}% vs last month` : null;
+  const yesterdayStr = new Date(Date.now() - 86_400_000).toDateString();
+  const regsYesterday = profiles.filter((p) => new Date(p.created_at).toDateString() === yesterdayStr).length;
+  const regsTodayTrend = `${regsToday - regsYesterday >= 0 ? '+' : ''}${regsToday - regsYesterday} vs yesterday`;
+
   // activity feed: signups + payments merged
   const activity = useMemo(() => {
     const items: { at: string; icon: any; tone: string; text: string }[] = [];
@@ -250,12 +275,12 @@ export function AdminOverviewPage() {
   ];
 
   const stats = [
-    { label: 'Pending Payments', value: pending.length, icon: ReceiptTextIcon, to: '/admin/payments', tone: pending.length > 0 ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500', spark: null as number[] | null, sparkColor: '' },
-    { label: 'Students', value: profiles.length, icon: UsersIcon, to: '/admin/students', tone: 'bg-blue-50 text-blue-600', spark: signupSpark, sparkColor: '#2563eb' },
-    { label: 'Active Batches', value: batches.length, icon: LayersIcon, to: '/admin/batches', tone: 'bg-violet-50 text-violet-600', spark: null, sparkColor: '' },
-    { label: 'Video Packs', value: packCount, icon: PackageIcon, to: '/admin/packs', tone: 'bg-emerald-50 text-emerald-600', spark: null, sparkColor: '' },
-    { label: 'Revenue (This Month)', value: fmtLKR(revenueThisMonth), icon: BanknoteIcon, to: '/admin/payments', tone: 'bg-rose-50 text-rose-600', spark: revenueSpark, sparkColor: '#e11d48' },
-    { label: "Today's Registrations", value: regsToday, icon: UserPlusIcon, to: '/admin/students', tone: 'bg-cyan-50 text-cyan-600', spark: signupSpark, sparkColor: '#0891b2' }
+    { label: 'Pending Payments', value: pending.length, icon: ReceiptTextIcon, to: '/admin/payments', tone: pending.length > 0 ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500', spark: null as number[] | null, sparkColor: '', trend: pending.length > 0 ? 'awaiting approval' : 'all caught up' },
+    { label: 'Students', value: profiles.length, icon: UsersIcon, to: '/admin/students', tone: 'bg-blue-50 text-blue-600', spark: signupSpark, sparkColor: '#2563eb', trend: `+${regsThisMonth} this month` },
+    { label: 'Active Batches', value: batches.length, icon: LayersIcon, to: '/admin/batches', tone: 'bg-violet-50 text-violet-600', spark: null, sparkColor: '', trend: null as string | null },
+    { label: 'Video Packs', value: packCount, icon: PackageIcon, to: '/admin/packs', tone: 'bg-emerald-50 text-emerald-600', spark: null, sparkColor: '', trend: null },
+    { label: 'Revenue (This Month)', value: fmtLKR(revenueThisMonth), icon: BanknoteIcon, to: '/admin/payments', tone: 'bg-rose-50 text-rose-600', spark: revenueSpark, sparkColor: '#e11d48', trend: revTrend },
+    { label: "Today's Registrations", value: regsToday, icon: UserPlusIcon, to: '/admin/students', tone: 'bg-cyan-50 text-cyan-600', spark: signupSpark, sparkColor: '#0891b2', trend: regsTodayTrend }
   ];
 
   const dateLabel = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -301,6 +326,11 @@ export function AdminOverviewPage() {
             </div>
             <p className="text-xl font-black text-slate-900 leading-none truncate">{loading ? '—' : s.value}</p>
             <p className="text-[11px] text-slate-500 mt-1.5 leading-tight">{s.label}</p>
+            {!loading && s.trend ? (
+              <p className={`text-[10px] font-semibold mt-1 truncate ${s.trend.startsWith('+') || s.trend === 'all caught up' ? 'text-emerald-600' : s.trend.startsWith('-') ? 'text-red-500' : 'text-slate-400'}`}>
+                {s.trend}
+              </p>
+            ) : null}
             {s.spark && s.spark.some((v) => v > 0) ? (
               <div className="mt-2"><Sparkline data={s.spark} stroke={s.sparkColor} /></div>
             ) : null}
@@ -318,7 +348,17 @@ export function AdminOverviewPage() {
               <span className="text-xs text-slate-400">last 6 months · approved payments</span>
             </div>
             <p className="text-2xl font-black text-slate-900 mb-3">{fmtLKR(revenueThisMonth)} <span className="text-sm font-medium text-slate-400">this month</span></p>
-            <RevenueChart buckets={revenueBuckets} />
+            <TrendAreaChart buckets={revenueBuckets} color="#2563eb" id="revfill" label="Monthly revenue" />
+          </div>
+
+          {/* student growth */}
+          <div className="rounded-2xl bg-white border border-slate-200 p-5">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="font-bold text-slate-900">Student Growth</h2>
+              <span className="text-xs text-slate-400">new registrations · last 7 months</span>
+            </div>
+            <p className="text-2xl font-black text-slate-900 mb-3">{regsThisMonth} <span className="text-sm font-medium text-slate-400">joined this month</span></p>
+            <TrendAreaChart buckets={growthBuckets} color="#059669" id="growfill" label="Student growth" />
           </div>
 
           {/* pending payments */}
@@ -354,6 +394,11 @@ export function AdminOverviewPage() {
                     </div>
                   </div>
                 ))}
+                {pending.length > 5 && (
+                  <p className="pt-3 text-xs text-slate-400 text-center">
+                    Showing 5 of {pending.length} — <Link to="/admin/payments" className="font-semibold text-blue-600 hover:underline">view the rest</Link>
+                  </p>
+                )}
               </div>
             )}
           </div>
