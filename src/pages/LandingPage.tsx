@@ -110,22 +110,12 @@ const PROCESS_STEPS = [
   },
 ];
 
-/* Placeholder testimonials shown until the admin adds real reviews. */
-const FALLBACK_REVIEWS: Review[] = [
-  { name: 'කවිෂ්කා පෙරේරා', school: 'ආනන්ද විද්‍යාලය, කොළඹ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=11', stars: 5, quote: 'පසිඳු සර්ගේ පාඩම් නිසා ICT ගැන ඇත්ත දැනීමක් ලැබුණා. සෑම පාඩමක්ම ඇති තරම් විස්තරාත්මකව කියලා දෙනවා. A/L exam ට ගිය ගමන් ඒ ලකුණු ගන්නත් ලේසි වුණා!', year: '2024 A/L' },
-  { name: 'සේනාල් ද සිල්වා', school: 'ධර්මාශෝක විද්‍යාලය, අම්බලන්ගොඩ', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=15', stars: 5, quote: 'ගම්පහ ඉදලා Colombo tuition class යන්න අමාරුයි. Pasindu Dissanayake ICT ඒ ගැටලුව solve කළා. ගෙදරදිම ඉන්නකොට live class ලබන්න ලැබීම ලොකු වාසියක්.', year: '2024 A/L' },
-  { name: 'නිල්මිණී ජයසිංහ', school: 'විශාකා බාලිකා, කොළඹ', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=47', stars: 5, quote: 'Past paper discussions section එකෙන් ගොඩාක් help වුණා. Exam pattern ගැන හොඳ idea එකක් ගන්නඑ ලේසි වුණා. ඒ section නොමැතිව exam ready වෙන්නේ නෑ.', year: '2024 A/L' },
-  { name: 'රසාංජල් ගුණසේකර', school: 'රාහුල විද්‍යාලය, ගාල්ල', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=12', stars: 5, quote: 'Video lectures replay කරන්නත් පුළුවන් නිසා concepts clear කරගන්නට ලේසියි. Data structures, algorithms ගැන කිසිදා හොඳාකාරව නොතේරුණු දේ මෙතෙන් ඉගෙනගත්තා.', year: '2023 A/L' },
-  { name: 'ඉෂිකා විජේරත්න', school: 'මහින්ද රාජපක්ෂ විද්‍යාලය', grade: 'A සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=44', stars: 5, quote: 'ICT ගැන කිසිම base එකක් නොතිබුණු මාට පවා මේ platform එක perfect. ඉතා සරළව basic ඉදලා advanced දක්වා explain කරනවා. දැන් university ට apply කරනවා!', year: '2024 A/L' },
-  { name: 'දිලෝෂ් ප්‍රනාන්දු', school: 'ශාන්ත සෙබස්තියාන්, මොරටුව', grade: 'B සාමාර්ථය', avatar: 'https://i.pravatar.cc/100?img=18', stars: 5, quote: 'WhatsApp group ඔස්සේ doubts clear කරගන්නෙත් ලේසි. Pasindu sir always reply දෙනවා. Practical paper ට ඕනෑ coding knowledge ත් ඒ course ඇතුළෙ ලැබෙනවා.', year: '2023 A/L' },
-];
-
 export function LandingPage() {
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
   const [promos, setPromos] = useState<any[]>([]);
   const [featured, setFeatured] = useState<any[]>([]);
-  const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewCount, setReviewCount] = useState(6);
   const [books, setBooks] = useState<any[]>([]);
 
@@ -492,7 +482,8 @@ export function LandingPage() {
           </section>
         )}
 
-        {/* ===== TESTIMONIALS SECTION ===== */}
+        {/* ===== TESTIMONIALS SECTION — only when real reviews exist ===== */}
+        {reviews.length > 0 && (
         <section id="reviews" className="py-24 bg-gradient-to-b from-red-50/50 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -546,6 +537,7 @@ export function LandingPage() {
             </motion.div>
           </div>
         </section>
+        )}
 
         {/* Features / Why Choose Us */}
         <section id="features" className="relative py-24 bg-white dark:bg-slate-900 overflow-hidden transition-colors scroll-mt-20">

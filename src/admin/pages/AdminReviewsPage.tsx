@@ -177,7 +177,7 @@ export function AdminReviewsPage() {
         <div className="text-center py-16 rounded-2xl border border-dashed border-slate-300 bg-white">
           <MessageSquareQuoteIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
           <p className="font-semibold text-slate-700">No reviews yet</p>
-          <p className="text-sm text-slate-400 mt-1">Add your students' testimonials — until then the landing page shows placeholder ones.</p>
+          <p className="text-sm text-slate-400 mt-1">Add your students' testimonials — the landing page reviews section stays hidden until at least one is visible.</p>
         </div>
       ) : (
         <div className="space-y-3">
