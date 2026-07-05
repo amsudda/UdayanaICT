@@ -11,6 +11,11 @@ import {
   FileTextIcon,
   FileXIcon,
   PlayIcon,
+  PauseIcon,
+  RotateCcwIcon,
+  RotateCwIcon,
+  MaximizeIcon,
+  MinimizeIcon,
   LayoutListIcon,
   SparklesIcon,
   SkipForwardIcon,
@@ -48,7 +53,7 @@ function loadYouTubeApi(): Promise<void> {
   return ytApiPromise;
 }
 
-function YouTubePlayer({ videoId, onEnded, onPlayer }: { videoId: string; onEnded: () => void; onPlayer?: (p: any) => void }) {
+function YouTubePlayer({ videoId, onEnded, onPlayer, onState }: { videoId: string; onEnded: () => void; onPlayer?: (p: any) => void; onState?: (s: number) => void }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const readyRef = useRef(false);
@@ -56,6 +61,8 @@ function YouTubePlayer({ videoId, onEnded, onPlayer }: { videoId: string; onEnde
   onEndedRef.current = onEnded;
   const onPlayerRef = useRef(onPlayer);
   onPlayerRef.current = onPlayer;
+  const onStateRef = useRef(onState);
+  onStateRef.current = onState;
 
   useEffect(() => {
     let cancelled = false;
@@ -69,10 +76,12 @@ function YouTubePlayer({ videoId, onEnded, onPlayer }: { videoId: string; onEnde
         width: '100%',
         height: '100%',
         videoId,
-        playerVars: { rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1 },
+        // native UI fully off — the app draws its own controls
+        playerVars: { rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1, controls: 0, disablekb: 1, fs: 0 },
         events: {
           onReady: () => { readyRef.current = true; onPlayerRef.current?.(playerRef.current); },
           onStateChange: (e: any) => {
+            onStateRef.current?.(e.data);
             if (window.YT && e.data === window.YT.PlayerState.ENDED) onEndedRef.current();
           }
         }
@@ -91,6 +100,212 @@ function YouTubePlayer({ videoId, onEnded, onPlayer }: { videoId: string; onEnde
   }, [videoId]);
 
   return <div ref={hostRef} className="w-full h-full" />;
+}
+
+/* ── custom player: blocks all YouTube UI, draws its own controls ── */
+const SPEEDS = [0.75, 1, 1.25, 1.5, 1.75, 2]; // YouTube's player caps at 2x
+
+function fmtTime(s: number) {
+  if (!isFinite(s) || s < 0) s = 0;
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = Math.floor(s % 60);
+  return `${h ? `${h}:` : ''}${h ? String(m).padStart(2, '0') : m}:${String(sec).padStart(2, '0')}`;
+}
+
+function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<any>(null);
+  const seekingRef = useRef(false);
+  const [playing, setPlaying] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [rate, setRate] = useState(1);
+  const [volume, setVolume] = useState(100);
+  const [muted, setMuted] = useState(false);
+  const [speedOpen, setSpeedOpen] = useState(false);
+  const [isFs, setIsFs] = useState(false);
+
+  // poll playhead
+  useEffect(() => {
+    const t = setInterval(() => {
+      const p = playerRef.current;
+      if (!p?.getCurrentTime) return;
+      try {
+        if (!seekingRef.current) setCurrent(p.getCurrentTime() ?? 0);
+        const d = p.getDuration?.() ?? 0;
+        if (d) setDuration(d);
+      } catch { /* ignore */ }
+    }, 500);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    const fn = () => setIsFs(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', fn);
+    return () => document.removeEventListener('fullscreenchange', fn);
+  }, []);
+
+  const handlePlayer = (p: any) => {
+    playerRef.current = p;
+    try {
+      setVolume(Math.round(p.getVolume?.() ?? 100));
+      setMuted(!!p.isMuted?.());
+      p.setPlaybackRate?.(rate);
+    } catch { /* ignore */ }
+  };
+  const handleState = (s: number) => {
+    if (!window.YT) return;
+    if (s === window.YT.PlayerState.PLAYING) setPlaying(true);
+    else if (s === window.YT.PlayerState.PAUSED || s === window.YT.PlayerState.ENDED) setPlaying(false);
+  };
+
+  const toggle = () => {
+    const p = playerRef.current;
+    if (!p) return;
+    try { if (playing) p.pauseVideo(); else p.playVideo(); } catch { /* ignore */ }
+  };
+  const seekBy = (d: number) => {
+    const p = playerRef.current;
+    if (!p?.seekTo) return;
+    try {
+      const t = Math.min(Math.max((p.getCurrentTime?.() ?? 0) + d, 0), duration || Number.MAX_SAFE_INTEGER);
+      p.seekTo(t, true);
+      setCurrent(t);
+    } catch { /* ignore */ }
+  };
+  const seekCommit = (v: number) => {
+    seekingRef.current = false;
+    try { playerRef.current?.seekTo?.(v, true); } catch { /* ignore */ }
+  };
+  const changeRate = (r: number) => {
+    setRate(r);
+    setSpeedOpen(false);
+    try { playerRef.current?.setPlaybackRate?.(r); } catch { /* ignore */ }
+  };
+  const changeVolume = (v: number) => {
+    setVolume(v);
+    const p = playerRef.current;
+    if (!p) return;
+    try {
+      p.setVolume(v);
+      if (v > 0 && p.isMuted?.()) { p.unMute(); setMuted(false); }
+      if (v === 0) { p.mute(); setMuted(true); }
+    } catch { /* ignore */ }
+  };
+  const toggleMute = () => {
+    const p = playerRef.current;
+    if (!p) return;
+    try {
+      if (p.isMuted?.()) { p.unMute(); setMuted(false); }
+      else { p.mute(); setMuted(true); }
+    } catch { /* ignore */ }
+  };
+  const toggleFs = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else containerRef.current?.requestFullscreen?.();
+  };
+
+  const ctlBtn = 'flex items-center justify-center w-9 h-9 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors shrink-0';
+
+  return (
+    <div ref={containerRef} className="relative w-full h-full bg-black select-none" onContextMenu={(e) => e.preventDefault()}>
+      <YouTubePlayer videoId={videoId} onEnded={onEnded} onPlayer={handlePlayer} onState={handleState} />
+
+      {/* interception layer — the YouTube iframe never receives clicks/hover */}
+      <div
+        className={`absolute inset-0 z-10 transition-colors ${playing ? '' : 'bg-black/95'}`}
+        onClick={toggle}
+        onDoubleClick={toggleFs}
+      >
+        {!playing && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="flex items-center justify-center w-16 h-16 rounded-full bg-[#c20f24] shadow-[0_8px_30px_rgba(194,15,36,0.5)] hover:scale-105 transition-transform">
+              <PlayIcon className="w-7 h-7 text-white fill-current ml-1" />
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* custom control bar */}
+      <div className="absolute bottom-0 inset-x-0 z-20 px-3 pb-2 pt-10 bg-gradient-to-t from-black/90 via-black/45 to-transparent">
+        <input
+          type="range"
+          min={0}
+          max={Math.max(duration, 1)}
+          step={1}
+          value={Math.min(current, Math.max(duration, 1))}
+          onChange={(e) => { seekingRef.current = true; setCurrent(Number(e.target.value)); }}
+          onMouseUp={(e) => seekCommit(Number((e.target as HTMLInputElement).value))}
+          onTouchEnd={(e) => seekCommit(Number((e.target as HTMLInputElement).value))}
+          onKeyUp={(e) => seekCommit(Number((e.target as HTMLInputElement).value))}
+          aria-label="Seek"
+          className="w-full h-1.5 accent-[#c20f24] cursor-pointer"
+        />
+        <div className="mt-1 flex items-center gap-1">
+          <button type="button" className={ctlBtn} onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}>
+            {playing ? <PauseIcon className="w-5 h-5 fill-current" /> : <PlayIcon className="w-5 h-5 fill-current" />}
+          </button>
+          <button type="button" className={ctlBtn} onClick={() => seekBy(-10)} aria-label="Back 10 seconds" title="Back 10s">
+            <RotateCcwIcon className="w-4 h-4" />
+          </button>
+          <button type="button" className={ctlBtn} onClick={() => seekBy(10)} aria-label="Forward 10 seconds" title="Forward 10s">
+            <RotateCwIcon className="w-4 h-4" />
+          </button>
+          <span className="text-[11px] text-white/60 tabular-nums px-1.5 shrink-0">
+            {fmtTime(current)} / {fmtTime(duration)}
+          </span>
+
+          <div className="flex-1" />
+
+          {/* speed */}
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setSpeedOpen((o) => !o)}
+              className="h-9 px-2.5 rounded-lg text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-colors tabular-nums"
+              aria-label="Playback speed"
+            >
+              {rate}x
+            </button>
+            {speedOpen && (
+              <div className="absolute bottom-11 right-0 bg-slate-900/95 backdrop-blur border border-white/10 rounded-xl p-1 flex flex-col min-w-[72px] shadow-xl">
+                {SPEEDS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => changeRate(s)}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold text-left tabular-nums ${s === rate ? 'bg-[#c20f24] text-white' : 'text-white/75 hover:bg-white/10'}`}
+                  >
+                    {s}x
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* volume */}
+          <button type="button" className={ctlBtn} onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'}>
+            {muted || volume === 0 ? <VolumeXIcon className="w-4 h-4" /> : <Volume2Icon className="w-4 h-4" />}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={muted ? 0 : volume}
+            onChange={(e) => changeVolume(Number(e.target.value))}
+            aria-label="Volume"
+            className="hidden sm:block w-20 accent-white cursor-pointer shrink-0"
+          />
+
+          {/* fullscreen */}
+          <button type="button" className={ctlBtn} onClick={toggleFs} aria-label={isFs ? 'Exit fullscreen' : 'Fullscreen'}>
+            {isFs ? <MinimizeIcon className="w-4 h-4" /> : <MaximizeIcon className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /* ── progress bar ── */
@@ -147,34 +362,6 @@ export function WatchPage() {
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
   const [mobilePlaylistOpen, setMobilePlaylistOpen] = useState(false);
 
-  // volume — the embedded player hides its slider on touch devices, so we expose our own
-  const [player, setPlayer] = useState<any>(null);
-  const [volume, setVolume] = useState(100);
-  const [muted, setMuted] = useState(false);
-
-  const handlePlayerReady = (p: any) => {
-    setPlayer(p);
-    try {
-      setVolume(Math.round(p.getVolume?.() ?? 100));
-      setMuted(!!p.isMuted?.());
-    } catch { /* ignore */ }
-  };
-  const changeVolume = (v: number) => {
-    setVolume(v);
-    if (!player) return;
-    try {
-      player.setVolume(v);
-      if (v > 0 && player.isMuted?.()) { player.unMute(); setMuted(false); }
-      if (v === 0) { player.mute(); setMuted(true); }
-    } catch { /* ignore */ }
-  };
-  const toggleMute = () => {
-    if (!player) return;
-    try {
-      if (player.isMuted?.()) { player.unMute(); setMuted(false); }
-      else { player.mute(); setMuted(true); }
-    } catch { /* ignore */ }
-  };
 
   const storageKey = `ict-watched-${packId}`;
 
@@ -306,7 +493,7 @@ export function WatchPage() {
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
           <div className="relative w-full bg-black shrink-0 lg:p-4 xl:p-5">
             <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
-              <YouTubePlayer videoId={active.youtubeId} onEnded={handleNext} onPlayer={handlePlayerReady} />
+              <CustomPlayer videoId={active.youtubeId} onEnded={handleNext} />
             </div>
           </div>
 
@@ -365,22 +552,6 @@ export function WatchPage() {
                   Next <SkipForwardIcon className="w-4 h-4" />
                 </button>
 
-                {/* volume */}
-                <div className="flex items-center gap-2 ml-auto rounded-xl border border-white/15 px-3 py-2">
-                  <button type="button" onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'}
-                    className="text-white/70 hover:text-white transition-colors">
-                    {muted || volume === 0 ? <VolumeXIcon className="w-4 h-4" /> : <Volume2Icon className="w-4 h-4" />}
-                  </button>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={muted ? 0 : volume}
-                    onChange={(e) => changeVolume(Number(e.target.value))}
-                    aria-label="Volume"
-                    className="w-24 sm:w-28 accent-[#c20f24] cursor-pointer"
-                  />
-                </div>
               </div>
 
               {/* mobile playlist */}
