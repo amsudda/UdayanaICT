@@ -20,7 +20,7 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
-import { PixelReveal } from '../components/shared/PixelFx';
+import { PixelPageBurst, PixelReveal } from '../components/shared/PixelFx';
 import { ReviewCard, type Review } from '../components/shared/ReviewCard';
 import { BookMockup } from '../components/shared/BookMockup';
 import { overlayClasses } from '../lib/overlay';
@@ -235,6 +235,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-apple-light dark:bg-slate-950 flex flex-col font-sans transition-colors duration-300">
+      <PixelPageBurst />
       <Navbar />
 
       <main className="flex-1">

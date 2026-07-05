@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -35,6 +35,50 @@ export function PixelReveal({ className = 'w-4 h-4 text-amber-400' }: { classNam
 }
 
 const BURST_COLORS = ['#c20f24', '#f59e0b', '#ef4444', '#ffffff'];
+
+/* page-entry burst: two rings of pixels flying out from the centre */
+const ENTRY = Array.from({ length: 28 }, (_, i) => {
+  const angle = (i / 28) * Math.PI * 2 + (i % 2 ? 0.12 : 0);
+  const dist = i % 2 ? 170 + (i % 5) * 55 : 320 + (i % 5) * 75;
+  return {
+    x: Math.cos(angle) * dist,
+    y: Math.sin(angle) * dist,
+    size: 6 + (i % 3) * 3,
+    color: BURST_COLORS[i % BURST_COLORS.length],
+    delay: (i % 4) * 0.04,
+  };
+});
+
+/**
+ * One-shot pixel burst fired right after the page mounts — the "you've
+ * entered" moment. Skipped for reduced-motion users; unmounts itself.
+ */
+export function PixelPageBurst() {
+  const [phase, setPhase] = useState<'idle' | 'burst' | 'done'>('idle');
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const start = window.setTimeout(() => setPhase('burst'), 300);   // just after first paint
+    const stop = window.setTimeout(() => setPhase('done'), 1600);
+    return () => { window.clearTimeout(start); window.clearTimeout(stop); };
+  }, []);
+
+  if (phase !== 'burst') return null;
+  return (
+    <div className="fixed inset-0 z-[70] pointer-events-none overflow-hidden" aria-hidden>
+      {ENTRY.map((p, i) => (
+        <motion.span
+          key={i}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.35 }}
+          transition={{ duration: 0.75, delay: p.delay, ease: 'easeOut' }}
+          className="pixel-svg absolute left-1/2 top-1/2"
+          style={{ width: p.size, height: p.size, marginLeft: -p.size / 2, marginTop: -p.size / 2, background: p.color }}
+        />
+      ))}
+    </div>
+  );
+}
 // fixed angles so the burst reads as a deliberate radial "power-up", not noise
 const BURST = Array.from({ length: 14 }, (_, i) => {
   const angle = (i / 14) * Math.PI * 2;
