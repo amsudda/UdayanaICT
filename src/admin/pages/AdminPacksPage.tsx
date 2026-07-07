@@ -5,6 +5,7 @@ import {
   Trash2Icon,
   FilmIcon,
   FileTextIcon,
+  SearchIcon,
   UploadCloudIcon,
   GripVerticalIcon,
   ChevronUpIcon,
@@ -63,6 +64,11 @@ export function AdminPacksPage() {
   // delete
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const [videoSavedMsg, setVideoSavedMsg] = useState('');
+
+  // list organisation
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -239,6 +245,14 @@ export function AdminPacksPage() {
     if (videosPack) reloadVideos(videosPack.id);
   };
 
+  const filtered = packs.filter((p) => {
+    const okType = typeFilter === 'All' || (p.type ?? 'Other') === typeFilter;
+    const okStatus = statusFilter === 'all' || (statusFilter === 'published' ? p.is_published : !p.is_published);
+    const okSearch = (p.title ?? '').toLowerCase().includes(search.toLowerCase());
+    return okType && okStatus && okSearch;
+  });
+  const groupOrder = [...TYPES, 'Other'];
+
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
@@ -249,6 +263,40 @@ export function AdminPacksPage() {
       </div>
       <p className="text-sm text-slate-500 mb-6">Create video packs, add YouTube videos, target batches and publish.</p>
 
+      {/* toolbar: search + status + type filters */}
+      {!loading && packs.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
+          <div className="relative sm:w-72">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              className="w-full h-10 rounded-xl border border-slate-200 pl-9 pr-3.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search packs…"
+            />
+          </div>
+          <div className="flex rounded-lg bg-slate-200/60 p-0.5 w-fit">
+            {([['all', `All ${packs.length}`], ['published', `Published ${packs.filter((p) => p.is_published).length}`], ['draft', `Drafts ${packs.filter((p) => !p.is_published).length}`]] as const).map(([key, label]) => (
+              <button key={key} type="button" onClick={() => setStatusFilter(key)}
+                className={`h-8 px-3 rounded-md text-xs font-semibold transition-colors ${statusFilter === key ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {['All', ...TYPES].map((t) => {
+              const n = t === 'All' ? packs.length : packs.filter((p) => (p.type ?? 'Other') === t).length;
+              return (
+                <button key={t} type="button" onClick={() => setTypeFilter(t)}
+                  className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors ${typeFilter === t ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-300'}`}>
+                  {t} <span className={typeFilter === t ? 'text-white/70' : 'text-slate-400'}>{n}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <p className="text-sm text-slate-400">Loading…</p>
       ) : packs.length === 0 ? (
@@ -257,36 +305,57 @@ export function AdminPacksPage() {
           <p className="font-semibold text-slate-700">No packs yet</p>
           <p className="text-sm text-slate-400 mt-1">Create your first video pack.</p>
         </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 rounded-2xl border border-dashed border-slate-300 bg-white">
+          <SearchIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+          <p className="font-semibold text-slate-700">No packs match</p>
+          <p className="text-sm text-slate-400 mt-1">Try a different search or clear the filters.</p>
+        </div>
       ) : (
-        <div className="space-y-3">
-          {packs.map((p) => (
-            <div key={p.id} className="flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4">
-              <div className="w-20 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0">
-                {p.thumbnail_url && <img src={p.thumbnail_url} alt="" className="w-full h-full object-cover" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-semibold text-slate-900 truncate">{p.title}</p>
-                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${p.is_published ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                    {p.is_published ? 'Published' : 'Draft'}
-                  </span>
+        <div className="space-y-7">
+          {groupOrder.map((groupName) => {
+            const group = filtered.filter((p) => (p.type ?? 'Other') === groupName);
+            if (!group.length) return null;
+            return (
+              <div key={groupName}>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">{groupName}</h2>
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-600">{group.length}</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {p.type} · {p.is_free ? 'FREE' : `Rs. ${Number(p.price).toLocaleString()}`} · {counts[p.id] ?? 0} videos · {audienceText(p)}
-                </p>
+                <div className="space-y-3">
+                  {group.map((p) => (
+                    <div key={p.id} className="flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4">
+                      <div className="w-20 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0">
+                        {p.thumbnail_url && <img src={p.thumbnail_url} alt="" className="w-full h-full object-cover" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold text-slate-900 truncate">{p.title}</p>
+                          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${p.is_published ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                            {p.is_published ? 'Published' : 'Draft'}
+                          </span>
+                          {p.is_free && <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">FREE</span>}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {p.is_free ? 'FREE' : `Rs. ${Number(p.price).toLocaleString()}`} · {counts[p.id] ?? 0} videos · {audienceText(p)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => openVideos(p)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <FilmIcon className="w-4 h-4" /> <span className="hidden sm:inline">Videos</span>
+                        </button>
+                        <button onClick={() => togglePublish(p)} title={p.is_published ? 'Unpublish' : 'Publish'} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+                          {p.is_published ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                        </button>
+                        <button onClick={() => openEdit(p)} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100"><PencilIcon className="w-4 h-4" /></button>
+                        <button onClick={() => setDeleteTarget(p)} className="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600"><Trash2Icon className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => openVideos(p)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                  <FilmIcon className="w-4 h-4" /> <span className="hidden sm:inline">Videos</span>
-                </button>
-                <button onClick={() => togglePublish(p)} title={p.is_published ? 'Unpublish' : 'Publish'} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100">
-                  {p.is_published ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-                </button>
-                <button onClick={() => openEdit(p)} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100"><PencilIcon className="w-4 h-4" /></button>
-                <button onClick={() => setDeleteTarget(p)} className="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600"><Trash2Icon className="w-4 h-4" /></button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
