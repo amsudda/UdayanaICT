@@ -59,6 +59,7 @@ export function AdminTheoryPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const [videoSavedMsg, setVideoSavedMsg] = useState('');
+  const [liveLinks, setLiveLinks] = useState<{ label: string; url: string }[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,11 +90,12 @@ export function AdminTheoryPage() {
   const openCreate = () => {
     setEditing(null);
     setForm(emptyMonth);
+    setLiveLinks([]);
     setThumbFile(null);
     setThumbPreview(undefined);
     setEditorOpen(true);
   };
-  const openEdit = (m: any) => {
+  const openEdit = async (m: any) => {
     setEditing(m);
     setForm({
       month: m.month,
@@ -107,7 +109,10 @@ export function AdminTheoryPage() {
     });
     setThumbFile(null);
     setThumbPreview(m.thumbnail_url ?? undefined);
+    setLiveLinks([]);
     setEditorOpen(true);
+    const { data: links } = await supabase.from('theory_live_links').select('*').eq('theory_month_id', m.id).order('sort_order');
+    setLiveLinks((links ?? []).map((l: any) => ({ label: l.label ?? '', url: l.url ?? '' })));
   };
   const onThumb = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -139,8 +144,31 @@ export function AdminTheoryPage() {
       is_published: form.is_published,
       thumbnail_url: thumbUrl || null
     };
-    if (editing) await supabase.from('theory_months').update(payload).eq('id', editing.id);
-    else await supabase.from('theory_months').insert(payload);
+    let monthId = editing?.id as string | undefined;
+    let error;
+    if (editing) {
+      ({ error } = await supabase.from('theory_months').update(payload).eq('id', editing.id));
+    } else {
+      const res = await supabase.from('theory_months').insert(payload).select().single();
+      error = res.error;
+      monthId = res.data?.id;
+    }
+    if (error) {
+      setSaving(false);
+      alert(`Could not save the month:\n${error.message}`);
+      return;
+    }
+    // sync live links (replace the set)
+    if (monthId) {
+      await supabase.from('theory_live_links').delete().eq('theory_month_id', monthId);
+      const rows = liveLinks
+        .filter((l) => l.url.trim())
+        .map((l, i) => ({ theory_month_id: monthId, label: l.label.trim() || 'Join Live Class', url: l.url.trim(), sort_order: i }));
+      if (rows.length) {
+        const { error: linkErr } = await supabase.from('theory_live_links').insert(rows);
+        if (linkErr) alert(`Month saved, but the live links could not be saved:\n${linkErr.message}\n\nIf this mentions a missing table, run supabase/migration_monthly_live.sql in the Supabase SQL editor.`);
+      }
+    }
     setSaving(false);
     setEditorOpen(false);
     load();
@@ -337,6 +365,24 @@ export function AdminTheoryPage() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* monthly live class links — visible to students only after the monthly fee is approved */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Live class links</label>
+            <p className="text-[11px] text-slate-400 mb-2">Zoom/Meet links for this month's live classes. Students see a "Join" button once their monthly payment is approved.</p>
+            <div className="space-y-2">
+              {liveLinks.map((l, i) => (
+                <div key={i} className="flex gap-2">
+                  <input className={`${inputCls} !w-[38%]`} value={l.label} onChange={(e) => setLiveLinks((ls) => ls.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} placeholder="Label (e.g. Saturday 7PM)" />
+                  <input className={inputCls} value={l.url} onChange={(e) => setLiveLinks((ls) => ls.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))} placeholder="https://zoom.us/j/…" />
+                  <button type="button" aria-label="Remove link" onClick={() => setLiveLinks((ls) => ls.filter((_, j) => j !== i))} className="h-11 px-2.5 rounded-lg text-red-500 hover:bg-red-50 shrink-0"><XIcon className="w-4 h-4" /></button>
+                </div>
+              ))}
+              <button type="button" onClick={() => setLiveLinks((ls) => [...ls, { label: '', url: '' }])} className="w-full h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2">
+                <PlusIcon className="w-4 h-4" /> Add live link
+              </button>
+            </div>
           </div>
 
           <label className="flex items-center gap-3 pt-1">

@@ -12,6 +12,7 @@ import {
   FileXIcon,
   PlayIcon,
   PauseIcon,
+  RadioIcon,
   RotateCcwIcon,
   RotateCwIcon,
   MaximizeIcon,
@@ -366,6 +367,7 @@ export function WatchPage() {
   const [notFound, setNotFound] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
+  const [liveLinks, setLiveLinks] = useState<any[]>([]);
   const [mobilePlaylistOpen, setMobilePlaylistOpen] = useState(false);
 
 
@@ -380,6 +382,7 @@ export function WatchPage() {
       let vids: any[] | null = null;
       let resolvedTitle = '';
 
+      let live: any[] = [];
       const { data: pack } = await supabase.from('packs').select('title').eq('id', packId).maybeSingle();
       if (pack) {
         resolvedTitle = pack.title;
@@ -389,8 +392,12 @@ export function WatchPage() {
         const { data: month } = await supabase.from('theory_months').select('month, year').eq('id', packId).maybeSingle();
         if (month) {
           resolvedTitle = `${month.month} ${month.year} — Recordings`;
-          const { data } = await supabase.from('theory_videos').select('*').eq('theory_month_id', packId).order('sort_order');
+          const [{ data }, { data: links }] = await Promise.all([
+            supabase.from('theory_videos').select('*').eq('theory_month_id', packId).order('sort_order'),
+            supabase.from('theory_live_links').select('*').eq('theory_month_id', packId).order('sort_order')
+          ]);
           vids = data;
+          live = links ?? [];
         }
       }
       if (!active) return;
@@ -410,6 +417,7 @@ export function WatchPage() {
       const watched = new Set(stored);
       setTitle(resolvedTitle);
       setLessons(mapped);
+      setLiveLinks(live);
       setWatchedIds(watched);
       const firstUnwatched = mapped.findIndex((l) => !watched.has(l.id));
       setActiveIndex(Math.max(firstUnwatched, 0));
@@ -526,6 +534,28 @@ export function WatchPage() {
                   <span>Lesson {activeIndex + 1} of {total}</span>
                 </div>
               </div>
+
+              {/* monthly live classes — unlocked with the monthly fee */}
+              {liveLinks.length > 0 && (
+                <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.07] px-4 py-4">
+                  <p className="flex items-center gap-2 text-sm font-bold text-emerald-300 mb-3">
+                    <RadioIcon className="w-4 h-4" /> Live Classes — this month
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {liveLinks.map((l) => (
+                      <a
+                        key={l.id}
+                        href={l.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-400 transition-colors shadow-[0_4px_16px_rgba(16,185,129,0.35)]"
+                      >
+                        <RadioIcon className="w-4 h-4" /> {l.label || 'Join Live Class'}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* lesson tute PDFs */}
               {active.tutes.length > 0 ? (

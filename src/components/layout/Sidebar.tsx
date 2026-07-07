@@ -7,7 +7,6 @@ import {
   LayoutDashboardIcon,
   LogOutIcon,
   UserIcon,
-  VideoIcon,
   ShoppingCartIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
@@ -26,11 +25,6 @@ const menuGroups = [
         name: 'My Classes',
         path: '/dashboard/courses',
         icon: BookOpenIcon
-      },
-      {
-        name: 'Live Classes',
-        path: '/dashboard/live',
-        icon: VideoIcon
       },
       {
         name: 'Extra Classes Store',

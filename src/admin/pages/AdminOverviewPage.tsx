@@ -15,8 +15,7 @@ import {
   Loader2Icon,
   UserPlusIcon,
   BanknoteIcon,
-  TrendingUpIcon,
-  RadioIcon
+  TrendingUpIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
@@ -92,22 +91,18 @@ export function AdminOverviewPage() {
   const [payments, setPayments] = useState<any[]>([]);
   const [batches, setBatches] = useState<any[]>([]);
   const [packCount, setPackCount] = useState(0);
-  const [liveNext, setLiveNext] = useState<any[]>([]);
   const [marks, setMarks] = useState<any[]>([]);
   const [batchMembers, setBatchMembers] = useState<any[]>([]);
 
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<any | null>(null);
-  const [now, setNow] = useState(Date.now());
 
   const load = async () => {
-    const nowIso = new Date().toISOString();
-    const [{ data: pr }, { data: pay }, { data: bs }, { count: pc }, { data: lc }, { data: mk }, { data: bm }] = await Promise.all([
+    const [{ data: pr }, { data: pay }, { data: bs }, { count: pc }, { data: mk }, { data: bm }] = await Promise.all([
       supabase.from('profiles').select('id, full_name, student_code, program, exam_year, created_at').eq('role', 'student').order('created_at', { ascending: false }),
       supabase.from('payments').select('*').order('created_at', { ascending: false }),
       supabase.from('batches').select('id, name'),
       supabase.from('packs').select('id', { count: 'exact', head: true }),
-      supabase.from('live_classes').select('*').gt('scheduled_at', nowIso).order('scheduled_at', { ascending: true }).limit(3),
       supabase.from('paper_marks').select('student_id, marks'),
       supabase.from('batch_members').select('student_id, batch_id')
     ]);
@@ -115,19 +110,11 @@ export function AdminOverviewPage() {
     setPayments(pay ?? []);
     setBatches(bs ?? []);
     setPackCount(pc ?? 0);
-    setLiveNext(lc ?? []);
     setMarks(mk ?? []);
     setBatchMembers(bm ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
-
-  // 1s ticker for the next-class countdown
-  useEffect(() => {
-    if (!liveNext.length) return;
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [liveNext.length]);
 
   const nameOf = useMemo(() => {
     const m = new Map<string, string>();
@@ -303,21 +290,10 @@ export function AdminOverviewPage() {
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
 
-  /* next-class countdown */
-  const nextClass = liveNext[0];
-  const countdown = useMemo(() => {
-    if (!nextClass) return null;
-    let s = Math.max(0, Math.floor((new Date(nextClass.scheduled_at).getTime() - now) / 1000));
-    const h = Math.floor(s / 3600); s -= h * 3600;
-    const m = Math.floor(s / 60); s -= m * 60;
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return h > 99 ? `${h}h` : `${pad(h)} : ${pad(m)} : ${pad(s)}`;
-  }, [nextClass, now]);
-
   const quickActions = [
     { title: 'Create Batch', desc: 'Start a new batch', to: '/admin/batches', icon: LayersIcon, tone: 'bg-violet-50 text-violet-600 border-violet-100' },
     { title: 'Upload Pack', desc: 'Add learning content', to: '/admin/packs', icon: PackageIcon, tone: 'bg-blue-50 text-blue-600 border-blue-100' },
-    { title: 'Schedule Live Class', desc: 'Plan a live session', to: '/admin/live', icon: VideoIcon, tone: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+    { title: 'Monthly Recordings', desc: 'Sessions + live links', to: '/admin/theory', icon: VideoIcon, tone: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
     { title: 'Approve Payments', desc: 'Review pending slips', to: '/admin/payments', icon: ReceiptTextIcon, tone: 'bg-amber-50 text-amber-600 border-amber-100' }
   ];
 
@@ -486,45 +462,6 @@ export function AdminOverviewPage() {
 
         {/* ── RIGHT column ── */}
         <div className="space-y-6 min-w-0">
-          {/* upcoming live classes */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-slate-900">Upcoming Live Classes</h2>
-              <Link to="/admin/live" className="text-xs font-semibold text-blue-600 hover:underline">View all</Link>
-            </div>
-            {liveNext.length === 0 ? (
-              <p className="text-sm text-slate-400 py-4 text-center">No upcoming classes scheduled.</p>
-            ) : (
-              <div className="space-y-3">
-                {nextClass && (
-                  <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 text-center">
-                    <p className="text-xs font-semibold text-blue-600 mb-1">Next class in</p>
-                    <p className="text-2xl font-black text-slate-900 tabular-nums tracking-wide">{countdown}</p>
-                    <p className="text-xs text-slate-500 mt-1 truncate">{nextClass.title}</p>
-                    {nextClass.zoom_link && (
-                      <a href={nextClass.zoom_link} target="_blank" rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center justify-center gap-2 w-full h-10 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors">
-                        <RadioIcon className="w-4 h-4" /> Join Meeting
-                      </a>
-                    )}
-                  </div>
-                )}
-                {liveNext.slice(1).map((c) => (
-                  <div key={c.id} className="flex items-center gap-3 rounded-xl border border-slate-100 p-3">
-                    <div className="w-12 shrink-0 text-center rounded-lg bg-slate-50 border border-slate-100 py-1.5">
-                      <p className="text-[9px] font-bold uppercase text-slate-400">{new Date(c.scheduled_at).toLocaleDateString('en-GB', { weekday: 'short' })}</p>
-                      <p className="text-xs font-bold text-slate-700">{new Date(c.scheduled_at).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{c.title}</p>
-                      {c.course_label && <p className="text-xs text-slate-400 truncate">{c.course_label}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* recent students */}
           <div className="rounded-2xl bg-white border border-slate-200 p-5">
             <div className="flex items-center justify-between mb-4">

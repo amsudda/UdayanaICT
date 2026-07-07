@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboardIcon,
   BookOpenIcon,
-  VideoIcon,
   ShoppingCartIcon,
   CreditCardIcon,
   UserIcon
@@ -12,7 +11,6 @@ export function MobileNav() {
   const navItems = [
     { name: 'Home',      path: '/dashboard',              icon: LayoutDashboardIcon, end: true },
     { name: 'Classes',   path: '/dashboard/courses',      icon: BookOpenIcon },
-    { name: 'Live',      path: '/dashboard/live',         icon: VideoIcon },
     { name: 'Store',     path: '/dashboard/extra-classes',icon: ShoppingCartIcon },
     { name: 'Payments',  path: '/dashboard/payments',     icon: CreditCardIcon },
     { name: 'Profile',   path: '/dashboard/profile',      icon: UserIcon }

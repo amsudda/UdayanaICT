@@ -7,7 +7,6 @@ import { ClassHistoryPage } from './pages/ClassHistoryPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { HelpPage } from './pages/HelpPage';
 import { LandingPage } from './pages/LandingPage';
-import { LiveClassesPage } from './pages/LiveClassesPage';
 import { LoginPage } from './pages/LoginPage';
 import { PaymentsPage } from './pages/PaymentsPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -23,7 +22,6 @@ import { AdminBatchesPage } from './admin/pages/AdminBatchesPage';
 import { AdminPaymentsPage } from './admin/pages/AdminPaymentsPage';
 import { AdminPacksPage } from './admin/pages/AdminPacksPage';
 import { AdminTheoryPage } from './admin/pages/AdminTheoryPage';
-import { AdminLivePage } from './admin/pages/AdminLivePage';
 import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
 import { AdminPromotionsPage } from './admin/pages/AdminPromotionsPage';
 import { AdminSettingsPage } from './admin/pages/AdminSettingsPage';
@@ -78,7 +76,6 @@ function AnimatedRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="courses" element={<MyCoursesPage />} />
           <Route path="extra-classes" element={<ExtraClassesPage />} />
-          <Route path="live" element={<LiveClassesPage />} />
           <Route path="history" element={<ClassHistoryPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="help" element={<HelpPage />} />
@@ -119,7 +116,6 @@ function AnimatedRoutes() {
           <Route path="batches" element={<AdminBatchesPage />} />
           <Route path="packs" element={<AdminPacksPage />} />
           <Route path="theory" element={<AdminTheoryPage />} />
-          <Route path="live" element={<AdminLivePage />} />
           <Route path="students" element={<AdminStudentsPage />} />
           <Route path="promotions" element={<AdminPromotionsPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />

@@ -75,6 +75,15 @@ create table if not exists public.theory_videos (
   kind text not null default 'lesson' check (kind in ('lesson','paper'))
 );
 
+create table if not exists public.theory_live_links (
+  id uuid primary key default gen_random_uuid(),
+  theory_month_id uuid not null references public.theory_months(id) on delete cascade,
+  label text not null default 'Join Live Class',
+  url text not null,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.live_classes (
   id uuid primary key default gen_random_uuid(),
   title text not null, scheduled_at timestamptz not null,
@@ -298,6 +307,20 @@ create policy theoryvids_read on public.theory_videos for select using (
       and public.has_paid_month(t.month, t.year)));
 drop policy if exists theoryvids_admin on public.theory_videos;
 create policy theoryvids_admin on public.theory_videos for all using (public.is_admin()) with check (public.is_admin());
+
+alter table public.theory_live_links enable row level security;
+drop policy if exists tll_read on public.theory_live_links;
+create policy tll_read on public.theory_live_links for select using (
+  public.is_admin() or exists (
+    select 1 from public.theory_months t
+     where t.id = theory_live_links.theory_month_id
+       and t.is_published
+       and public.can_view(t.audience_scope, t.batch_ids, t.audience_program)
+       and public.has_paid_month(t.month, t.year)
+  )
+);
+drop policy if exists tll_admin on public.theory_live_links;
+create policy tll_admin on public.theory_live_links for all using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists live_read on public.live_classes;
 create policy live_read on public.live_classes for select using (

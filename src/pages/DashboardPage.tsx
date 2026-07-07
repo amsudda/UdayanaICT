@@ -23,7 +23,7 @@ import { StudyTimeCard } from '../components/shared/StudyTimeCard';
 
 const quickActions = [
   { title: 'My Classes', subtitle: 'Watch your classes', icon: BookOpenIcon, path: '/dashboard/courses', tone: 'bg-[linear-gradient(135deg,#ef2b42,#c20f24)]' },
-  { title: 'Live Classes', subtitle: 'Join sessions', icon: VideoIcon, path: '/dashboard/live', tone: 'bg-[linear-gradient(135deg,#e3142b,#a50f24)]' },
+  { title: 'Class History', subtitle: 'Past classes', icon: VideoIcon, path: '/dashboard/history', tone: 'bg-[linear-gradient(135deg,#e3142b,#a50f24)]' },
   { title: 'Extra Classes', subtitle: 'Browse packs', icon: ShoppingCartIcon, path: '/dashboard/extra-classes', tone: 'bg-[linear-gradient(135deg,#d81a30,#9c0c1d)]' },
   { title: 'Payments', subtitle: 'Slips & history', icon: ReceiptTextIcon, path: '/dashboard/payments', tone: 'bg-[linear-gradient(135deg,#c20f24,#8a0c1c)]' },
   { title: 'My Profile', subtitle: 'Your details', icon: UserIcon, path: '/dashboard/profile', tone: 'bg-[linear-gradient(135deg,#b0122a,#7a0a18)]' },
