@@ -5,6 +5,7 @@ import {
   Trash2Icon,
   VideoIcon,
   FileTextIcon,
+  SearchIcon,
   UploadCloudIcon,
   ChevronUpIcon,
   ChevronDownIcon,
@@ -60,6 +61,10 @@ export function AdminTheoryPage() {
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const [videoSavedMsg, setVideoSavedMsg] = useState('');
   const [liveLinks, setLiveLinks] = useState<{ label: string; url: string }[]>([]);
+
+  // list organisation
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -249,6 +254,21 @@ export function AdminTheoryPage() {
     if (videosMonth) reloadVideos(videosMonth.id);
   };
 
+  const filteredMonths = months.filter((m) => {
+    const okStatus = statusFilter === 'all' || (statusFilter === 'published' ? m.is_published : !m.is_published);
+    const hay = `${m.month} ${m.year} ${(m.topics ?? []).join(' ')}`.toLowerCase();
+    return okStatus && hay.includes(search.toLowerCase());
+  });
+  // group by year (newest first), months in calendar order (newest first)
+  const yearGroups: [string, any[]][] = [...new Set(filteredMonths.map((m) => String(m.year)))]
+    .sort((a, b) => Number(b) - Number(a))
+    .map((y) => [
+      y,
+      filteredMonths
+        .filter((m) => String(m.year) === y)
+        .sort((a, b) => MONTHS.indexOf(b.month) - MONTHS.indexOf(a.month))
+    ]);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
@@ -261,6 +281,29 @@ export function AdminTheoryPage() {
         Group each month's live-class recordings. Students unlock a month once you approve that month's fee.
       </p>
 
+      {/* toolbar: search + status filter */}
+      {!loading && months.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
+          <div className="relative sm:w-72">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              className="w-full h-10 rounded-xl border border-slate-200 pl-9 pr-3.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search month or topic…"
+            />
+          </div>
+          <div className="flex rounded-lg bg-slate-200/60 p-0.5 w-fit">
+            {([['all', `All ${months.length}`], ['published', `Published ${months.filter((m) => m.is_published).length}`], ['draft', `Drafts ${months.filter((m) => !m.is_published).length}`]] as const).map(([key, label]) => (
+              <button key={key} type="button" onClick={() => setStatusFilter(key)}
+                className={`h-8 px-3 rounded-md text-xs font-semibold transition-colors ${statusFilter === key ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <p className="text-sm text-slate-400">Loading…</p>
       ) : months.length === 0 ? (
@@ -269,9 +312,22 @@ export function AdminTheoryPage() {
           <p className="font-semibold text-slate-700">No months yet</p>
           <p className="text-sm text-slate-400 mt-1">Add a month to start uploading recordings.</p>
         </div>
+      ) : filteredMonths.length === 0 ? (
+        <div className="text-center py-16 rounded-2xl border border-dashed border-slate-300 bg-white">
+          <SearchIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+          <p className="font-semibold text-slate-700">No months match</p>
+          <p className="text-sm text-slate-400 mt-1">Try a different search or clear the filter.</p>
+        </div>
       ) : (
-        <div className="space-y-3">
-          {months.map((m) => (
+        <div className="space-y-7">
+          {yearGroups.map(([year, group]) => (
+            <div key={year}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">{year}</h2>
+                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-600">{group.length}</span>
+              </div>
+              <div className="space-y-3">
+                {group.map((m) => (
             <div key={m.id} className="flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-3 sm:p-4">
               <div className="w-20 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center text-slate-400">
                 {m.thumbnail_url ? <img src={m.thumbnail_url} alt="" className="w-full h-full object-cover" /> : <CalendarIcon className="w-5 h-5" />}
@@ -294,6 +350,9 @@ export function AdminTheoryPage() {
                 </button>
                 <button onClick={() => openEdit(m)} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100"><PencilIcon className="w-4 h-4" /></button>
                 <button onClick={() => setDeleteTarget(m)} className="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600"><Trash2Icon className="w-4 h-4" /></button>
+              </div>
+            </div>
+                ))}
               </div>
             </div>
           ))}
