@@ -16,6 +16,8 @@ interface VideoPackProps {
   };
   status?: PackStatus;
   onBuy?: () => void;
+  /** Open the pack in My Classes — used for owned & free packs (whole card is clickable). */
+  onOpen?: () => void;
 }
 
 /** Per-type accent: a solid colour that carries meaning across the card. */
@@ -25,18 +27,25 @@ const typeAccent: Record<string, { rail: string; chip: string; stack: string }> 
   Revision: { rail: 'bg-emerald-500', chip: 'bg-emerald-500/90', stack: 'bg-emerald-200 dark:bg-emerald-500/30' }
 };
 
-export function VideoPackCard({ pack, status = 'none', onBuy }: VideoPackProps) {
+export function VideoPackCard({ pack, status = 'none', onBuy, onOpen }: VideoPackProps) {
   const accent = typeAccent[pack.type] ?? {
     rail: 'bg-slate-400',
     chip: 'bg-slate-500/90',
     stack: 'bg-slate-200 dark:bg-slate-600'
   };
 
+  // owned & free packs open in My Classes → the whole card is clickable
+  const clickable = pack.isFree || status === 'owned';
+
   return (
     <motion.div
       whileHover={{ y: -6 }}
       transition={{ duration: 0.22, ease: 'easeOut' }}
-      className="group relative flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 hover:border-gray-200 dark:hover:border-slate-700 shadow-[0_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-all duration-300"
+      onClick={clickable ? onOpen : undefined}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen?.(); } } : undefined}
+      className={`group relative flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 hover:border-gray-200 dark:hover:border-slate-700 shadow-[0_4px_20px_rgba(15,23,42,0.05)] hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-all duration-300 ${clickable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24]/50 focus-visible:ring-offset-2' : ''}`}
     >
       {/* ── thumbnail with "stacked playlist" motif ── */}
       <div className="relative px-3 pt-3">
@@ -104,23 +113,19 @@ export function VideoPackCard({ pack, status = 'none', onBuy }: VideoPackProps) 
           </div>
 
           {pack.isFree ? (
-            <button
-              type="button"
-              onClick={onBuy}
-              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white text-sm font-semibold px-5 h-11 rounded-2xl shadow-[0_6px_20px_rgba(16,185,129,0.32)] hover:shadow-[0_8px_28px_rgba(16,185,129,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 transition-all duration-200"
-            >
+            <span className="flex items-center gap-2 bg-emerald-500 group-hover:bg-emerald-600 text-white text-sm font-semibold px-5 h-11 rounded-2xl shadow-[0_6px_20px_rgba(16,185,129,0.32)] transition-colors">
               <PlayIcon className="w-4 h-4 fill-current" />
               Watch Free
-            </button>
+            </span>
           ) : status === 'pending' ? (
             <span className="flex items-center gap-1.5 bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 text-sm font-semibold px-4 h-11 rounded-2xl">
               <ClockAlertIcon className="w-4 h-4" />
               Pending
             </span>
           ) : status === 'owned' ? (
-            <span className="flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-4 h-11 rounded-2xl">
+            <span className="flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white text-sm font-semibold px-4 h-11 rounded-2xl transition-colors">
               <CheckCircleIcon className="w-4 h-4" />
-              Owned
+              Open
             </span>
           ) : (
             <button

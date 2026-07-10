@@ -19,6 +19,7 @@ export type LibPack = {
   thumbnailUrl?: string;
   duration?: string;
   videoCount: number;
+  isFree?: boolean;
 };
 
 /** Watched video ids for a pack/month (mock progress, kept in localStorage). */
@@ -66,25 +67,37 @@ export async function loadLibrary(userId: string): Promise<{ packs: LibPack[]; r
     .not('pack_id', 'is', null);
 
   const ownedPacks = (enr ?? []).map((e: any) => e.pack).filter(Boolean);
+  const ownedIds = new Set(ownedPacks.map((p: any) => p.id));
+
+  // free packs the student can view (RLS filters by audience) — accessible without payment
+  const { data: freeRows } = await supabase
+    .from('packs')
+    .select('*')
+    .eq('is_published', true)
+    .eq('is_free', true);
+  const freePacks = (freeRows ?? []).filter((p: any) => !ownedIds.has(p.id));
+
+  const allPacks = [...ownedPacks, ...freePacks];
   let videoCounts: Record<string, number> = {};
-  if (ownedPacks.length) {
+  if (allPacks.length) {
     const { data: pv } = await supabase
       .from('pack_videos')
       .select('pack_id')
-      .in('pack_id', ownedPacks.map((p: any) => p.id));
+      .in('pack_id', allPacks.map((p: any) => p.id));
     videoCounts = (pv ?? []).reduce<Record<string, number>>((a, r: any) => {
       a[r.pack_id] = (a[r.pack_id] ?? 0) + 1;
       return a;
     }, {});
   }
 
-  const packs: LibPack[] = ownedPacks.map((p: any) => ({
+  const packs: LibPack[] = allPacks.map((p: any) => ({
     id: p.id,
     title: p.title,
     type: p.type,
     thumbnailUrl: p.thumbnail_url ?? undefined,
     duration: p.duration_label ?? undefined,
-    videoCount: videoCounts[p.id] ?? 0
+    videoCount: videoCounts[p.id] ?? 0,
+    isFree: !!p.is_free && !ownedIds.has(p.id)
   }));
 
   return { packs, recordings };

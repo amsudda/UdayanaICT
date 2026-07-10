@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   BookOpenIcon,
@@ -22,10 +22,14 @@ const pct = (w: number, t: number) => (t > 0 ? Math.round((w / t) * 100) : 0);
 export function MyCoursesPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [params] = useSearchParams();
+  const highlightId = params.get('highlight');
   const [tab, setTab] = useState<Tab>('All');
   const [packs, setPacks] = useState<LibPack[]>([]);
   const [recordings, setRecordings] = useState<LibMonth[]>([]);
   const [loading, setLoading] = useState(true);
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -39,6 +43,18 @@ export function MyCoursesPage() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // arriving from the store with ?highlight=<packId> — focus & flash that pack
+  useEffect(() => {
+    if (loading || !highlightId || !packs.some((p) => p.id === highlightId)) return;
+    setTab('Video Packs');
+    setFlashId(highlightId);
+    const raf = requestAnimationFrame(() =>
+      cardRefs.current[highlightId]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    );
+    const t = window.setTimeout(() => setFlashId(null), 2800);
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(t); };
+  }, [loading, highlightId, packs]);
 
   const unlockedMonths = recordings.filter((r) => r.unlocked).length;
 
@@ -56,7 +72,7 @@ export function MyCoursesPage() {
           My Classes
         </h1>
         <p className="text-apple-subtext dark:text-slate-400 mt-1.5 text-sm">
-          Your purchased video packs and monthly class recordings.
+          Your video packs and monthly class recordings.
         </p>
       </div>
 
@@ -105,7 +121,7 @@ export function MyCoursesPage() {
                 <div className="w-8 h-8 rounded-xl bg-[#c20f24]/10 dark:bg-[#c20f24]/20 flex items-center justify-center">
                   <FilmIcon className="w-4 h-4 text-[#c20f24]" />
                 </div>
-                <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Purchased Video Packs</h2>
+                <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Your Video Packs</h2>
               </div>
 
               {packs.length === 0 ? (
@@ -123,13 +139,19 @@ export function MyCoursesPage() {
                     return (
                       <button
                         key={p.id}
+                        ref={(el) => { cardRefs.current[p.id] = el; }}
                         onClick={() => navigate(`/dashboard/watch/${p.id}`)}
-                        className="group text-left bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform"
+                        className={`group text-left bg-white dark:bg-slate-900 rounded-3xl border overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-all duration-300 ${
+                          flashId === p.id
+                            ? 'border-[#c20f24] ring-2 ring-[#c20f24] ring-offset-2 ring-offset-white dark:ring-offset-slate-950 scale-[1.015]'
+                            : 'border-gray-100 dark:border-slate-800'
+                        }`}
                       >
                         <div className="relative overflow-hidden bg-slate-100" style={{ aspectRatio: '16/9' }}>
                           {p.thumbnailUrl && <img src={p.thumbnailUrl} alt={p.title} className="w-full h-full object-cover" />}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
                           <span className="absolute top-3 left-3 text-[11px] font-semibold bg-[#c20f24]/90 text-white px-2.5 py-1 rounded-full">{p.type}</span>
+                          {p.isFree && <span className="absolute top-3 right-3 text-[11px] font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">FREE</span>}
                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <span className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center"><PlayCircleIcon className="w-7 h-7 text-[#c20f24]" /></span>
                           </div>
