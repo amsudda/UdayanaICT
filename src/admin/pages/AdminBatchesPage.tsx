@@ -214,7 +214,7 @@ export function AdminBatchesPage() {
                   {!b.is_active && <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">Inactive</span>}
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {b.exam_year ?? '—'}{b.medium ? ` · ${b.medium}` : ''} · {b.member_count} student{b.member_count === 1 ? '' : 's'}
+                  {b.exam_year ?? '—'} · {b.member_count} student{b.member_count === 1 ? '' : 's'}
                 </p>
               </div>
               <div className="flex items-center gap-1 shrink-0">
@@ -266,14 +266,6 @@ export function AdminBatchesPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Grade (optional)</label>
               <input type="number" className={inputCls} value={form.grade} onChange={(e) => setForm({ ...form, grade: e.target.value })} placeholder="13" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Medium</label>
-              <select className={inputCls} value={form.medium} onChange={(e) => setForm({ ...form, medium: e.target.value })}>
-                <option value="Sinhala">Sinhala</option>
-                <option value="English">English</option>
-                <option value="Tamil">Tamil</option>
-              </select>
             </div>
           </div>
           <label className="flex items-center gap-3 pt-1">

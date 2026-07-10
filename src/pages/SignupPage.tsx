@@ -75,6 +75,10 @@ export function SignupPage() {
       setError('Please choose your program.');
       return;
     }
+    if (!examYear) {
+      setError('Please select your exam year.');
+      return;
+    }
     if (password.length < 6) {
       setError('Password must be at least 6 characters long.');
       return;
@@ -233,7 +237,7 @@ export function SignupPage() {
             onChange={(e) => setProgram(e.target.value)}
           />
           <Select
-            label="Exam Year"
+            label="Exam Year *"
             placeholder="Select year"
             options={examYears}
             value={examYear}
