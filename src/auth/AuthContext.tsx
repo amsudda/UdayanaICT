@@ -4,7 +4,8 @@ import { supabase } from '../lib/supabase';
 
 export type AuthUser = {
   id: string;
-  role: 'student' | 'admin';
+  role: 'student' | 'admin' | 'staff';
+  perms: string[];
   studentId: string;
   name: string;
   email: string;
@@ -49,6 +50,7 @@ type AuthContextValue = {
   loading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isOwner: boolean;
   login: (input: LoginInput) => Promise<Result>;
   signup: (input: RegisterInput) => Promise<Result>;
   updateProfile: (input: UpdateProfileInput) => Promise<Result>;
@@ -62,6 +64,7 @@ function mapRowToUser(row: any): AuthUser {
   return {
     id: row.id,
     role: row.role ?? 'student',
+    perms: Array.isArray(row.admin_perms) ? row.admin_perms : [],
     studentId: row.student_code ?? '',
     name: row.full_name ?? '',
     email: row.email ?? '',
@@ -217,7 +220,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         isAuthenticated: Boolean(user),
-        isAdmin: user?.role === 'admin',
+        isAdmin: user?.role === 'admin' || user?.role === 'staff',
+        isOwner: user?.role === 'admin',
         login,
         signup,
         updateProfile,

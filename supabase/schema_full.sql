@@ -6,7 +6,8 @@
 -- ---------- TABLES ----------
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  role text not null default 'student' check (role in ('student','admin')),
+  role text not null default 'student' check (role in ('student','admin','staff')),
+  admin_perms text[] not null default '{}',
   student_code text unique,
   full_name text, email text, phone text, nic text, gender text,
   birth_date date, school text, district text, medium text,
@@ -166,8 +167,28 @@ insert into public.settings (id) values (1) on conflict (id) do nothing;
 -- ---------- FUNCTIONS ----------
 create or replace function public.is_admin()
 returns boolean language sql security definer stable set search_path = public as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role in ('admin','staff'));
+$$;
+
+create or replace function public.is_owner()
+returns boolean language sql security definer stable set search_path = public as $$
   select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
 $$;
+
+-- only the owner may change roles or permissions
+create or replace function public.guard_role_change()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if (new.role is distinct from old.role or new.admin_perms is distinct from old.admin_perms)
+     and not public.is_owner() then
+    raise exception 'Only the owner can change roles or permissions';
+  end if;
+  return new;
+end; $$;
+
+drop trigger if exists trg_guard_role on public.profiles;
+create trigger trg_guard_role before update on public.profiles
+  for each row execute function public.guard_role_change();
 
 create or replace function public.can_view(p_scope text, p_batch_ids uuid[], p_program text)
 returns boolean language sql security definer stable set search_path = public as $$

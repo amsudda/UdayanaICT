@@ -53,11 +53,14 @@ export function LoginPage() {
     });
     setSubmitting(false);
     if (err) {
-      setError(
-        /rate limit/i.test(err.message)
-          ? 'Too many reset emails sent — please wait about an hour and try again. (Email limit reached)'
-          : err.message
-      );
+      const secs = err.message.match(/after (\d+) seconds/i)?.[1];
+      let msg = err.message;
+      if (secs || /for security purposes/i.test(err.message)) {
+        msg = `Please wait ${secs ? `${secs} seconds` : 'a moment'} before requesting another reset link — you just requested one. Check your inbox and spam folder in the meantime.`;
+      } else if (/rate limit/i.test(err.message)) {
+        msg = 'Too many reset emails sent — please wait about an hour and try again. (Email limit reached)';
+      }
+      setError(msg);
       return;
     }
     setInfo('Password reset link sent! Check your email inbox (and the spam folder) and follow the link to set a new password.');
