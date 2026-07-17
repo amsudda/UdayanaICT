@@ -5,7 +5,10 @@ import {
   ReceiptTextIcon,
   ImageIcon,
   Loader2Icon,
-  SearchIcon
+  SearchIcon,
+  PackageIcon,
+  CalendarIcon,
+  FileTextIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
@@ -37,10 +40,20 @@ const typeOptions = [
   { key: 'other', label: 'Other' }
 ];
 
-function kindLabel(p: any) {
-  const base = kindLabels[p.kind] ?? 'Payment';
-  if (p.kind === 'monthly_fee' && p.period_month) return `${base} · ${p.period_month} ${p.period_year ?? ''}`.trim();
-  return base;
+/** Exactly what the student is paying for — the item, not just the category. */
+function payingFor(p: any): { label: string; detail: string; Icon: any } {
+  if (p.kind === 'pack') {
+    return { label: 'Video pack', detail: p.pack?.title ?? '(pack removed)', Icon: PackageIcon };
+  }
+  if (p.kind === 'monthly_fee') {
+    const period = [p.period_month, p.period_year].filter(Boolean).join(' ');
+    return { label: 'Monthly fee', detail: period || '(no month set)', Icon: CalendarIcon };
+  }
+  if (p.kind === 'theory') {
+    const period = p.theory ? `${p.theory.month} ${p.theory.year}` : (p.period_month ? `${p.period_month} ${p.period_year ?? ''}`.trim() : '');
+    return { label: 'Monthly recordings', detail: period || '(no month set)', Icon: CalendarIcon };
+  }
+  return { label: kindLabels[p.kind] ?? 'Payment', detail: p.reference ?? '', Icon: FileTextIcon };
 }
 const batchOf = (p: any) => p.student?.batch_members?.[0]?.batch?.name as string | undefined;
 
@@ -88,7 +101,7 @@ export function AdminPaymentsPage() {
 
     let q = supabase
       .from('payments')
-      .select('*, student:profiles!payments_student_id_fkey(full_name, student_code, phone, batch_members(batch:batches(name)))')
+      .select('*, student:profiles!payments_student_id_fkey(full_name, student_code, phone, batch_members(batch:batches(name))), pack:packs(title), theory:theory_months(month, year)')
       .order('created_at', { ascending: false });
     if (filter !== 'all') q = q.eq('status', filter);
     if (typeFilter !== 'all') q = q.eq('kind', typeFilter);
@@ -206,12 +219,22 @@ export function AdminPaymentsPage() {
                   {batchOf(p) && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">{batchOf(p)}</span>}
                   <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${statusBadge[p.status]}`}>{p.status}</span>
                 </div>
-                <p className="text-sm text-slate-600 mt-1">
-                  {kindLabel(p)} · <span className="font-semibold">{formatLKR(Number(p.amount))}</span>
-                </p>
-                <p className="text-xs text-slate-400 mt-0.5">
+                {(() => {
+                  const pf = payingFor(p);
+                  return (
+                    <div className="mt-2 flex items-center gap-2.5 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 border border-blue-100 px-2.5 py-1.5">
+                        <pf.Icon className="w-4 h-4 text-blue-600 shrink-0" />
+                        <span className="text-[11px] font-bold uppercase tracking-wide text-blue-500">{pf.label}</span>
+                        {pf.detail && <span className="text-sm font-semibold text-slate-800">· {pf.detail}</span>}
+                      </span>
+                      <span className="text-base font-black text-slate-900">{formatLKR(Number(p.amount))}</span>
+                    </div>
+                  );
+                })()}
+                <p className="text-xs text-slate-400 mt-1">
                   {new Date(p.created_at).toLocaleDateString('en-LK', { year: 'numeric', month: 'short', day: '2-digit' })}
-                  {p.reference ? ` · ${p.reference}` : ''}
+                  {p.reference ? ` · ref: ${p.reference}` : ''}
                   {p.reject_reason ? ` · Reason: ${p.reject_reason}` : ''}
                 </p>
               </div>
