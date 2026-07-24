@@ -27,7 +27,7 @@ const menuGroups = [
         icon: BookOpenIcon
       },
       {
-        name: 'Extra Classes Store',
+        name: 'Lesson Store',
         path: '/dashboard/extra-classes',
         icon: ShoppingCartIcon
       }

@@ -82,3 +82,31 @@
     animation: none;
   }
 }
+
+/* ── Smooth "pop" lift for feature / process cards ── */
+.card-pop {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease;
+  will-change: transform;
+}
+.card-pop:hover {
+  transform: translateY(-8px);
+}
+/* icon springs a touch more than the card for a lively pop */
+.card-pop .pop-icon {
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+}
+.card-pop:hover .pop-icon {
+  transform: scale(1.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-pop,
+  .card-pop .pop-icon {
+    transition: none;
+  }
+  .card-pop:hover,
+  .card-pop:hover .pop-icon {
+    transform: none;
+  }
+}

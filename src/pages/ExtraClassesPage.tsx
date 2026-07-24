@@ -97,7 +97,7 @@ export function ExtraClassesPage() {
         <div className="absolute -bottom-16 -left-10 w-48 h-48 rounded-full bg-amber-300/10 blur-2xl pointer-events-none" aria-hidden />
         <div className="relative p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
           <div className="sm:flex-1 min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-200/80">{examLabel} · Pack Store</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-200/80">{examLabel} · Lesson Store</p>
             <h1 className="text-2xl sm:text-3xl font-black leading-tight mt-1">ඔබට අවශ්‍ය පාඩම් pack එක තෝරන්න</h1>
             <p className="flex items-center gap-2 text-sm text-rose-100/75 mt-2">
               <InfinityIcon className="w-4 h-4 shrink-0" /> One-time payment · watch anytime · no deadline

@@ -698,10 +698,12 @@ export function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
-                  className={`bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_32px_rgba(194,15,36,0.10)] hover:-translate-y-1 transition-all duration-300 ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
+                  className={`group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:border-[#c20f24]/25 hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
                 >
-                  <step.icon className={`w-9 h-9 mx-auto ${step.color}`} strokeWidth={2.2} />
-                  <h3 className="mt-4 mb-3 text-lg font-bold text-apple-text dark:text-apple-light transition-colors">
+                  <div className="pop-icon mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-slate-700/60 group-hover:bg-[#c20f24]/[0.07]">
+                    <step.icon className={`w-8 h-8 ${step.color}`} strokeWidth={2.2} />
+                  </div>
+                  <h3 className="mb-3 text-lg font-bold text-apple-text dark:text-apple-light transition-colors">
                     {step.title}
                   </h3>
                   <p className={`text-sm leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors ${step.wide ? 'max-w-3xl mx-auto' : ''}`}>
