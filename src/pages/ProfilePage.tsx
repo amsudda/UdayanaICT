@@ -17,6 +17,7 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { districts, examYears, genders, mediums, programs } from '../data/studentOptions';
+import { IdVerificationPanel } from '../components/shared/IdVerification';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─── tiny helper ─────────────────────────────────────── */
@@ -219,6 +220,9 @@ export function ProfilePage() {
           Click the avatar to change your photo
         </p>
       </div>
+
+      {/* ── ID verification ── */}
+      <IdVerificationPanel />
 
       {/* ── national ID card preview ── */}
       <div className="flex flex-col items-center sm:items-start">

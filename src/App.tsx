@@ -17,6 +17,7 @@ import { ExtraClassesPage } from './pages/ExtraClassesPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
 import { WatchPage } from './pages/WatchPage';
 import { BuyPackPage } from './pages/BuyPackPage';
+import { VerificationGate } from './components/shared/IdVerification';
 import { AdminLayout } from './admin/AdminLayout';
 import { AdminOverviewPage } from './admin/pages/AdminOverviewPage';
 import { AdminBatchesPage } from './admin/pages/AdminBatchesPage';
@@ -98,8 +99,8 @@ function AnimatedRoutes() {
           }
         >
           <Route index element={<DashboardPage />} />
-          <Route path="courses" element={<MyCoursesPage />} />
-          <Route path="extra-classes" element={<ExtraClassesPage />} />
+          <Route path="courses" element={<VerificationGate><MyCoursesPage /></VerificationGate>} />
+          <Route path="extra-classes" element={<VerificationGate><ExtraClassesPage /></VerificationGate>} />
           <Route path="history" element={<ClassHistoryPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="help" element={<HelpPage />} />
@@ -111,7 +112,9 @@ function AnimatedRoutes() {
           path="/dashboard/watch/:packId"
           element={
             <ProtectedRoute>
-              <WatchPage />
+              <VerificationGate>
+                <WatchPage />
+              </VerificationGate>
             </ProtectedRoute>
           }
         />
@@ -121,7 +124,9 @@ function AnimatedRoutes() {
           path="/dashboard/buy/:packId"
           element={
             <ProtectedRoute>
-              <BuyPackPage />
+              <VerificationGate>
+                <BuyPackPage />
+              </VerificationGate>
             </ProtectedRoute>
           }
         />

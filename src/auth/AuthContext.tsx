@@ -24,6 +24,11 @@ export type AuthUser = {
   avatar?: string;
   /** false until the student has filled in the profile form (Google sign-ups). */
   profileComplete: boolean;
+  /** ID-card verification — gates watching packs/recordings and buying. */
+  verificationStatus: 'unverified' | 'pending' | 'approved' | 'rejected';
+  idFrontPath?: string;
+  idBackPath?: string;
+  verificationRejectReason?: string;
 };
 
 /** Everything we collect at signup (besides credentials). */
@@ -57,6 +62,7 @@ type AuthContextValue = {
   signup: (input: RegisterInput) => Promise<Result>;
   signInWithGoogle: () => Promise<Result>;
   updateProfile: (input: UpdateProfileInput) => Promise<Result>;
+  submitIdVerification: (frontPath: string, backPath: string) => Promise<Result>;
   logout: () => Promise<void>;
 };
 
@@ -84,7 +90,13 @@ function mapRowToUser(row: any): AuthUser {
     guardianPhone: row.guardian_phone ?? undefined,
     address: row.address ?? undefined,
     avatar: row.avatar_url ?? undefined,
-    profileComplete: row.profile_completed === true
+    profileComplete: row.profile_completed === true,
+    // Fail open if the column doesn't exist yet (migration not run): treat as
+    // approved so the live site keeps working until the migration is applied.
+    verificationStatus: row.verification_status ?? 'approved',
+    idFrontPath: row.id_front_path ?? undefined,
+    idBackPath: row.id_back_path ?? undefined,
+    verificationRejectReason: row.verification_reject_reason ?? undefined
   };
 }
 
@@ -227,6 +239,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const submitIdVerification = async (frontPath: string, backPath: string): Promise<Result> => {
+    if (!user) return { success: false, message: 'You must be signed in.' };
+    // The DB guard trigger allows a student to move only to 'pending'.
+    const { error } = await supabase
+      .from('profiles')
+      .update({ id_front_path: frontPath, id_back_path: backPath, verification_status: 'pending' })
+      .eq('id', user.id);
+    if (error) return { success: false, message: error.message };
+    await loadProfile(user.id);
+    return { success: true };
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -244,6 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         signInWithGoogle,
         updateProfile,
+        submitIdVerification,
         logout
       }}
     >

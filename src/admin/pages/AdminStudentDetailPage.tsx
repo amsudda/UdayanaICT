@@ -18,10 +18,13 @@ import {
   PlayCircleIcon,
   ReceiptTextIcon,
   ShieldAlertIcon,
+  ShieldCheckIcon,
   UserIcon,
-  VideoIcon
+  VideoIcon,
+  XCircleIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../auth/AuthContext';
 import { formatLKR } from '../../data/paymentConfig';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -99,6 +102,7 @@ export function AdminStudentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const reduce = useReducedMotion();
+  const { user: admin } = useAuth();
 
   const [student, setStudent] = useState<any | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -112,6 +116,12 @@ export function AdminStudentDetailPage() {
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<Set<string>>(new Set());
+
+  // ID verification
+  const [idUrls, setIdUrls] = useState<{ front?: string; back?: string }>({});
+  const [showReject, setShowReject] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [vBusy, setVBusy] = useState(false);
 
   const setBusyKey = (k: string, v: boolean) =>
     setBusy((p) => {
@@ -178,6 +188,22 @@ export function AdminStudentDetailPage() {
       )
     );
     await loadEnrollments();
+
+    // signed URLs for the uploaded ID photos (private bucket)
+    if (s.id_front_path || s.id_back_path) {
+      const [f, b] = await Promise.all([
+        s.id_front_path
+          ? supabase.storage.from('id-cards').createSignedUrl(s.id_front_path, 3600)
+          : Promise.resolve({ data: null }),
+        s.id_back_path
+          ? supabase.storage.from('id-cards').createSignedUrl(s.id_back_path, 3600)
+          : Promise.resolve({ data: null })
+      ]);
+      setIdUrls({ front: (f.data as any)?.signedUrl, back: (b.data as any)?.signedUrl });
+    } else {
+      setIdUrls({});
+    }
+
     setLoading(false);
   }, [id, loadEnrollments]);
 
@@ -201,6 +227,24 @@ export function AdminStudentDetailPage() {
       setBatchIds((p) => new Set([...p, batchId]));
     }
     setBusyKey(key, false);
+  };
+
+  /* ── ID verification review ── */
+  const decideVerification = async (status: 'approved' | 'rejected') => {
+    setVBusy(true);
+    await supabase
+      .from('profiles')
+      .update({
+        verification_status: status,
+        verification_reviewed_by: admin?.id ?? null,
+        verification_reviewed_at: new Date().toISOString(),
+        verification_reject_reason: status === 'rejected' ? rejectReason.trim() || 'Please re-upload a clearer ID.' : null
+      })
+      .eq('id', id);
+    setVBusy(false);
+    setShowReject(false);
+    setRejectReason('');
+    load();
   };
 
   /* ── access grants (comp a student) ── */
@@ -260,9 +304,19 @@ export function AdminStudentDetailPage() {
     );
   }
 
-  const verified = batchIds.size > 0;
+  const inBatch = batchIds.size > 0;
+  const vStatus: string = student.verification_status ?? 'approved';
+  const hasIdUpload = Boolean(idUrls.front || idUrls.back);
   const studentBatches = (student.batch_members ?? []).map((m: any) => m.batch).filter(Boolean);
   const fade = reduce ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
+
+  const vHeroChip: Record<string, { cls: string; icon: any; label: string }> = {
+    approved: { cls: 'bg-emerald-400/20 text-emerald-200 ring-emerald-300/30', icon: BadgeCheckIcon, label: 'ID verified' },
+    pending: { cls: 'bg-amber-400/20 text-amber-100 ring-amber-300/30', icon: ShieldAlertIcon, label: 'ID pending' },
+    rejected: { cls: 'bg-red-400/20 text-red-100 ring-red-300/30', icon: XCircleIcon, label: 'ID rejected' },
+    unverified: { cls: 'bg-white/10 text-blue-100 ring-white/20', icon: ShieldCheckIcon, label: 'ID not submitted' }
+  };
+  const vChip = vHeroChip[vStatus] ?? vHeroChip.unverified;
 
   /* status chip for an access row */
   const StatusChip = ({ state }: { state: AccessState }) => {
@@ -320,13 +374,12 @@ export function AdminStudentDetailPage() {
           <div className="flex-1 min-w-0 text-center sm:text-left">
             <div className="flex items-center gap-2.5 justify-center sm:justify-start flex-wrap">
               <h1 className="text-2xl font-bold">{student.full_name || '(no name)'}</h1>
-              {verified ? (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30">
-                  <BadgeCheckIcon className="w-3.5 h-3.5" /> Verified
-                </span>
-              ) : (
+              <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ring-1 ${vChip.cls}`}>
+                <vChip.icon className="w-3.5 h-3.5" /> {vChip.label}
+              </span>
+              {!inBatch && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full bg-amber-400/20 text-amber-100 ring-1 ring-amber-300/30">
-                  <ShieldAlertIcon className="w-3.5 h-3.5" /> Needs a batch
+                  <ShieldAlertIcon className="w-3.5 h-3.5" /> No batch
                 </span>
               )}
             </div>
@@ -360,6 +413,99 @@ export function AdminStudentDetailPage() {
       <div className="grid lg:grid-cols-3 gap-6 items-start">
         {/* LEFT column: info + batches + payments */}
         <div className="space-y-6 lg:col-span-1">
+          {/* ── ID verification ── */}
+          <Card icon={ShieldCheckIcon} title="ID verification" desc="Approve to unlock watching & buying." accent="text-[#c20f24] bg-red-50">
+            <div className="mb-4">
+              <span
+                className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg ${
+                  vStatus === 'approved'
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : vStatus === 'pending'
+                    ? 'bg-amber-50 text-amber-700'
+                    : vStatus === 'rejected'
+                    ? 'bg-red-50 text-red-700'
+                    : 'bg-slate-100 text-slate-500'
+                }`}
+              >
+                {vStatus === 'approved' ? 'Verified' : vStatus === 'pending' ? 'Pending review' : vStatus === 'rejected' ? 'Rejected' : 'Not submitted'}
+              </span>
+              {student.verification_submitted_at && (
+                <span className="ml-2 text-xs text-slate-400">Submitted {fmtDate(student.verification_submitted_at)}</span>
+              )}
+            </div>
+
+            {hasIdUpload ? (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {(['front', 'back'] as const).map((side) => {
+                  const url = idUrls[side];
+                  return (
+                    <div key={side}>
+                      <p className="text-[11px] uppercase tracking-wider text-slate-400 mb-1">{side}</p>
+                      {url ? (
+                        <a href={url} target="_blank" rel="noreferrer" className="block rounded-xl overflow-hidden border border-slate-200 hover:border-[#c20f24] transition-colors">
+                          <img src={url} alt={`ID ${side}`} className="w-full h-24 object-cover" />
+                        </a>
+                      ) : (
+                        <div className="h-24 rounded-xl bg-slate-100 flex items-center justify-center text-slate-300">
+                          <IdCardIcon className="w-6 h-6" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 mb-4">No ID uploaded yet.</p>
+            )}
+
+            {hasIdUpload && (
+              <>
+                {!showReject ? (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => decideVerification('approved')}
+                      disabled={vBusy || vStatus === 'approved'}
+                      className="flex-1 h-10 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-40 flex items-center justify-center gap-1.5"
+                    >
+                      <CheckIcon className="w-4 h-4" /> {vStatus === 'approved' ? 'Approved' : 'Approve'}
+                    </button>
+                    <button
+                      onClick={() => setShowReject(true)}
+                      disabled={vBusy}
+                      className="flex-1 h-10 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 disabled:opacity-40 flex items-center justify-center gap-1.5"
+                    >
+                      <XCircleIcon className="w-4 h-4" /> Reject
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      placeholder="Reason (shown to the student)"
+                      className="w-full h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/40"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => decideVerification('rejected')}
+                        disabled={vBusy}
+                        className="flex-1 h-10 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-40"
+                      >
+                        Confirm reject
+                      </button>
+                      <button
+                        onClick={() => { setShowReject(false); setRejectReason(''); }}
+                        className="flex-1 h-10 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </Card>
+
           <Card icon={UserIcon} title="Contact & details">
             <dl className="space-y-3 text-sm">
               {[

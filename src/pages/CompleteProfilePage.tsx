@@ -73,16 +73,25 @@ export function CompleteProfilePage() {
     e.preventDefault();
     setError('');
 
-    if (name.trim().length < 2) {
-      setError('Enter your full name.');
-      return;
-    }
-    if (!program) {
-      setError('Please choose your program.');
-      return;
-    }
-    if (!examYear) {
-      setError('Please select your exam year.');
+    // Every field is required.
+    const checks: [boolean, string][] = [
+      [name.trim().length < 2, 'Enter your full name.'],
+      [!phone.trim(), 'Enter your phone number.'],
+      [!gender, 'Select your gender.'],
+      [!birthDate, 'Enter your date of birth.'],
+      [!district, 'Select your district.'],
+      [!address.trim(), 'Enter your home address.'],
+      [!program, 'Choose your program.'],
+      [!examYear, 'Select your exam year.'],
+      [!school.trim(), 'Enter your school.'],
+      [!medium, 'Select your medium.'],
+      [!guardianName.trim(), "Enter your guardian's name."],
+      [!guardianPhone.trim(), "Enter your guardian's phone number."],
+      [!nic.trim(), 'Enter your NIC number.']
+    ];
+    const failed = checks.find(([bad]) => bad);
+    if (failed) {
+      setError(failed[1]);
       return;
     }
 
@@ -133,8 +142,7 @@ export function CompleteProfilePage() {
       </div>
 
       <div className="mb-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-apple-text">
-        <span className="font-semibold">*</span> සලකුණු කළ ක්ෂේත්‍ර අනිවාර්ය වේ. අනෙක් විස්තර
-        ඔබේ පැතිකඩ සම්පූර්ණ කිරීමට උපකාරී වේ — පසුව ඔබට ඒවා වෙනස් කළ හැක.
+        සියලුම ක්ෂේත්‍ර <span className="font-semibold">අනිවාර්ය</span> වේ. පසුව ඔබට ඒවා වෙනස් කළ හැක.
       </div>
 
       <form className="space-y-8" onSubmit={handleSubmit}>
@@ -150,27 +158,29 @@ export function CompleteProfilePage() {
             />
           </div>
           <Input
-            label="Phone (WhatsApp)"
+            label="Phone (WhatsApp) *"
             type="tel"
             placeholder="+94 71 234 5678"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            required
           />
           <Select
-            label="Gender"
+            label="Gender *"
             placeholder="Select gender"
             options={genders}
             value={gender}
             onChange={(e) => setGender(e.target.value)}
           />
           <Input
-            label="Date of Birth"
+            label="Date of Birth *"
             type="date"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
+            required
           />
           <Select
-            label="District"
+            label="District *"
             placeholder="Select district"
             options={districts}
             value={district}
@@ -178,10 +188,11 @@ export function CompleteProfilePage() {
           />
           <div className="sm:col-span-2">
             <Input
-              label="Home Address"
+              label="Home Address *"
               placeholder="Street, City"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
+              required
             />
           </div>
         </FieldGroup>
@@ -204,14 +215,15 @@ export function CompleteProfilePage() {
           />
           <div className="sm:col-span-2">
             <Input
-              label="School"
+              label="School *"
               placeholder="e.g. Ananda College, Colombo"
               value={school}
               onChange={(e) => setSchool(e.target.value)}
+              required
             />
           </div>
           <Select
-            label="Medium"
+            label="Medium *"
             placeholder="Select medium"
             options={mediums}
             value={medium}
@@ -222,17 +234,19 @@ export function CompleteProfilePage() {
         {/* ── Guardian ── */}
         <FieldGroup title="භාරකරු විස්තර / Guardian">
           <Input
-            label="Guardian Name"
+            label="Guardian Name *"
             placeholder="Parent / guardian name"
             value={guardianName}
             onChange={(e) => setGuardianName(e.target.value)}
+            required
           />
           <Input
-            label="Guardian Phone"
+            label="Guardian Phone *"
             type="tel"
             placeholder="+94 77 123 4567"
             value={guardianPhone}
             onChange={(e) => setGuardianPhone(e.target.value)}
+            required
           />
         </FieldGroup>
 
@@ -244,11 +258,12 @@ export function CompleteProfilePage() {
           <div className="relative">
             <IdCardIcon className="absolute left-4 top-[42px] w-4 h-4 text-apple-subtext pointer-events-none z-10" />
             <Input
-              label="NIC Number"
+              label="NIC Number *"
               placeholder="200012345678 / 991234567V"
               value={nic}
               onChange={(e) => setNic(e.target.value)}
               className="pl-11"
+              required
             />
           </div>
         </div>

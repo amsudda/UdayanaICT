@@ -56,6 +56,12 @@ export function AdminStudentsPage() {
         <p className="text-sm font-medium text-slate-900 truncate">{s.full_name || '(no name)'}</p>
         <p className="text-xs text-slate-400 truncate">{s.student_code} · {s.email}</p>
       </div>
+      {s.verification_status === 'pending' && (
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 shrink-0">ID pending</span>
+      )}
+      {s.verification_status === 'rejected' && (
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 shrink-0">ID rejected</span>
+      )}
       <ChevronRightIcon className="w-4 h-4 text-slate-300 group-hover:text-slate-500 shrink-0" />
     </button>
   );
