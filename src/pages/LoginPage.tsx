@@ -6,6 +6,7 @@ import { useAuth } from '../auth/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Input } from '../components/ui/Input';
 import { AuthLayout } from '../components/layout/AuthLayout';
+import { GoogleSignInButton } from '../components/shared/GoogleSignInButton';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -126,6 +127,16 @@ export function LoginPage() {
         <p className="text-sm text-apple-subtext">
           ඔබේ පාඨමාලා වෙත පිවිසීමට පිවිසුම් තොරතුරු ඇතුළත් කරන්න.
         </p>
+      </div>
+
+      <GoogleSignInButton label="Continue with Google" />
+
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs font-medium uppercase tracking-wider text-apple-subtext">
+          or sign in with email
+        </span>
+        <div className="h-px flex-1 bg-gray-200" />
       </div>
 
       <form className="space-y-5" onSubmit={handleLogin}>

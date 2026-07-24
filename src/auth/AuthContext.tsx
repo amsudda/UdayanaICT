@@ -22,6 +22,8 @@ export type AuthUser = {
   guardianPhone?: string;
   address?: string;
   avatar?: string;
+  /** false until the student has filled in the profile form (Google sign-ups). */
+  profileComplete: boolean;
 };
 
 /** Everything we collect at signup (besides credentials). */
@@ -53,6 +55,7 @@ type AuthContextValue = {
   isOwner: boolean;
   login: (input: LoginInput) => Promise<Result>;
   signup: (input: RegisterInput) => Promise<Result>;
+  signInWithGoogle: () => Promise<Result>;
   updateProfile: (input: UpdateProfileInput) => Promise<Result>;
   logout: () => Promise<void>;
 };
@@ -80,7 +83,8 @@ function mapRowToUser(row: any): AuthUser {
     guardianName: row.guardian_name ?? undefined,
     guardianPhone: row.guardian_phone ?? undefined,
     address: row.address ?? undefined,
-    avatar: row.avatar_url ?? undefined
+    avatar: row.avatar_url ?? undefined,
+    profileComplete: row.profile_completed === true
   };
 }
 
@@ -147,6 +151,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const signInWithGoogle = async (): Promise<Result> => {
+    // Redirects the browser to Google. On return, Supabase restores the session
+    // and the DB trigger has already created a (possibly incomplete) profile.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/dashboard` }
+    });
+    if (error) return { success: false, message: error.message };
+    return { success: true };
+  };
+
   const signup = async ({ name, email, password, ...details }: RegisterInput): Promise<Result> => {
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -200,6 +215,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         full_name: name,
         email: normalizedEmail,
         avatar_url: avatar ?? null,
+        // Saving the profile form always counts as "completed" — this is what
+        // graduates a fresh Google sign-up out of the /complete-profile gate.
+        profile_completed: true,
         ...detailsToColumns(details)
       })
       .eq('id', user.id);
@@ -224,6 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isOwner: user?.role === 'admin',
         login,
         signup,
+        signInWithGoogle,
         updateProfile,
         logout
       }}

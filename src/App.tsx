@@ -11,6 +11,7 @@ import { LoginPage } from './pages/LoginPage';
 import { PaymentsPage } from './pages/PaymentsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SignupPage } from './pages/SignupPage';
+import { CompleteProfilePage } from './pages/CompleteProfilePage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ExtraClassesPage } from './pages/ExtraClassesPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
@@ -39,6 +40,18 @@ function FullSpinner() {
 }
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, loading, user } = useAuth();
+  if (loading) return <FullSpinner />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // A fresh Google sign-up has a profile but hasn't filled in the details yet.
+  if (user && user.role === 'student' && !user.profileComplete) {
+    return <Navigate to="/complete-profile" replace />;
+  }
+  return <>{children}</>;
+}
+
+/** Authenticated, but does NOT require a completed profile (the form itself). */
+function AuthedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
   if (loading) return <FullSpinner />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
@@ -64,6 +77,16 @@ function AnimatedRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* First-run profile form for new Google sign-ups */}
+        <Route
+          path="/complete-profile"
+          element={
+            <AuthedRoute>
+              <CompleteProfilePage />
+            </AuthedRoute>
+          }
+        />
 
         <Route
           path="/dashboard"
