@@ -42,6 +42,14 @@ export async function loadLibrary(userId: string): Promise<{ packs: LibPack[]; r
     .eq('status', 'approved');
   const paid = new Set((pays ?? []).map((p: any) => `${p.period_month}-${p.period_year}`));
 
+  // months the admin has granted for free (comped) — an enrollment row with a
+  // theory_month_id unlocks that month without a monthly payment.
+  const { data: grantedRows } = await supabase
+    .from('enrollments')
+    .select('theory_month_id')
+    .not('theory_month_id', 'is', null);
+  const grantedMonths = new Set((grantedRows ?? []).map((e: any) => e.theory_month_id));
+
   // months visible to this student (RLS already filters by batch + published)
   const { data: months } = await supabase
     .from('theory_months')
@@ -57,7 +65,7 @@ export async function loadLibrary(userId: string): Promise<{ packs: LibPack[]; r
     thumbnailUrl: m.thumbnail_url ?? undefined,
     topics: m.topics ?? [],
     sessionCount: m.session_count ?? 0,
-    unlocked: paid.has(`${m.month}-${m.year}`)
+    unlocked: paid.has(`${m.month}-${m.year}`) || grantedMonths.has(m.id)
   }));
 
   // packs the student owns (via approved-payment enrollments)

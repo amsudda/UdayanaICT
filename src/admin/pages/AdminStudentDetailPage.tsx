@@ -1,0 +1,599 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  ArrowLeftIcon,
+  BadgeCheckIcon,
+  CalendarIcon,
+  CheckIcon,
+  FilmIcon,
+  GiftIcon,
+  IdCardIcon,
+  LayersIcon,
+  Loader2Icon,
+  LockIcon,
+  MailIcon,
+  MapPinIcon,
+  PhoneIcon,
+  PlayCircleIcon,
+  ReceiptTextIcon,
+  ShieldAlertIcon,
+  UserIcon,
+  VideoIcon
+} from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { formatLKR } from '../../data/paymentConfig';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+const statusBadge: Record<string, string> = {
+  pending: 'bg-amber-100 text-amber-700',
+  approved: 'bg-emerald-100 text-emerald-700',
+  rejected: 'bg-red-100 text-red-700'
+};
+
+const initials = (n?: string) =>
+  (n ?? '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+const fmtDate = (iso?: string) =>
+  iso ? new Date(iso).toLocaleDateString('en-LK', { year: 'numeric', month: 'short', day: '2-digit' }) : '—';
+
+type Enr = { id: string; source_payment_id: string | null };
+type AccessState = 'paid' | 'granted' | 'none';
+
+/* ── little iOS-style switch ── */
+function Toggle({ on, disabled, onClick }: { on: boolean; disabled?: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      disabled={disabled}
+      onClick={onClick}
+      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 disabled:opacity-40 ${
+        on ? 'bg-blue-600' : 'bg-slate-300'
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+          on ? 'translate-x-5' : ''
+        }`}
+      />
+    </button>
+  );
+}
+
+/* ── card shell with an icon header ── */
+function Card({
+  icon: Icon,
+  title,
+  desc,
+  accent = 'text-blue-600 bg-blue-50',
+  children,
+  action
+}: {
+  icon: any;
+  title: string;
+  desc?: string;
+  accent?: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
+  return (
+    <section className="bg-white border border-slate-200 rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.04)] overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${accent}`}>
+          <Icon className="w-[18px] h-[18px]" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-semibold text-slate-900 leading-tight">{title}</h2>
+          {desc && <p className="text-xs text-slate-500 mt-0.5">{desc}</p>}
+        </div>
+        {action}
+      </div>
+      <div className="p-5">{children}</div>
+    </section>
+  );
+}
+
+export function AdminStudentDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const reduce = useReducedMotion();
+
+  const [student, setStudent] = useState<any | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [batches, setBatches] = useState<any[]>([]);
+  const [batchIds, setBatchIds] = useState<Set<string>>(new Set());
+  const [packs, setPacks] = useState<any[]>([]);
+  const [months, setMonths] = useState<any[]>([]);
+  const [packEnr, setPackEnr] = useState<Record<string, Enr>>({});
+  const [monthEnr, setMonthEnr] = useState<Record<string, Enr>>({});
+  const [paidMonths, setPaidMonths] = useState<Set<string>>(new Set());
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<Set<string>>(new Set());
+
+  const setBusyKey = (k: string, v: boolean) =>
+    setBusy((p) => {
+      const n = new Set(p);
+      v ? n.add(k) : n.delete(k);
+      return n;
+    });
+
+  const loadEnrollments = useCallback(async () => {
+    const { data: enr } = await supabase
+      .from('enrollments')
+      .select('id, pack_id, theory_month_id, source_payment_id')
+      .eq('student_id', id);
+    const pe: Record<string, Enr> = {};
+    const me: Record<string, Enr> = {};
+    (enr ?? []).forEach((e: any) => {
+      if (e.pack_id) pe[e.pack_id] = { id: e.id, source_payment_id: e.source_payment_id };
+      if (e.theory_month_id) me[e.theory_month_id] = { id: e.id, source_payment_id: e.source_payment_id };
+    });
+    setPackEnr(pe);
+    setMonthEnr(me);
+  }, [id]);
+
+  const load = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    const [{ data: s }, { data: bs }, { data: ps }, { data: ms }, { data: pays }] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('*, batch_members(batch:batches(id,name,program,exam_year))')
+        .eq('id', id)
+        .maybeSingle(),
+      supabase.from('batches').select('*').order('exam_year', { ascending: false }).order('name'),
+      supabase
+        .from('packs')
+        .select('id,title,type,thumbnail_url,price,is_free')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('theory_months')
+        .select('id,month,year,thumbnail_url,session_count,price')
+        .eq('is_published', true)
+        .order('year', { ascending: false })
+        .order('created_at', { ascending: false }),
+      supabase.from('payments').select('*').eq('student_id', id).order('created_at', { ascending: false })
+    ]);
+
+    if (!s) {
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
+    setStudent(s);
+    setBatchIds(new Set((s.batch_members ?? []).map((m: any) => m.batch?.id).filter(Boolean)));
+    setBatches(bs ?? []);
+    setPacks(ps ?? []);
+    setMonths(ms ?? []);
+    setPayments(pays ?? []);
+    setPaidMonths(
+      new Set(
+        (pays ?? [])
+          .filter((p: any) => p.kind === 'monthly_fee' && p.status === 'approved')
+          .map((p: any) => `${p.period_month}-${p.period_year}`)
+      )
+    );
+    await loadEnrollments();
+    setLoading(false);
+  }, [id, loadEnrollments]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  /* ── batch membership (assign = verify) ── */
+  const toggleBatch = async (batchId: string) => {
+    const key = `b:${batchId}`;
+    setBusyKey(key, true);
+    if (batchIds.has(batchId)) {
+      await supabase.from('batch_members').delete().eq('batch_id', batchId).eq('student_id', id);
+      setBatchIds((p) => {
+        const n = new Set(p);
+        n.delete(batchId);
+        return n;
+      });
+    } else {
+      await supabase.from('batch_members').insert({ batch_id: batchId, student_id: id });
+      setBatchIds((p) => new Set([...p, batchId]));
+    }
+    setBusyKey(key, false);
+  };
+
+  /* ── access grants (comp a student) ── */
+  const grant = async (key: string, row: { pack_id?: string; theory_month_id?: string }) => {
+    setBusyKey(key, true);
+    await supabase.from('enrollments').insert({ student_id: id, ...row });
+    await loadEnrollments();
+    setBusyKey(key, false);
+  };
+  const revoke = async (key: string, enrId: string) => {
+    setBusyKey(key, true);
+    await supabase.from('enrollments').delete().eq('id', enrId);
+    await loadEnrollments();
+    setBusyKey(key, false);
+  };
+
+  const packState = (packId: string): AccessState => {
+    const e = packEnr[packId];
+    if (!e) return 'none';
+    return e.source_payment_id ? 'paid' : 'granted';
+  };
+  const monthState = (m: any): AccessState => {
+    if (paidMonths.has(`${m.month}-${m.year}`)) return 'paid';
+    return monthEnr[m.id] ? 'granted' : 'none';
+  };
+
+  const grantedCount = useMemo(
+    () =>
+      Object.values(packEnr).filter((e) => !e.source_payment_id).length +
+      Object.values(monthEnr).filter((e) => !e.source_payment_id).length,
+    [packEnr, monthEnr]
+  );
+
+  const monthsByYear = useMemo(() => {
+    const g: Record<string, any[]> = {};
+    months.forEach((m) => ((g[m.year] ??= []).push(m)));
+    return Object.entries(g).sort((a, b) => Number(b[0]) - Number(a[0]));
+  }, [months]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-32 text-slate-400">
+        <Loader2Icon className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (notFound || !student) {
+    return (
+      <div className="text-center py-24">
+        <ShieldAlertIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+        <p className="font-semibold text-slate-700">Student not found</p>
+        <button onClick={() => navigate('/admin/students')} className="mt-3 text-sm font-semibold text-blue-600 hover:underline">
+          ← Back to Students
+        </button>
+      </div>
+    );
+  }
+
+  const verified = batchIds.size > 0;
+  const studentBatches = (student.batch_members ?? []).map((m: any) => m.batch).filter(Boolean);
+  const fade = reduce ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
+
+  /* status chip for an access row */
+  const StatusChip = ({ state }: { state: AccessState }) => {
+    if (state === 'paid')
+      return (
+        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">
+          <LockIcon className="w-3 h-3" /> Paid
+        </span>
+      );
+    if (state === 'granted')
+      return (
+        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-lg bg-blue-50 text-blue-700">
+          <GiftIcon className="w-3 h-3" /> Free access
+        </span>
+      );
+    return <span className="text-[11px] font-medium text-slate-400">No access</span>;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* back */}
+      <button
+        onClick={() => navigate('/admin/students')}
+        className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+      >
+        <ArrowLeftIcon className="w-4 h-4" /> Students
+      </button>
+
+      {/* ── identity hero ── */}
+      <motion.div
+        {...fade}
+        transition={{ duration: 0.4 }}
+        className="relative overflow-hidden rounded-3xl text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)]"
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(120%_140%_at_0%_0%,#3b4a63_0%,#1e293b_45%,#0f172a_100%)]" />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg,#fff 1px, transparent 1px)',
+            backgroundSize: '26px 26px'
+          }}
+        />
+        <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-blue-500/15 blur-3xl" />
+
+        <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          <div className="w-24 h-24 rounded-3xl overflow-hidden bg-white/10 ring-2 ring-white/20 flex items-center justify-center text-3xl font-bold shrink-0">
+            {student.avatar_url ? (
+              <img src={student.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              initials(student.full_name)
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            <div className="flex items-center gap-2.5 justify-center sm:justify-start flex-wrap">
+              <h1 className="text-2xl font-bold">{student.full_name || '(no name)'}</h1>
+              {verified ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30">
+                  <BadgeCheckIcon className="w-3.5 h-3.5" /> Verified
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full bg-amber-400/20 text-amber-100 ring-1 ring-amber-300/30">
+                  <ShieldAlertIcon className="w-3.5 h-3.5" /> Needs a batch
+                </span>
+              )}
+            </div>
+            <p className="mt-1 font-mono text-sm tracking-widest text-blue-200/80">{student.student_code || '— no ID —'}</p>
+            <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start">
+              <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-white/10">
+                {student.program ?? '—'} {student.exam_year ?? ''}
+              </span>
+              {studentBatches.map((b: any) => (
+                <span key={b.id} className="text-xs font-medium px-2.5 py-1 rounded-lg bg-white/10">
+                  {b.name}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* quick stats */}
+          <div className="flex gap-3 shrink-0">
+            <div className="min-w-[76px] rounded-2xl bg-white/10 px-4 py-3 text-center">
+              <p className="text-2xl font-black leading-none">{Object.keys(packEnr).length}</p>
+              <p className="text-[11px] text-blue-100/70 mt-1">Packs</p>
+            </div>
+            <div className="min-w-[76px] rounded-2xl bg-white/10 px-4 py-3 text-center">
+              <p className="text-2xl font-black leading-none text-blue-200">{grantedCount}</p>
+              <p className="text-[11px] text-blue-100/70 mt-1">Comped</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="grid lg:grid-cols-3 gap-6 items-start">
+        {/* LEFT column: info + batches + payments */}
+        <div className="space-y-6 lg:col-span-1">
+          <Card icon={UserIcon} title="Contact & details">
+            <dl className="space-y-3 text-sm">
+              {[
+                { icon: MailIcon, label: 'Email', value: student.email },
+                { icon: PhoneIcon, label: 'Phone', value: student.phone },
+                { icon: MapPinIcon, label: 'Address', value: student.address || student.district },
+                { icon: IdCardIcon, label: 'NIC', value: student.nic },
+                { icon: CalendarIcon, label: 'Born', value: student.birth_date ? fmtDate(student.birth_date) : null },
+                {
+                  icon: UserIcon,
+                  label: 'Guardian',
+                  value: [student.guardian_name, student.guardian_phone].filter(Boolean).join(' · ')
+                }
+              ]
+                .filter((r) => r.value)
+                .map((r) => (
+                  <div key={r.label} className="flex items-start gap-3">
+                    <r.icon className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <dt className="text-[11px] uppercase tracking-wider text-slate-400">{r.label}</dt>
+                      <dd className="text-slate-700 break-words">{r.value}</dd>
+                    </div>
+                  </div>
+                ))}
+              {student.school && (
+                <div className="flex items-start gap-3">
+                  <LayersIcon className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                  <div className="min-w-0">
+                    <dt className="text-[11px] uppercase tracking-wider text-slate-400">School</dt>
+                    <dd className="text-slate-700 break-words">{student.school}</dd>
+                  </div>
+                </div>
+              )}
+            </dl>
+            <p className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400">Joined {fmtDate(student.created_at)}</p>
+          </Card>
+
+          <Card icon={LayersIcon} title="Batches" desc="Assigning a batch verifies the student.">
+            {batches.length === 0 ? (
+              <p className="text-sm text-slate-400">No batches yet — create one first.</p>
+            ) : (
+              <div className="space-y-1.5">
+                {batches.map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="text-sm text-slate-700 flex-1">{b.name}</span>
+                    <span
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        b.program === 'A/L' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
+                      }`}
+                    >
+                      {b.program} {b.exam_year ?? ''}
+                    </span>
+                    {busy.has(`b:${b.id}`) ? (
+                      <Loader2Icon className="w-4 h-4 text-slate-400 animate-spin" />
+                    ) : (
+                      <Toggle on={batchIds.has(b.id)} onClick={() => toggleBatch(b.id)} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          <Card icon={ReceiptTextIcon} title="Payment history" accent="text-violet-600 bg-violet-50">
+            {payments.length === 0 ? (
+              <p className="text-sm text-slate-400">No payments yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {payments.slice(0, 10).map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between gap-2 text-sm border border-slate-100 rounded-xl px-3 py-2"
+                  >
+                    <span className="text-slate-600 min-w-0 truncate">
+                      {p.kind === 'monthly_fee' ? `Monthly · ${p.period_month} ${p.period_year}` : p.kind} ·{' '}
+                      {formatLKR(Number(p.amount))}
+                    </span>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0 ${statusBadge[p.status]}`}>
+                      {p.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+
+        {/* RIGHT column: the access manager (signature) */}
+        <div className="lg:col-span-2">
+          <Card
+            icon={GiftIcon}
+            title="Access manager"
+            desc="Grant free access to a student who can't pay this month. Paid items are managed in Payments."
+            accent="text-blue-600 bg-blue-50"
+          >
+            {/* video packs */}
+            <div className="flex items-center gap-2 mb-3">
+              <FilmIcon className="w-4 h-4 text-slate-400" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Video packs</h3>
+              <span className="text-[11px] font-bold text-slate-400 bg-slate-100 rounded-md px-1.5 py-0.5">
+                {packs.length}
+              </span>
+            </div>
+
+            {packs.length === 0 ? (
+              <p className="text-sm text-slate-400 mb-6">No published packs.</p>
+            ) : (
+              <div className="space-y-2 mb-8">
+                {packs.map((p) => {
+                  const state = packState(p.id);
+                  const enr = packEnr[p.id];
+                  const key = `p:${p.id}`;
+                  const saving = busy.has(key);
+                  return (
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-3 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors"
+                    >
+                      <div className="w-14 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
+                        {p.thumbnail_url ? (
+                          <img src={p.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <PlayCircleIcon className="w-5 h-5 text-slate-300" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-800 truncate">{p.title}</p>
+                        <p className="text-xs text-slate-400">
+                          {p.type || 'Pack'}
+                          {p.is_free ? ' · Free for all' : p.price ? ` · ${formatLKR(Number(p.price))}` : ''}
+                        </p>
+                      </div>
+                      <StatusChip state={state} />
+                      {saving ? (
+                        <Loader2Icon className="w-4 h-4 text-slate-400 animate-spin" />
+                      ) : state === 'paid' ? (
+                        <span className="w-11 flex justify-center" title="Paid — manage in Payments">
+                          <LockIcon className="w-4 h-4 text-slate-300" />
+                        </span>
+                      ) : (
+                        <Toggle
+                          on={state === 'granted'}
+                          onClick={() =>
+                            state === 'granted' ? revoke(key, enr!.id) : grant(key, { pack_id: p.id })
+                          }
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* monthly recordings */}
+            <div className="flex items-center gap-2 mb-3">
+              <VideoIcon className="w-4 h-4 text-slate-400" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Monthly recordings</h3>
+              <span className="text-[11px] font-bold text-slate-400 bg-slate-100 rounded-md px-1.5 py-0.5">
+                {months.length}
+              </span>
+            </div>
+
+            {months.length === 0 ? (
+              <p className="text-sm text-slate-400">No published recordings.</p>
+            ) : (
+              <div className="space-y-5">
+                {monthsByYear.map(([year, list]) => (
+                  <div key={year}>
+                    <p className="text-[11px] font-bold text-slate-400 mb-2">{year}</p>
+                    <div className="space-y-2">
+                      {list.map((m) => {
+                        const state = monthState(m);
+                        const enr = monthEnr[m.id];
+                        const key = `m:${m.id}`;
+                        const saving = busy.has(key);
+                        return (
+                          <div
+                            key={m.id}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors"
+                          >
+                            <div className="w-14 h-10 rounded-lg overflow-hidden bg-violet-50 shrink-0 flex items-center justify-center">
+                              {m.thumbnail_url ? (
+                                <img src={m.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <CalendarIcon className="w-5 h-5 text-violet-300" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-slate-800 truncate">
+                                {m.month} {m.year}
+                              </p>
+                              <p className="text-xs text-slate-400">
+                                {m.session_count ?? 0} session{m.session_count === 1 ? '' : 's'}
+                              </p>
+                            </div>
+                            <StatusChip state={state} />
+                            {saving ? (
+                              <Loader2Icon className="w-4 h-4 text-slate-400 animate-spin" />
+                            ) : state === 'paid' ? (
+                              <span className="w-11 flex justify-center" title="Paid — manage in Payments">
+                                <LockIcon className="w-4 h-4 text-slate-300" />
+                              </span>
+                            ) : (
+                              <Toggle
+                                on={state === 'granted'}
+                                onClick={() =>
+                                  state === 'granted' ? revoke(key, enr!.id) : grant(key, { theory_month_id: m.id })
+                                }
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* legend */}
+            <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-500">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckIcon className="w-3.5 h-3.5 text-blue-600" /> Toggle on = free access granted
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <LockIcon className="w-3.5 h-3.5 text-emerald-500" /> Paid = unlocked by a verified payment
+              </span>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
