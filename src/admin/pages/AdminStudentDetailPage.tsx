@@ -19,6 +19,7 @@ import {
   ReceiptTextIcon,
   ShieldAlertIcon,
   ShieldCheckIcon,
+  Trash2Icon,
   UserIcon,
   VideoIcon,
   XCircleIcon
@@ -26,6 +27,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
 import { formatLKR } from '../../data/paymentConfig';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -122,6 +124,11 @@ export function AdminStudentDetailPage() {
   const [showReject, setShowReject] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [vBusy, setVBusy] = useState(false);
+
+  // delete
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const setBusyKey = (k: string, v: boolean) =>
     setBusy((p) => {
@@ -245,6 +252,20 @@ export function AdminStudentDetailPage() {
     setShowReject(false);
     setRejectReason('');
     load();
+  };
+
+  /* ── delete the whole student account ── */
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError('');
+    const { error } = await supabase.rpc('admin_delete_student', { p_student: id });
+    setDeleting(false);
+    if (error) {
+      setConfirmDelete(false);
+      setDeleteError(error.message || 'Could not delete this student.');
+      return;
+    }
+    navigate('/admin/students');
   };
 
   /* ── access grants (comp a student) ── */
@@ -740,6 +761,39 @@ export function AdminStudentDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* ── danger zone ── */}
+      <div className="rounded-2xl border border-red-200 bg-red-50/60 p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex-1">
+            <h3 className="font-semibold text-red-700">Delete this student</h3>
+            <p className="text-sm text-red-600/80 mt-0.5">
+              Permanently removes the account and all their data — payments, access, progress and uploads. This cannot be undone.
+            </p>
+            {deleteError && <p className="text-sm font-medium text-red-700 mt-2">{deleteError}</p>}
+          </div>
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="shrink-0 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+          >
+            <Trash2Icon className="w-4 h-4" /> Delete student
+          </button>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={`Delete ${student.full_name || 'this student'}?`}
+        message={
+          <>
+            This permanently deletes the account and <strong>all their data</strong> (payments, access, progress, uploaded ID).
+            This cannot be undone.
+          </>
+        }
+        confirmLabel={deleting ? 'Deleting…' : 'Delete student'}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }
