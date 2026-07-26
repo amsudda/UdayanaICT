@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SearchIcon, UsersIcon, AlertCircleIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon } from 'lucide-react';
+import { SearchIcon, UsersIcon, AlertCircleIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon, ShieldCheckIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -33,7 +33,9 @@ export function AdminStudentsPage() {
   // grouping
   const studentsByBatch: Record<string, any[]> = {};
   const unassigned: any[] = [];
+  const needsVerification: any[] = [];
   students.forEach((s) => {
+    if (s.verification_status === 'pending') needsVerification.push(s);
     const bs = batchesOf(s);
     if (bs.length === 0) unassigned.push(s);
     else bs.forEach((b: any) => { (studentsByBatch[b.id] ??= []).push(s); });
@@ -111,6 +113,22 @@ export function AdminStudentsPage() {
       ) : (
         /* batch folders */
         <div className="space-y-6">
+          {needsVerification.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2 text-rose-700">
+                <ShieldCheckIcon className="w-4 h-4" />
+                <p className="text-xs font-bold uppercase tracking-wider">Needs ID verification</p>
+              </div>
+              <Folder
+                id="needs-verification"
+                title="Awaiting ID verification"
+                sub={`${needsVerification.length} student${needsVerification.length === 1 ? '' : 's'} uploaded an ID — review to unlock lessons`}
+                items={needsVerification}
+                accent="bg-rose-100 text-rose-600"
+              />
+            </div>
+          )}
+
           {unassigned.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2 text-amber-700">

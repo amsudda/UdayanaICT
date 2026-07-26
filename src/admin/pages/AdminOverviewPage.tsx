@@ -15,7 +15,10 @@ import {
   Loader2Icon,
   UserPlusIcon,
   BanknoteIcon,
-  TrendingUpIcon
+  TrendingUpIcon,
+  IdCardIcon,
+  ShieldCheckIcon,
+  BellRingIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
@@ -96,10 +99,12 @@ export function AdminOverviewPage() {
 
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<any | null>(null);
+  const [vBusyId, setVBusyId] = useState<string | null>(null);
+  const [idRejectTarget, setIdRejectTarget] = useState<any | null>(null);
 
   const load = async () => {
     const [{ data: pr }, { data: pay }, { data: bs }, { count: pc }, { data: mk }, { data: bm }] = await Promise.all([
-      supabase.from('profiles').select('id, full_name, student_code, program, exam_year, created_at').eq('role', 'student').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('id, full_name, student_code, program, exam_year, created_at, verification_status, id_front_path, id_back_path, verification_submitted_at, phone').eq('role', 'student').order('created_at', { ascending: false }),
       supabase.from('payments').select('*').order('created_at', { ascending: false }),
       supabase.from('batches').select('id, name'),
       supabase.from('packs').select('id', { count: 'exact', head: true }),
@@ -116,6 +121,19 @@ export function AdminOverviewPage() {
   };
   useEffect(() => { load(); }, []);
 
+  // realtime: refresh the moment a student submits/updates an ID verification
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-overview-id-alerts')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        () => { load(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   const nameOf = useMemo(() => {
     const m = new Map<string, string>();
     profiles.forEach((p) => m.set(p.id, p.full_name ?? '—'));
@@ -125,6 +143,7 @@ export function AdminOverviewPage() {
   /* ── derived ── */
   const pending = payments.filter((p) => p.status === 'pending');
   const approved = payments.filter((p) => p.status === 'approved');
+  const pendingIds = profiles.filter((p) => p.verification_status === 'pending');
 
   const monthKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}`;
   const thisMonth = monthKey(new Date());
@@ -243,8 +262,12 @@ export function AdminOverviewPage() {
       at: p.created_at, icon: BanknoteIcon, tone: 'bg-emerald-50 text-emerald-600',
       text: `Payment ${p.status === 'pending' ? 'received' : p.status} — ${fmtLKR(Number(p.amount ?? 0))} from ${nameOf(p.student_id)}`
     }));
+    pendingIds.slice(0, 8).forEach((p) => items.push({
+      at: p.verification_submitted_at ?? p.created_at, icon: IdCardIcon, tone: 'bg-rose-50 text-rose-600',
+      text: `${p.full_name ?? 'A student'} submitted an ID for verification`
+    }));
     return items.sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 7);
-  }, [profiles, payments, nameOf]);
+  }, [profiles, payments, pendingIds, nameOf]);
 
   // batch performance: avg paper marks per batch
   const batchPerf = useMemo(() => {
@@ -290,6 +313,48 @@ export function AdminOverviewPage() {
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
 
+  /* ── ID verification actions (same shape as AdminStudentDetailPage) ── */
+  const viewIdImages = async (s: any) => {
+    const paths = [s.id_front_path, s.id_back_path].filter(Boolean) as string[];
+    if (paths.length === 0) return;
+    const results = await Promise.all(
+      paths.map((p) => supabase.storage.from('id-cards').createSignedUrl(p, 3600))
+    );
+    results.forEach((r) => {
+      if (r.data?.signedUrl) window.open(r.data.signedUrl, '_blank');
+    });
+  };
+  const approveId = async (s: any) => {
+    setVBusyId(s.id);
+    await supabase
+      .from('profiles')
+      .update({
+        verification_status: 'approved',
+        verification_reviewed_by: user?.id ?? null,
+        verification_reviewed_at: new Date().toISOString(),
+        verification_reject_reason: null
+      })
+      .eq('id', s.id);
+    setVBusyId(null);
+    load();
+  };
+  const doRejectId = async () => {
+    if (!idRejectTarget) return;
+    setVBusyId(idRejectTarget.id);
+    await supabase
+      .from('profiles')
+      .update({
+        verification_status: 'rejected',
+        verification_reviewed_by: user?.id ?? null,
+        verification_reviewed_at: new Date().toISOString(),
+        verification_reject_reason: 'Please re-upload a clearer ID.'
+      })
+      .eq('id', idRejectTarget.id);
+    setVBusyId(null);
+    setIdRejectTarget(null);
+    load();
+  };
+
   const quickActions = [
     { title: 'Create Batch', desc: 'Start a new batch', to: '/admin/batches', icon: LayersIcon, tone: 'bg-violet-50 text-violet-600 border-violet-100' },
     { title: 'Upload Pack', desc: 'Add learning content', to: '/admin/packs', icon: PackageIcon, tone: 'bg-blue-50 text-blue-600 border-blue-100' },
@@ -298,6 +363,7 @@ export function AdminOverviewPage() {
   ];
 
   const stats = [
+    { label: 'Pending ID Verifications', value: pendingIds.length, icon: IdCardIcon, to: '/admin/students', tone: pendingIds.length > 0 ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500', spark: null as number[] | null, sparkColor: '', trend: pendingIds.length > 0 ? 'awaiting approval' : 'all caught up' },
     { label: 'Pending Payments', value: pending.length, icon: ReceiptTextIcon, to: '/admin/payments', tone: pending.length > 0 ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500', spark: null as number[] | null, sparkColor: '', trend: pending.length > 0 ? 'awaiting approval' : 'all caught up' },
     { label: 'Students', value: profiles.length, icon: UsersIcon, to: '/admin/students', tone: 'bg-blue-50 text-blue-600', spark: signupSpark, sparkColor: '#2563eb', trend: `+${regsThisMonth} this month` },
     { label: 'Active Batches', value: batches.length, icon: LayersIcon, to: '/admin/batches', tone: 'bg-violet-50 text-violet-600', spark: null, sparkColor: '', trend: null as string | null },
@@ -310,6 +376,24 @@ export function AdminOverviewPage() {
 
   return (
     <div>
+      {/* prominent ID-verification alert (most important, above everything) */}
+      {!loading && pendingIds.length > 0 && (
+        <Link
+          to="/admin/students"
+          className="mb-6 flex items-center gap-3 rounded-2xl bg-rose-600 text-white px-4 sm:px-5 py-4 shadow-sm hover:bg-rose-700 transition-colors animate-pulse"
+        >
+          <span className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <BellRingIcon className="w-5 h-5" />
+          </span>
+          <p className="text-sm font-semibold flex-1 min-w-0">
+            <span className="font-black">{pendingIds.length}</span> student{pendingIds.length === 1 ? '' : 's'} {pendingIds.length === 1 ? 'has' : 'have'} uploaded an ID awaiting verification — review to unlock their lessons.
+          </p>
+          <span className="hidden sm:flex text-sm font-bold items-center gap-1 shrink-0">
+            Verify now <ArrowRightIcon className="w-4 h-4" />
+          </span>
+        </Link>
+      )}
+
       {/* header */}
       <div className="flex flex-wrap items-end justify-between gap-2 mb-6">
         <div>
@@ -364,6 +448,58 @@ export function AdminOverviewPage() {
       <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-6 items-start">
         {/* ── LEFT column ── */}
         <div className="space-y-6 min-w-0">
+          {/* ID verifications queue */}
+          <div className="rounded-2xl bg-white border border-rose-200 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="flex items-center gap-2 font-bold text-slate-900">
+                <ShieldCheckIcon className="w-4 h-4 text-rose-600" />
+                ID Verifications
+              </h2>
+              <Link to="/admin/students" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                View all <ArrowRightIcon className="w-3 h-3" />
+              </Link>
+            </div>
+            {pendingIds.length === 0 ? (
+              <p className="text-sm text-slate-400 py-6 text-center">No IDs waiting — all verified ✅</p>
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {pendingIds.slice(0, 5).map((s) => (
+                  <div key={s.id} className="py-3 flex items-center gap-3">
+                    <span className="w-9 h-9 rounded-full bg-rose-50 text-rose-600 text-xs font-bold flex items-center justify-center shrink-0">
+                      {(s.full_name ?? '?').split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 truncate">{s.full_name || '(no name)'}</p>
+                      <p className="text-xs text-slate-400 truncate">
+                        {s.student_code}
+                        {s.verification_submitted_at ? ` · submitted ${timeAgo(s.verification_submitted_at)}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button onClick={() => viewIdImages(s)} disabled={!s.id_front_path && !s.id_back_path} title="View ID"
+                        className="w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-30 flex items-center justify-center">
+                        <ImageIcon className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => approveId(s)} disabled={vBusyId === s.id} title="Approve"
+                        className="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center">
+                        {vBusyId === s.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <CheckIcon className="w-4 h-4" />}
+                      </button>
+                      <button onClick={() => setIdRejectTarget(s)} disabled={vBusyId === s.id} title="Reject"
+                        className="w-8 h-8 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center">
+                        <XIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {pendingIds.length > 5 && (
+                  <p className="pt-3 text-xs text-slate-400 text-center">
+                    Showing 5 of {pendingIds.length} — <Link to="/admin/students" className="font-semibold text-blue-600 hover:underline">view the rest</Link>
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* revenue */}
           <div className="rounded-2xl bg-white border border-slate-200 p-5">
             <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
@@ -534,6 +670,15 @@ export function AdminOverviewPage() {
         confirmLabel="Reject"
         onConfirm={doReject}
         onCancel={() => setRejectTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={!!idRejectTarget}
+        title="Reject this ID?"
+        message={`Reject ${idRejectTarget?.full_name ?? 'this student'}'s ID? They'll be asked to re-upload a clearer photo before they can access lessons.`}
+        confirmLabel="Reject"
+        onConfirm={doRejectId}
+        onCancel={() => setIdRejectTarget(null)}
       />
     </div>
   );
