@@ -221,6 +221,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) return { success: false, message: error.message };
     }
 
+    // Keep program + exam_year in auth metadata so the DB trigger can use
+    // them if the profile row is ever re-created.
+    const cols = detailsToColumns(details);
+    if (cols.program || cols.exam_year) {
+      const meta: Record<string, string> = {};
+      if (cols.program) meta.program = cols.program;
+      if (cols.exam_year != null) meta.exam_year = String(cols.exam_year);
+      await supabase.auth.updateUser({ data: meta });
+    }
+
     const { error } = await supabase
       .from('profiles')
       .update({
@@ -230,7 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Saving the profile form always counts as "completed" — this is what
         // graduates a fresh Google sign-up out of the /complete-profile gate.
         profile_completed: true,
-        ...detailsToColumns(details)
+        ...cols
       })
       .eq('id', user.id);
     if (error) return { success: false, message: error.message };

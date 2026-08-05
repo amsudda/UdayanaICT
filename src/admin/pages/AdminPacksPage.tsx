@@ -190,7 +190,7 @@ export function AdminPacksPage() {
     load();
   };
   const saveVideo = async () => {
-    if (!videosPack || !vForm.title.trim() || !vForm.youtube.trim()) return;
+    if (!videosPack || !vForm.title.trim() || (!vForm.youtube.trim() && vForm.tutes.length === 0 && tuteFiles.length === 0)) return;
     const tutes = [...vForm.tutes];
     for (const f of tuteFiles) {
       const path = `packs/${videosPack.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.pdf`;
@@ -203,7 +203,7 @@ export function AdminPacksPage() {
     }
     const payload = {
       title: vForm.title.trim(),
-      youtube_id: parseYouTubeId(vForm.youtube),
+      youtube_id: vForm.youtube.trim() ? parseYouTubeId(vForm.youtube) : null,
       duration_label: vForm.duration || null,
       description: vForm.description || null,
       tutes
@@ -462,7 +462,7 @@ export function AdminPacksPage() {
         <div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
           <p className="text-sm font-semibold text-slate-700">{vForm.id ? 'Edit video' : 'Add a video'}</p>
           <input className={inputCls} value={vForm.title} onChange={(e) => setVForm({ ...vForm, title: e.target.value })} placeholder="Video title" />
-          <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID" />
+          <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID (optional — leave blank for PDF only)" />
           <input className={inputCls} value={vForm.duration} onChange={(e) => setVForm({ ...vForm, duration: e.target.value })} placeholder="Duration e.g. 45 mins" />
 
           {/* tute PDFs — click again to add more, one by one or several at once */}
@@ -499,7 +499,7 @@ export function AdminPacksPage() {
             {vForm.id && (
               <button onClick={() => { setVForm({ id: '', title: '', youtube: '', duration: '', description: '', tutes: [] }); setTuteFiles([]); }} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>
             )}
-            <button onClick={saveVideo} disabled={!vForm.title.trim() || !vForm.youtube.trim()} className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50">
+            <button onClick={saveVideo} disabled={!vForm.title.trim() || (!vForm.youtube.trim() && vForm.tutes.length === 0 && tuteFiles.length === 0)} className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50">
               {vForm.id ? 'Update video' : 'Add video'}
             </button>
           </div>

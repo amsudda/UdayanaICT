@@ -332,8 +332,14 @@ function PlaylistItem({ lesson, index, isActive, isWatched, onClick }: {
       className={`group/item w-full flex items-start gap-3 p-2.5 rounded-2xl text-left transition-all duration-150 ${
         isActive ? 'bg-red-500/15 ring-1 ring-red-400/40' : 'ring-1 ring-transparent hover:bg-white/[0.06]'}`}>
       <div className="relative w-[84px] h-[48px] rounded-xl shrink-0 overflow-hidden bg-white/5">
-        <img src={ytThumb(lesson.youtubeId)} alt="" loading="lazy"
-          className={`w-full h-full object-cover transition ${isWatched && !isActive ? 'opacity-45' : 'opacity-90 group-hover/item:opacity-100'}`} />
+        {lesson.youtubeId ? (
+          <img src={ytThumb(lesson.youtubeId)} alt="" loading="lazy"
+            className={`w-full h-full object-cover transition ${isWatched && !isActive ? 'opacity-45' : 'opacity-90 group-hover/item:opacity-100'}`} />
+        ) : (
+          <div className={`w-full h-full flex items-center justify-center bg-red-500/15 border border-red-500/25 transition ${isWatched && !isActive ? 'opacity-45' : 'opacity-90'}`}>
+            <FileTextIcon className="w-5 h-5 text-red-300" />
+          </div>
+        )}
         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
           {isActive ? (
             <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#c20f24] shadow-lg"><PlayIcon className="w-3.5 h-3.5 text-white fill-current ml-0.5" /></span>
@@ -343,7 +349,7 @@ function PlaylistItem({ lesson, index, isActive, isWatched, onClick }: {
             <span className="text-xs font-bold text-white/80">{index + 1}</span>
           )}
         </div>
-        {isActive && <span className="absolute bottom-0 inset-x-0 text-center text-[8px] font-black text-white bg-[#c20f24]/90 uppercase tracking-wider leading-[11px]">Now Playing</span>}
+        {isActive && <span className="absolute bottom-0 inset-x-0 text-center text-[8px] font-black text-white bg-[#c20f24]/90 uppercase tracking-wider leading-[11px]">{lesson.youtubeId ? 'Now Playing' : 'PDF'}</span>}
       </div>
       <div className="flex-1 min-w-0 pt-0.5">
         <p className={`text-[13px] font-semibold leading-snug line-clamp-2 ${isActive ? 'text-white' : isWatched ? 'text-white/45' : 'text-white/85'}`}>{lesson.title}</p>
@@ -509,9 +515,19 @@ export function WatchPage() {
       <div className="flex-1 flex min-h-0 overflow-hidden">
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
           <div className="relative w-full bg-black shrink-0 lg:p-4 xl:p-5">
-            <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
-              <CustomPlayer videoId={active.youtubeId} onEnded={handleNext} />
-            </div>
+            {active.youtubeId ? (
+              <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
+                <CustomPlayer videoId={active.youtubeId} onEnded={handleNext} />
+              </div>
+            ) : (
+              <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-gradient-to-br from-red-500/15 to-black flex flex-col items-center justify-center text-center px-6" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
+                <div className="w-16 h-16 rounded-2xl bg-red-500/20 border border-red-500/30 flex items-center justify-center mb-4">
+                  <FileTextIcon className="w-8 h-8 text-red-300" />
+                </div>
+                <p className="text-lg font-bold text-white">PDF-only lesson</p>
+                <p className="text-sm text-white/50 mt-1 max-w-sm">This lesson has no video — open the tute PDF below to read it.</p>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.12) transparent' }}>

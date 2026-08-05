@@ -7,18 +7,22 @@
 -- ============================================================
 
 -- 1) Full profile auto-fill on signup (from signup metadata)
+--    student_code is NOT set here — the trg_assign_student_code_insert
+--    trigger fills it when program + exam_year are present; for Google
+--    sign-ups the trg_assign_student_code trigger does it on profile update.
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare m jsonb := new.raw_user_meta_data;
 begin
   insert into public.profiles (
-    id, email, role, student_code,
-    full_name, phone, nic, gender, birth_date, school, district, medium,
+    id, email, role,
+    full_name, avatar_url, phone, nic, gender, birth_date, school, district, medium,
     program, exam_year, guardian_name, guardian_phone, address
   ) values (
     new.id, new.email, 'student',
-    'STU-' || lpad(((abs(hashtext(new.id::text)) % 90000) + 10000)::text, 5, '0'),
-    nullif(m->>'full_name',''), nullif(m->>'phone',''), nullif(m->>'nic',''),
+    coalesce(nullif(m->>'full_name',''), nullif(m->>'name',''), ''),
+    coalesce(m->>'avatar_url', m->>'picture'),
+    nullif(m->>'phone',''), nullif(m->>'nic',''),
     nullif(m->>'gender',''), nullif(m->>'birth_date','')::date, nullif(m->>'school',''),
     nullif(m->>'district',''), nullif(m->>'medium',''), nullif(m->>'program',''),
     nullif(m->>'exam_year','')::int, nullif(m->>'guardian_name',''),

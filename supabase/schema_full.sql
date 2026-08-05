@@ -49,7 +49,7 @@ create table if not exists public.packs (
 create table if not exists public.pack_videos (
   id uuid primary key default gen_random_uuid(),
   pack_id uuid not null references public.packs(id) on delete cascade,
-  title text not null, youtube_id text not null,
+  title text not null, youtube_id text,
   duration_label text, sort_order int not null default 0, description text,
   tute_url text,
   tutes jsonb not null default '[]'::jsonb
@@ -69,7 +69,7 @@ create table if not exists public.theory_months (
 create table if not exists public.theory_videos (
   id uuid primary key default gen_random_uuid(),
   theory_month_id uuid not null references public.theory_months(id) on delete cascade,
-  title text not null, youtube_id text not null,
+  title text not null, youtube_id text,
   duration_label text, sort_order int not null default 0, description text,
   tute_url text,
   tutes jsonb not null default '[]'::jsonb,
@@ -234,28 +234,24 @@ declare
   m jsonb := new.raw_user_meta_data;
   v_program text := nullif(m->>'program','');
   v_year int := nullif(m->>'exam_year','')::int;
-  v_prefix text;
-  v_no int;
-  v_code text;
 begin
-  v_prefix := case when v_program = 'A/L' then 'AL' when v_program = 'O/L' then 'OL' else 'UI' end;
-  if v_year is not null then v_prefix := v_prefix || right(v_year::text, 2); end if;
-
-  insert into public.student_code_counters (cohort, last_no)
-  values (v_prefix, 1)
-  on conflict (cohort) do update set last_no = public.student_code_counters.last_no + 1
-  returning last_no into v_no;
-
-  v_code := v_prefix || '-' || lpad(v_no::text, 3, '0');  -- e.g. AL26-001
-
+  -- student_code is left NULL here — the trg_assign_student_code_insert
+  -- trigger (BEFORE INSERT on profiles) fills it in automatically when
+  -- program + exam_year are present.  For Google sign-ups (where those
+  -- fields are absent), the code is assigned later when the student
+  -- completes their profile via trg_assign_student_code.
   insert into public.profiles (
-    id, email, role, student_code, full_name, phone, nic, gender, birth_date,
-    school, district, medium, program, exam_year, guardian_name, guardian_phone, address
+    id, email, role, full_name, avatar_url,
+    phone, nic, gender, birth_date, school, district, medium,
+    program, exam_year, guardian_name, guardian_phone, address
   ) values (
-    new.id, new.email, 'student', v_code,
-    nullif(m->>'full_name',''), nullif(m->>'phone',''), nullif(m->>'nic',''),
-    nullif(m->>'gender',''), nullif(m->>'birth_date','')::date, nullif(m->>'school',''),
-    nullif(m->>'district',''), nullif(m->>'medium',''), v_program,
+    new.id, new.email, 'student',
+    coalesce(nullif(m->>'full_name',''), nullif(m->>'name',''), ''),
+    coalesce(m->>'avatar_url', m->>'picture'),
+    nullif(m->>'phone',''), nullif(m->>'nic',''),
+    nullif(m->>'gender',''), nullif(m->>'birth_date','')::date,
+    nullif(m->>'school',''), nullif(m->>'district',''),
+    nullif(m->>'medium',''), v_program,
     v_year, nullif(m->>'guardian_name',''),
     nullif(m->>'guardian_phone',''), nullif(m->>'address','')
   ) on conflict (id) do nothing;
