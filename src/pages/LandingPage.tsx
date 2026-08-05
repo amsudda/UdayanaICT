@@ -266,6 +266,13 @@ export function LandingPage() {
                 transition={{ duration: 0.7 }}
                 className="flex flex-col items-center text-center pb-10 lg:pb-20 pt-4"
               >
+                {/* Brand Logo */}
+                <img
+                  src="/images/pd-logo.png"
+                  alt="Pasindu Dissanayake ICT Logo"
+                  className="w-20 h-20 md:w-24 md:h-24 mb-4 object-contain drop-shadow-md"
+                />
+
                 {/* Pixel "level up" chip */}
                 <div className="font-pixel inline-flex items-center gap-2 mb-5 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900">
                   <PixelStar className="w-3 h-3 text-amber-400" />
