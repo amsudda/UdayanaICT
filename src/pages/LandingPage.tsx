@@ -270,7 +270,7 @@ export function LandingPage() {
                 <img
                   src="/images/pd-logo.png"
                   alt="Pasindu Dissanayake ICT Logo"
-                  className="w-20 h-20 md:w-24 md:h-24 mb-4 object-contain drop-shadow-md"
+                  className="w-32 h-32 md:w-44 md:h-44 mb-5 object-contain drop-shadow-lg"
                 />
 
                 {/* Pixel "level up" chip */}
