@@ -134,42 +134,78 @@ export function CourseDetailsPage() {
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative rounded-[2rem] overflow-hidden mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.06)] bg-[#0a0c11]"
       >
-        {/* Tech/Pixel Grid Background */}
-        <div className="absolute inset-0 opacity-[0.15]" style={{
-          backgroundImage: `linear-gradient(to right, #4f4f4f 1px, transparent 1px), linear-gradient(to bottom, #4f4f4f 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-          backgroundPosition: 'center center'
-        }} />
         
-        {/* Animated Moving Gradient Accents */}
+        {/* Motion Graphics Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Tech/Pixel Grid Background */}
-          <div className="absolute inset-0 opacity-[0.15]" style={{
-            backgroundImage: `linear-gradient(to right, #4f4f4f 1px, transparent 1px), linear-gradient(to bottom, #4f4f4f 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
-            backgroundPosition: 'center center'
-          }} />
-          
+          {/* Animated Tech Grid */}
           <motion.div 
-            animate={{ x: ['-50%', '50%', '-50%'], y: ['-50%', '50%', '-50%'], opacity: [0.1, 0.3, 0.1] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute top-0 left-0 w-full h-full rounded-full bg-[#c20f24] blur-[150px]" 
+            animate={{ backgroundPosition: ['0px 0px', '40px 40px'] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 opacity-[0.1]"
+            style={{
+              backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
+              backgroundSize: '40px 40px'
+            }}
           />
+
+          {/* SVG Abstract Motion Elements */}
+          <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="glowRed" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#c20f24" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#ff4747" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="glowBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#2563eb" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+
+            {/* Rotating Rings */}
+            <motion.circle 
+              cx="10%" cy="80%" r="150" 
+              fill="none" stroke="url(#glowRed)" strokeWidth="2" strokeDasharray="10 20"
+              animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              style={{ originX: '10%', originY: '80%' }}
+            />
+            <motion.circle 
+              cx="90%" cy="20%" r="200" 
+              fill="none" stroke="url(#glowBlue)" strokeWidth="1" strokeDasharray="5 15"
+              animate={{ rotate: -360 }} transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+              style={{ originX: '90%', originY: '20%' }}
+            />
+
+            {/* Floating Geometric Nodes & Lines */}
+            <motion.g animate={{ y: [0, -20, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+              <line x1="20%" y1="30%" x2="40%" y2="50%" stroke="#c20f24" strokeWidth="1" opacity="0.3" />
+              <circle cx="20%" cy="30%" r="4" fill="#c20f24" />
+              <circle cx="40%" cy="50%" r="3" fill="#ff4747" />
+            </motion.g>
+
+            <motion.g animate={{ x: [0, 30, 0], y: [0, 15, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
+              <line x1="60%" y1="70%" x2="80%" y2="40%" stroke="#2563eb" strokeWidth="1" opacity="0.3" />
+              <circle cx="60%" cy="70%" r="5" fill="#2563eb" />
+              <circle cx="80%" cy="40%" r="4" fill="#60a5fa" />
+            </motion.g>
+          </svg>
+
+          {/* Scanning Laser Line */}
           <motion.div 
-            animate={{ x: ['50%', '-50%', '50%'], y: ['50%', '-50%', '50%'], opacity: [0.1, 0.2, 0.1] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-0 right-0 w-full h-full rounded-full bg-blue-600 blur-[150px]" 
+            animate={{ top: ['-10%', '110%'] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#c20f24] to-transparent shadow-[0_0_15px_#c20f24] opacity-50"
           />
-          
-          {/* Animated Pixel Squares */}
-          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[20%] left-[30%] w-2 h-2 bg-[#c20f24]" />
-          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, delay: 1.2 }} className="absolute top-[60%] left-[70%] w-2 h-2 bg-blue-500" />
-          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 2.5, repeat: Infinity, delay: 2 }} className="absolute top-[80%] left-[40%] w-2 h-2 bg-white/50" />
-          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, delay: 0.8 }} className="absolute top-[30%] left-[80%] w-2 h-2 bg-[#c20f24]" />
+
+          {/* Slow Moving Gradients for Atmosphere */}
+          <motion.div 
+            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.1, 0.2, 0.1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-[#c20f24] blur-[120px] rounded-full" 
+          />
         </div>
         
         {/* Darkening Overlays so text is readable */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c11] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c11] via-[#0a0c11]/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11] via-[#0a0c11]/60 to-transparent" />
 
         <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12 min-h-[320px]">
