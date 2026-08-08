@@ -315,7 +315,7 @@ export function CourseDetailsPage() {
                   <div className="flex-1 w-full">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-[10px] font-black text-[#c20f24] tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded text-xs">
-                        Lesson {idx + 1}
+                        Day {idx + 1}
                       </span>
                       {lesson.kind === 'paper' && (
                         <span className="text-[10px] font-black text-amber-600 tracking-widest uppercase bg-amber-50 px-2 py-0.5 rounded text-xs">
