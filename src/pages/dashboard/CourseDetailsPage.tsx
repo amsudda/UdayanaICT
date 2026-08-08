@@ -270,15 +270,15 @@ export function CourseDetailsPage() {
              </span>
           </div>
           
-          <div className="flex overflow-x-auto pb-8 gap-5 custom-scrollbar snap-x snap-mandatory hide-scroll-on-mobile">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {lessons.map((lesson, idx) => {
               const isWatched = watchedIds.has(lesson.id);
               return (
                 <motion.button
-                  initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: Math.min(idx * 0.05, 0.5) }}
                   key={lesson.id}
                   onClick={() => navigate(`/dashboard/watch/${packId}?v=${lesson.id}`)}
-                  className="w-[280px] sm:w-[320px] shrink-0 snap-start group text-left flex flex-col p-4 rounded-[1.5rem] bg-white border border-slate-100 hover:border-[#c20f24]/30 hover:shadow-[0_12px_30px_-10px_rgba(194,15,36,0.15)] transition-all duration-300"
+                  className="w-full group text-left flex flex-col p-4 rounded-[1.5rem] bg-white border border-slate-100 hover:border-[#c20f24]/30 hover:shadow-[0_12px_30px_-10px_rgba(194,15,36,0.15)] transition-all duration-300"
                 >
                   <div className="relative w-full aspect-video rounded-xl overflow-hidden shrink-0 bg-slate-100 mb-4 shadow-sm">
                     {lesson.youtubeId ? (
