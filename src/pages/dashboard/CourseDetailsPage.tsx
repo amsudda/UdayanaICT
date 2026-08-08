@@ -141,15 +141,15 @@ export function CourseDetailsPage() {
           <motion.div 
             animate={{ backgroundPosition: ['0px 0px', '40px 40px'] }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 opacity-[0.1]"
+            className="absolute inset-0 opacity-[0.3]"
             style={{
-              backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
+              backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.15) 1px, transparent 1px)`,
               backgroundSize: '40px 40px'
             }}
           />
 
           {/* SVG Abstract Motion Elements */}
-          <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="xMidYMid slice">
+          <svg className="absolute inset-0 w-full h-full opacity-100" preserveAspectRatio="xMidYMid slice">
             <defs>
               <linearGradient id="glowRed" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#c20f24" stopOpacity="0.8" />
@@ -163,50 +163,50 @@ export function CourseDetailsPage() {
 
             {/* Rotating Rings */}
             <motion.circle 
-              cx="10%" cy="80%" r="150" 
-              fill="none" stroke="url(#glowRed)" strokeWidth="2" strokeDasharray="10 20"
-              animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              style={{ originX: '10%', originY: '80%' }}
+              cx="20%" cy="50%" r="180" 
+              fill="none" stroke="url(#glowRed)" strokeWidth="4" strokeDasharray="15 30"
+              animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              style={{ originX: '20%', originY: '50%' }}
             />
             <motion.circle 
-              cx="90%" cy="20%" r="200" 
-              fill="none" stroke="url(#glowBlue)" strokeWidth="1" strokeDasharray="5 15"
-              animate={{ rotate: -360 }} transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-              style={{ originX: '90%', originY: '20%' }}
+              cx="80%" cy="30%" r="220" 
+              fill="none" stroke="url(#glowBlue)" strokeWidth="3" strokeDasharray="10 25"
+              animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+              style={{ originX: '80%', originY: '30%' }}
             />
 
             {/* Floating Geometric Nodes & Lines */}
-            <motion.g animate={{ y: [0, -20, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-              <line x1="20%" y1="30%" x2="40%" y2="50%" stroke="#c20f24" strokeWidth="1" opacity="0.3" />
-              <circle cx="20%" cy="30%" r="4" fill="#c20f24" />
-              <circle cx="40%" cy="50%" r="3" fill="#ff4747" />
+            <motion.g animate={{ y: [0, -30, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
+              <line x1="30%" y1="20%" x2="50%" y2="60%" stroke="#c20f24" strokeWidth="2" opacity="0.8" />
+              <circle cx="30%" cy="20%" r="8" fill="#c20f24" />
+              <circle cx="50%" cy="60%" r="6" fill="#ff4747" />
             </motion.g>
 
-            <motion.g animate={{ x: [0, 30, 0], y: [0, 15, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
-              <line x1="60%" y1="70%" x2="80%" y2="40%" stroke="#2563eb" strokeWidth="1" opacity="0.3" />
-              <circle cx="60%" cy="70%" r="5" fill="#2563eb" />
-              <circle cx="80%" cy="40%" r="4" fill="#60a5fa" />
+            <motion.g animate={{ x: [0, 40, 0], y: [0, 25, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
+              <line x1="70%" y1="80%" x2="90%" y2="50%" stroke="#3b82f6" strokeWidth="2" opacity="0.8" />
+              <circle cx="70%" cy="80%" r="10" fill="#2563eb" />
+              <circle cx="90%" cy="50%" r="7" fill="#60a5fa" />
             </motion.g>
           </svg>
 
           {/* Scanning Laser Line */}
           <motion.div 
             animate={{ top: ['-10%', '110%'] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#c20f24] to-transparent shadow-[0_0_15px_#c20f24] opacity-50"
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            className="absolute left-0 right-0 h-[4px] bg-[#c20f24] shadow-[0_0_25px_8px_rgba(194,15,36,0.8)] opacity-90"
           />
 
           {/* Slow Moving Gradients for Atmosphere */}
           <motion.div 
-            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.1, 0.2, 0.1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-[#c20f24] blur-[120px] rounded-full" 
+            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.15, 0.3, 0.15] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-[#c20f24] blur-[100px] rounded-full mix-blend-screen" 
           />
         </div>
         
         {/* Darkening Overlays so text is readable */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c11] via-[#0a0c11]/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11] via-[#0a0c11]/60 to-transparent" />
+        <div className="absolute inset-0 bg-[#0a0c11]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11]/80 via-transparent to-transparent" />
 
         <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12 min-h-[320px]">
           {/* Thumbnail */}
