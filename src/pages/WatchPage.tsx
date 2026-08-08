@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeftIcon,
@@ -366,6 +366,8 @@ function PlaylistItem({ lesson, index, isActive, isWatched, onClick }: {
 export function WatchPage() {
   const { packId } = useParams<{ packId: string }>();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const targetVideoId = params.get('v');
 
   const [title, setTitle] = useState('');
   const [lessons, setLessons] = useState<VideoLesson[]>([]);
@@ -425,8 +427,13 @@ export function WatchPage() {
       setLessons(mapped);
       setLiveLinks(live);
       setWatchedIds(watched);
-      const firstUnwatched = mapped.findIndex((l) => !watched.has(l.id));
-      setActiveIndex(Math.max(firstUnwatched, 0));
+      
+      let initialIndex = Math.max(mapped.findIndex((l) => !watched.has(l.id)), 0);
+      if (targetVideoId) {
+        const found = mapped.findIndex(l => l.id === targetVideoId);
+        if (found !== -1) initialIndex = found;
+      }
+      setActiveIndex(initialIndex);
       setLoading(false);
     })();
     return () => { active = false; };
@@ -479,7 +486,7 @@ export function WatchPage() {
         <p className="text-white/60 max-w-xs">
           {notFound ? 'This content was not found.' : 'No videos available here yet — or this month is locked until its fee is verified.'}
         </p>
-        <button onClick={() => navigate('/dashboard/courses')} className="text-red-400 text-sm font-semibold hover:underline">← My Classes</button>
+        <button onClick={() => navigate(`/dashboard/courses/${packId}`)} className="text-red-400 text-sm font-semibold hover:underline">← Course Details</button>
       </div>
     );
   }
@@ -495,9 +502,9 @@ export function WatchPage() {
     >
       <header className="flex items-center gap-3 px-4 sm:px-6 h-16 shrink-0 border-b border-white/[0.07] z-20"
         style={{ background: 'rgba(12,14,20,0.85)', backdropFilter: 'blur(20px)' }}>
-        <button onClick={() => navigate('/dashboard/courses')} className="group flex items-center gap-2.5 text-sm text-white/70 hover:text-white shrink-0">
+        <button onClick={() => navigate(`/dashboard/courses/${packId}`)} className="group flex items-center gap-2.5 text-sm text-white/70 hover:text-white shrink-0">
           <div className="w-9 h-9 rounded-xl bg-white/8 group-hover:bg-white/15 border border-white/10 flex items-center justify-center"><ArrowLeftIcon className="w-4 h-4" /></div>
-          <span className="hidden sm:inline font-medium">My Classes</span>
+          <span className="hidden sm:inline font-medium">Course Details</span>
         </button>
         <div className="h-6 w-px bg-white/10 hidden sm:block" />
         <div className="flex-1 min-w-0">

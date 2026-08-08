@@ -33,6 +33,7 @@ import { AdminMarksPage } from './admin/pages/AdminMarksPage';
 import { AdminReviewsPage } from './admin/pages/AdminReviewsPage';
 import { AdminBooksPage } from './admin/pages/AdminBooksPage';
 import { PapersPage } from './pages/dashboard/PapersPage';
+import { CourseDetailsPage } from './pages/dashboard/CourseDetailsPage';
 import { AdminPapersPage } from './admin/pages/AdminPapersPage';
 
 function FullSpinner() {
@@ -102,6 +103,7 @@ function AnimatedRoutes() {
         >
           <Route index element={<DashboardPage />} />
           <Route path="courses" element={<VerificationGate><MyCoursesPage /></VerificationGate>} />
+          <Route path="courses/:packId" element={<VerificationGate><CourseDetailsPage /></VerificationGate>} />
           <Route path="extra-classes" element={<VerificationGate><ExtraClassesPage /></VerificationGate>} />
           <Route path="papers" element={<VerificationGate><PapersPage /></VerificationGate>} />
           <Route path="history" element={<ClassHistoryPage />} />

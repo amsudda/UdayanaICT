@@ -140,7 +140,7 @@ export function MyCoursesPage() {
                       <button
                         key={p.id}
                         ref={(el) => { cardRefs.current[p.id] = el; }}
-                        onClick={() => navigate(`/dashboard/watch/${p.id}`)}
+                        onClick={() => navigate(`/dashboard/courses/${p.id}`)}
                         className={`group text-left bg-white dark:bg-slate-900 rounded-3xl border overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-all duration-300 ${
                           flashId === p.id
                             ? 'border-[#c20f24] ring-2 ring-[#c20f24] ring-offset-2 ring-offset-white dark:ring-offset-slate-950 scale-[1.015]'
@@ -195,7 +195,7 @@ export function MyCoursesPage() {
                     return (
                       <button
                         key={m.id}
-                        onClick={() => (m.unlocked ? navigate(`/dashboard/watch/${m.id}`) : navigate('/dashboard/payments'))}
+                        onClick={() => (m.unlocked ? navigate(`/dashboard/courses/${m.id}`) : navigate('/dashboard/payments'))}
                         className={`group text-left bg-white dark:bg-slate-900 rounded-3xl border overflow-hidden transition-transform active:scale-[0.98] ${
                           m.unlocked ? 'border-gray-100 dark:border-slate-800' : 'border-amber-200 dark:border-amber-500/30'
                         }`}
