@@ -253,11 +253,11 @@ export function CourseDetailsPage() {
         </div>
       </motion.div>
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
+      {/* Layout */}
+      <div className="space-y-12">
         
-        {/* Left Column: Lessons */}
-        <div className="lg:col-span-8 space-y-6">
+        {/* Horizontal Lessons Row */}
+        <div className="space-y-6">
           <div className="flex items-center justify-between mb-8">
              <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center">
@@ -270,17 +270,17 @@ export function CourseDetailsPage() {
              </span>
           </div>
           
-          <div className="space-y-4">
+          <div className="flex overflow-x-auto pb-8 gap-5 custom-scrollbar snap-x snap-mandatory hide-scroll-on-mobile">
             {lessons.map((lesson, idx) => {
               const isWatched = watchedIds.has(lesson.id);
               return (
                 <motion.button
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: idx * 0.05 }}
                   key={lesson.id}
                   onClick={() => navigate(`/dashboard/watch/${packId}?v=${lesson.id}`)}
-                  className="w-full group text-left flex flex-col sm:flex-row items-start sm:items-center p-3 md:p-4 rounded-[1.5rem] bg-white border border-slate-100 hover:border-[#c20f24]/30 hover:shadow-[0_12px_30px_-10px_rgba(194,15,36,0.15)] transition-all duration-300"
+                  className="w-[280px] sm:w-[320px] shrink-0 snap-start group text-left flex flex-col p-4 rounded-[1.5rem] bg-white border border-slate-100 hover:border-[#c20f24]/30 hover:shadow-[0_12px_30px_-10px_rgba(194,15,36,0.15)] transition-all duration-300"
                 >
-                  <div className="relative w-full sm:w-[180px] aspect-video rounded-xl overflow-hidden shrink-0 bg-slate-100 mb-4 sm:mb-0 shadow-sm">
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden shrink-0 bg-slate-100 mb-4 shadow-sm">
                     {lesson.youtubeId ? (
                       <img src={ytThumb(lesson.youtubeId)} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                     ) : (
@@ -312,8 +312,8 @@ export function CourseDetailsPage() {
                     )}
                   </div>
                   
-                  <div className="flex-1 sm:pl-6 pr-2 w-full">
-                    <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex-1 w-full">
+                    <div className="flex items-center gap-2 mb-2">
                       <span className="text-[10px] font-black text-[#c20f24] tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded text-xs">
                         Lesson {idx + 1}
                       </span>
@@ -324,11 +324,11 @@ export function CourseDetailsPage() {
                       )}
                     </div>
                     
-                    <h3 className="text-base md:text-lg font-bold text-slate-900 group-hover:text-[#c20f24] transition-colors line-clamp-2 leading-snug mb-3">
+                    <h3 className="text-base font-bold text-slate-900 group-hover:text-[#c20f24] transition-colors line-clamp-2 leading-snug mb-3">
                       {lesson.title}
                     </h3>
                     
-                    <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs font-semibold text-slate-500">
+                    <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500 mt-auto">
                       {lesson.tutes.length > 0 && (
                         <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg border border-slate-100 text-slate-600">
                            <FileTextIcon className="w-3.5 h-3.5 text-blue-500" /> 
@@ -337,18 +337,14 @@ export function CourseDetailsPage() {
                       )}
                     </div>
                   </div>
-                  
-                  <div className="hidden sm:flex w-10 h-10 rounded-full bg-slate-50 items-center justify-center group-hover:bg-red-50 transition-colors ml-4 shrink-0">
-                    <ChevronRightIcon className="w-5 h-5 text-slate-300 group-hover:text-[#c20f24] transition-colors" />
-                  </div>
                 </motion.button>
               );
             })}
           </div>
         </div>
 
-        {/* Right Column: Sidebar */}
-        <div className="lg:col-span-4 space-y-6">
+        {/* Bottom Section: Live Classes & Study Materials */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {liveLinks.length > 0 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
@@ -421,11 +417,16 @@ export function CourseDetailsPage() {
       </div>
       
       {/* Scrollbar styles to hide/make elegant */}
+      {/* Scrollbar styles to hide/make elegant */}
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media (max-width: 640px) {
+          .hide-scroll-on-mobile::-webkit-scrollbar { display: none; }
+          .hide-scroll-on-mobile { -ms-overflow-style: none; scrollbar-width: none; }
+        }
       `}</style>
     </div>
   );
