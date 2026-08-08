@@ -4,13 +4,15 @@ import {
   BookOpenIcon,
   ShoppingCartIcon,
   CreditCardIcon,
-  UserIcon
+  UserIcon,
+  FileTextIcon
 } from 'lucide-react';
 
 export function MobileNav() {
   const navItems = [
     { name: 'Home',      path: '/dashboard',              icon: LayoutDashboardIcon, end: true },
     { name: 'Classes',   path: '/dashboard/courses',      icon: BookOpenIcon },
+    { name: 'Papers',    path: '/dashboard/papers',       icon: FileTextIcon },
     { name: 'Store',     path: '/dashboard/extra-classes',icon: ShoppingCartIcon },
     { name: 'Payments',  path: '/dashboard/payments',     icon: CreditCardIcon },
     { name: 'Profile',   path: '/dashboard/profile',      icon: UserIcon }

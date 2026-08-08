@@ -7,7 +7,8 @@ import {
   LayoutDashboardIcon,
   LogOutIcon,
   UserIcon,
-  ShoppingCartIcon
+  ShoppingCartIcon,
+  FileTextIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 
@@ -30,6 +31,11 @@ const menuGroups = [
         name: 'Lesson Store',
         path: '/dashboard/extra-classes',
         icon: ShoppingCartIcon
+      },
+      {
+        name: 'Papers',
+        path: '/dashboard/papers',
+        icon: FileTextIcon
       }
     ]
   },

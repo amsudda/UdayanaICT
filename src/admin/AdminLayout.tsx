@@ -19,7 +19,8 @@ import {
   ExternalLinkIcon,
   BookOpenIcon,
   BellRingIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  FileTextIcon
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -31,6 +32,7 @@ const nav = [
   { name: 'Packs', path: '/admin/packs', icon: PackageIcon },
   { name: 'Recordings', path: '/admin/theory', icon: VideoIcon },
   { name: 'Students', path: '/admin/students', icon: UsersIcon, badge: 'ids' },
+  { name: 'Papers', path: '/admin/papers', icon: FileTextIcon },
   { name: 'Paper Marks', path: '/admin/marks', icon: TrendingUpIcon },
   { name: 'Promotions', path: '/admin/promotions', icon: MegaphoneIcon },
   { name: 'Reviews', path: '/admin/reviews', icon: MessageSquareQuoteIcon },

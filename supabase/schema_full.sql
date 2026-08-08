@@ -157,6 +157,19 @@ create table if not exists public.notifications (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.papers (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  pdf_url text not null,
+  audience_scope text not null default 'batches' check (audience_scope in ('public','program','batches')),
+  batch_ids uuid[] not null default '{}',
+  audience_program text check (audience_program in ('O/L','A/L')),
+  is_published boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+
 create table if not exists public.settings (
   id int primary key default 1 check (id = 1),
   bank_name text, account_name text, account_number text, branch text,
@@ -282,6 +295,7 @@ alter table public.progress enable row level security;
 alter table public.promotions enable row level security;
 alter table public.notifications enable row level security;
 alter table public.settings enable row level security;
+alter table public.papers enable row level security;
 
 drop policy if exists profiles_self_read on public.profiles;
 create policy profiles_self_read on public.profiles for select using (id = auth.uid() or public.is_admin());
@@ -372,6 +386,14 @@ drop policy if exists notif_update on public.notifications;
 create policy notif_update on public.notifications for update using (student_id = auth.uid() or public.is_admin());
 drop policy if exists notif_admin on public.notifications;
 create policy notif_admin on public.notifications for insert with check (public.is_admin());
+
+drop policy if exists papers_read on public.papers;
+create policy papers_read on public.papers for select using (
+  public.is_admin() or (is_published and public.can_view(audience_scope, batch_ids, audience_program))
+);
+
+drop policy if exists papers_admin on public.papers;
+create policy papers_admin on public.papers for all using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists settings_read on public.settings;
 create policy settings_read on public.settings for select using (true);
