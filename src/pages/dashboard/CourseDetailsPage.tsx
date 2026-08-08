@@ -138,7 +138,7 @@ export function CourseDetailsPage() {
         {/* Logo Background */}
         <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
           <img 
-            src="/images/pd-logo.png" 
+            src="/images/bg-logo.jpg" 
             alt="" 
             className="w-[120%] h-[120%] object-contain filter invert mix-blend-screen" 
           />
