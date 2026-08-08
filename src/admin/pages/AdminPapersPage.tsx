@@ -20,6 +20,10 @@ const emptyForm = {
   title: '',
   description: '',
   pdf_url: '',
+  paper_type: 'past_paper' as 'past_paper' | 'provincial_paper' | 'model_paper',
+  year: new Date().getFullYear(),
+  province: '',
+  marking_scheme_url: '',
   audience_scope: 'batches' as 'public' | 'program' | 'batches',
   batch_ids: [] as string[],
   audience_program: 'A/L' as 'O/L' | 'A/L',
@@ -35,9 +39,11 @@ export function AdminPapersPage() {
   const [editing, setEditing] = useState<any | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [markingFile, setMarkingFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const pdfRef = useRef<HTMLInputElement>(null);
+  const markingRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,7 +58,7 @@ export function AdminPapersPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openCreate = () => { setEditing(null); setForm(emptyForm); setPdfFile(null); setEditorOpen(true); };
+  const openCreate = () => { setEditing(null); setForm(emptyForm); setPdfFile(null); setMarkingFile(null); setEditorOpen(true); };
   
   const openEdit = (p: any) => {
     setEditing(p);
@@ -60,18 +66,28 @@ export function AdminPapersPage() {
       title: p.title ?? '',
       description: p.description ?? '',
       pdf_url: p.pdf_url ?? '',
+      paper_type: p.paper_type ?? 'model_paper',
+      year: p.year ?? new Date().getFullYear(),
+      province: p.province ?? '',
+      marking_scheme_url: p.marking_scheme_url ?? '',
       audience_scope: p.audience_scope ?? 'batches',
       batch_ids: p.batch_ids ?? [],
       audience_program: p.audience_program ?? 'A/L',
       is_published: p.is_published ?? false
     });
     setPdfFile(null);
+    setMarkingFile(null);
     setEditorOpen(true);
   };
 
   const onPdf = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (f) setPdfFile(f);
+  };
+
+  const onMarking = (e: ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) setMarkingFile(f);
   };
 
   const toggleBatch = (id: string) => {
@@ -83,23 +99,39 @@ export function AdminPapersPage() {
     if (!pdfFile && !form.pdf_url) return alert("Please upload a PDF.");
 
     setSaving(true);
-    let finalUrl = form.pdf_url;
+    let finalPdfUrl = form.pdf_url;
+    let finalMarkingUrl = form.marking_scheme_url;
 
     if (pdfFile) {
       const ext = pdfFile.name.split('.').pop() || 'pdf';
-      const path = `papers/${Date.now()}.${ext}`;
+      const path = `papers/q_${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from('tutes').upload(path, pdfFile, { upsert: true, contentType: 'application/pdf' });
       if (upErr) {
         setSaving(false);
         return alert(`Could not upload PDF: ${upErr.message}`);
       }
-      finalUrl = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+      finalPdfUrl = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+    }
+
+    if (markingFile) {
+      const ext = markingFile.name.split('.').pop() || 'pdf';
+      const path = `papers/m_${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('tutes').upload(path, markingFile, { upsert: true, contentType: 'application/pdf' });
+      if (upErr) {
+        setSaving(false);
+        return alert(`Could not upload Marking Scheme: ${upErr.message}`);
+      }
+      finalMarkingUrl = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
     }
 
     const payload = {
       title: form.title.trim(),
       description: form.description.trim() || null,
-      pdf_url: finalUrl,
+      pdf_url: finalPdfUrl,
+      paper_type: form.paper_type,
+      year: form.paper_type === 'past_paper' || form.paper_type === 'model_paper' ? form.year : null,
+      province: form.paper_type === 'provincial_paper' ? form.province.trim() : null,
+      marking_scheme_url: finalMarkingUrl || null,
       audience_scope: form.audience_scope,
       batch_ids: form.audience_scope === 'batches' ? form.batch_ids : [],
       audience_program: form.audience_scope === 'program' ? form.audience_program : null,
@@ -183,20 +215,66 @@ export function AdminPapersPage() {
             <label className="block text-sm font-semibold text-slate-900 mb-1.5">Title</label>
             <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className={inputCls} placeholder="e.g. 2026 Model Paper 1" />
           </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-900 mb-1.5">Paper Type</label>
+            <select value={form.paper_type} onChange={e => setForm({ ...form, paper_type: e.target.value as any })} className={inputCls}>
+              <option value="past_paper">Past Paper</option>
+              <option value="provincial_paper">Provincial Paper</option>
+              <option value="model_paper">Model Paper</option>
+            </select>
+          </div>
+
+          {(form.paper_type === 'past_paper' || form.paper_type === 'model_paper') && (
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-1.5">Year</label>
+              <input type="number" value={form.year} onChange={e => setForm({ ...form, year: parseInt(e.target.value) || new Date().getFullYear() })} className={inputCls} placeholder="e.g. 2024" />
+            </div>
+          )}
+
+          {form.paper_type === 'provincial_paper' && (
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-1.5">Province</label>
+              <select value={form.province} onChange={e => setForm({ ...form, province: e.target.value })} className={inputCls}>
+                <option value="">Select Province...</option>
+                <option value="Western Province">Western Province</option>
+                <option value="Southern Province">Southern Province</option>
+                <option value="Central Province">Central Province</option>
+                <option value="Northern Province">Northern Province</option>
+                <option value="Eastern Province">Eastern Province</option>
+                <option value="North Western Province">North Western Province</option>
+                <option value="North Central Province">North Central Province</option>
+                <option value="Uva Province">Uva Province</option>
+                <option value="Sabaragamuwa Province">Sabaragamuwa Province</option>
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-1.5">Description (Optional)</label>
             <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={`${inputCls} h-20 py-2.5 resize-none`} placeholder="Brief description..." />
           </div>
           
-          <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-1.5">PDF File</label>
-            <input type="file" accept="application/pdf" className="hidden" ref={pdfRef} onChange={onPdf} />
-            <div className="flex items-center gap-3">
-              <button onClick={() => pdfRef.current?.click()} className="flex items-center gap-2 h-11 px-4 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-                <UploadCloudIcon className="w-4 h-4" /> {pdfFile ? 'Change PDF' : 'Upload PDF'}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-1.5">Question Paper PDF</label>
+              <input type="file" accept="application/pdf" className="hidden" ref={pdfRef} onChange={onPdf} />
+              <button onClick={() => pdfRef.current?.click()} className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
+                <UploadCloudIcon className="w-4 h-4" /> {pdfFile || form.pdf_url ? 'Change Paper' : 'Upload Paper'}
               </button>
               {(pdfFile || form.pdf_url) && (
-                <span className="text-sm text-emerald-600 flex items-center gap-1"><CheckCircle2Icon className="w-4 h-4" /> {pdfFile ? pdfFile.name : 'PDF Uploaded'}</span>
+                <span className="text-xs text-emerald-600 flex items-center gap-1 mt-1 truncate"><CheckCircle2Icon className="w-3 h-3 shrink-0" /> {pdfFile ? pdfFile.name : 'PDF Uploaded'}</span>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-1.5">Marking Scheme PDF</label>
+              <input type="file" accept="application/pdf" className="hidden" ref={markingRef} onChange={onMarking} />
+              <button onClick={() => markingRef.current?.click()} className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
+                <UploadCloudIcon className="w-4 h-4" /> {markingFile || form.marking_scheme_url ? 'Change Scheme' : 'Upload Scheme'}
+              </button>
+              {(markingFile || form.marking_scheme_url) && (
+                <span className="text-xs text-emerald-600 flex items-center gap-1 mt-1 truncate"><CheckCircle2Icon className="w-3 h-3 shrink-0" /> {markingFile ? markingFile.name : 'Scheme Uploaded'}</span>
               )}
             </div>
           </div>
