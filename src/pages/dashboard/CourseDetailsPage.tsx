@@ -140,11 +140,11 @@ export function CourseDetailsPage() {
           
           {/* Subtle Logo Watermark */}
           <motion.div 
-            animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.15, 0.05] }}
+            animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.6, 0.3] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -right-[10%] top-1/2 -translate-y-1/2 w-[600px] h-[600px] mix-blend-screen pointer-events-none"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] mix-blend-screen pointer-events-none"
           >
-            <img src="/images/pd-logo.png" alt="" className="w-full h-full object-contain filter invert opacity-30 drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]" />
+            <img src="/images/pd-logo.png" alt="" className="w-full h-full object-contain filter invert drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" />
           </motion.div>
 
           {/* Animated Tech Grid */}
