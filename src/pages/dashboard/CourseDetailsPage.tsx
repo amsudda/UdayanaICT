@@ -131,19 +131,19 @@ export function CourseDetailsPage() {
       
       {/* Immersive Hero Header */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative rounded-[2rem] overflow-hidden mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.06)] bg-[#0a0c11]"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+        className="relative rounded-[2rem] overflow-hidden mb-8 shadow-[0_20px_40px_rgba(194,15,36,0.15)] bg-gradient-to-br from-[#7a0010] to-[#c20f24]"
       >
         
-        {/* Motion Graphics Animated Background - RED THEME */}
+        {/* Motion Graphics Animated Background - CONTRAST THEME */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Animated Tech Grid */}
           <motion.div 
             animate={{ backgroundPosition: ['0px 0px', '40px 40px'] }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 opacity-[0.35]"
+            className="absolute inset-0 opacity-[0.2]"
             style={{
-              backgroundImage: `linear-gradient(to right, rgba(194,15,36,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(194,15,36,0.15) 1px, transparent 1px)`,
+              backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.2) 1px, transparent 1px)`,
               backgroundSize: '40px 40px'
             }}
           />
@@ -151,41 +151,41 @@ export function CourseDetailsPage() {
           {/* SVG Abstract Motion Elements */}
           <svg className="absolute inset-0 w-full h-full opacity-100" preserveAspectRatio="xMidYMid slice">
             <defs>
-              <linearGradient id="glowRed1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#c20f24" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#ff4747" stopOpacity="0.1" />
+              <linearGradient id="glowContrast1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#fef3c7" stopOpacity="0.1" />
               </linearGradient>
-              <linearGradient id="glowRed2" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ff4747" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#7a0010" stopOpacity="0.1" />
+              <linearGradient id="glowContrast2" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.1" />
               </linearGradient>
             </defs>
 
             {/* Rotating Rings */}
             <motion.circle 
               cx="20%" cy="50%" r="180" 
-              fill="none" stroke="url(#glowRed1)" strokeWidth="4" strokeDasharray="15 30"
+              fill="none" stroke="url(#glowContrast1)" strokeWidth="4" strokeDasharray="15 30"
               animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
               style={{ originX: '20%', originY: '50%' }}
             />
             <motion.circle 
               cx="80%" cy="30%" r="220" 
-              fill="none" stroke="url(#glowRed2)" strokeWidth="3" strokeDasharray="10 25"
+              fill="none" stroke="url(#glowContrast2)" strokeWidth="3" strokeDasharray="10 25"
               animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
               style={{ originX: '80%', originY: '30%' }}
             />
 
             {/* Floating Geometric Nodes & Lines */}
             <motion.g animate={{ y: [0, -30, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-              <line x1="30%" y1="20%" x2="50%" y2="60%" stroke="#c20f24" strokeWidth="2" opacity="0.8" />
-              <circle cx="30%" cy="20%" r="8" fill="#ff4747" />
-              <circle cx="50%" cy="60%" r="6" fill="#c20f24" />
+              <line x1="30%" y1="20%" x2="50%" y2="60%" stroke="#fbbf24" strokeWidth="2" opacity="0.8" />
+              <circle cx="30%" cy="20%" r="8" fill="#ffffff" />
+              <circle cx="50%" cy="60%" r="6" fill="#fbbf24" />
             </motion.g>
 
             <motion.g animate={{ x: [0, 40, 0], y: [0, 25, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
-              <line x1="70%" y1="80%" x2="90%" y2="50%" stroke="#ff4747" strokeWidth="2" opacity="0.6" />
-              <circle cx="70%" cy="80%" r="10" fill="#c20f24" />
-              <circle cx="90%" cy="50%" r="7" fill="#ff4747" />
+              <line x1="70%" y1="80%" x2="90%" y2="50%" stroke="#ffffff" strokeWidth="2" opacity="0.6" />
+              <circle cx="70%" cy="80%" r="10" fill="#fbbf24" />
+              <circle cx="90%" cy="50%" r="7" fill="#ffffff" />
             </motion.g>
           </svg>
 
@@ -193,22 +193,22 @@ export function CourseDetailsPage() {
           <motion.div 
             animate={{ top: ['-10%', '110%'] }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#ff4747] to-transparent shadow-[0_0_30px_10px_rgba(255,71,71,0.6)] opacity-90"
+            className="absolute left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#fbbf24] to-transparent shadow-[0_0_30px_10px_rgba(251,191,36,0.6)] opacity-90"
           />
 
           {/* Slow Moving Gradients for Atmosphere */}
           <motion.div 
-            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.15, 0.4, 0.15] }}
+            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.1, 0.25, 0.1] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-gradient-to-br from-[#c20f24] to-[#ff4747] blur-[120px] rounded-full mix-blend-screen" 
+            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-gradient-to-br from-[#ffffff] to-[#fbbf24] blur-[120px] rounded-full mix-blend-screen" 
           />
         </div>
         
         {/* Subtle Darkening Overlays */}
-        <div className="absolute inset-0 bg-[#0a0c11]/50 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11] via-[#0a0c11]/80 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-[#7a0010]/30 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#7a0010] via-[#7a0010]/50 to-transparent pointer-events-none" />
 
-        <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12 min-h-[320px]">
+        <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-8 p-6 md:p-8 min-h-[260px]">
           {/* Thumbnail */}
           <div className="w-full max-w-[280px] md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl shrink-0 ring-1 ring-white/10 group">
             {thumbnail ? (
@@ -222,11 +222,11 @@ export function CourseDetailsPage() {
           
           {/* Info */}
           <div className="flex-1 text-center md:text-left z-10">
-            <button onClick={() => navigate('/dashboard/courses')} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-semibold tracking-wide backdrop-blur-md transition-all mb-6">
+            <button onClick={() => navigate('/dashboard/courses')} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white text-xs font-semibold tracking-wide backdrop-blur-md transition-all mb-4">
               <ArrowLeftIcon className="w-3.5 h-3.5" /> MY CLASSES
             </button>
-            <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight drop-shadow-sm">{title}</h1>
-            {description && <p className="text-slate-300 text-sm md:text-base mb-8 max-w-2xl leading-relaxed font-medium">{description}</p>}
+            <h1 className="text-2xl md:text-4xl font-black text-white mb-3 leading-tight tracking-tight drop-shadow-md">{title}</h1>
+            {description && <p className="text-white/80 text-sm md:text-sm mb-6 max-w-2xl leading-relaxed font-medium drop-shadow">{description}</p>}
             
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 max-w-md bg-white/5 p-5 rounded-2xl backdrop-blur-sm border border-white/10">
               <div className="flex-1 w-full">
@@ -234,12 +234,12 @@ export function CourseDetailsPage() {
                   <span>Progress</span>
                   <span className="text-[#ff3b3b]">{progressPct}%</span>
                 </div>
-                <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="h-2.5 w-full bg-white/20 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPct}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                    className="h-full bg-gradient-to-r from-[#c20f24] to-[#ff4747] rounded-full shadow-[0_0_10px_rgba(255,59,59,0.5)]" 
+                    className="h-full bg-gradient-to-r from-[#fbbf24] to-[#fef3c7] rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)]" 
                   />
                 </div>
               </div>
