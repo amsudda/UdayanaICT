@@ -135,88 +135,18 @@ export function CourseDetailsPage() {
         className="relative rounded-[2rem] overflow-hidden mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.06)] bg-[#0a0c11]"
       >
         
-        {/* Motion Graphics Animated Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          
-          {/* Subtle Logo Watermark */}
-          <motion.div 
-            animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] mix-blend-screen pointer-events-none"
-          >
-            <img src="/images/pd-logo.png" alt="" className="w-full h-full object-contain filter invert drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" />
-          </motion.div>
-
-          {/* Animated Tech Grid */}
-          <motion.div 
-            animate={{ backgroundPosition: ['0px 0px', '40px 40px'] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 opacity-[0.3]"
-            style={{
-              backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.15) 1px, transparent 1px)`,
-              backgroundSize: '40px 40px'
-            }}
-          />
-
-          {/* SVG Abstract Motion Elements */}
-          <svg className="absolute inset-0 w-full h-full opacity-100" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <linearGradient id="glowRed" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#c20f24" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#ff4747" stopOpacity="0" />
-              </linearGradient>
-              <linearGradient id="glowBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#2563eb" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-
-            {/* Rotating Rings */}
-            <motion.circle 
-              cx="20%" cy="50%" r="180" 
-              fill="none" stroke="url(#glowRed)" strokeWidth="4" strokeDasharray="15 30"
-              animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              style={{ originX: '20%', originY: '50%' }}
-            />
-            <motion.circle 
-              cx="80%" cy="30%" r="220" 
-              fill="none" stroke="url(#glowBlue)" strokeWidth="3" strokeDasharray="10 25"
-              animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-              style={{ originX: '80%', originY: '30%' }}
-            />
-
-            {/* Floating Geometric Nodes & Lines */}
-            <motion.g animate={{ y: [0, -30, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-              <line x1="30%" y1="20%" x2="50%" y2="60%" stroke="#c20f24" strokeWidth="2" opacity="0.8" />
-              <circle cx="30%" cy="20%" r="8" fill="#c20f24" />
-              <circle cx="50%" cy="60%" r="6" fill="#ff4747" />
-            </motion.g>
-
-            <motion.g animate={{ x: [0, 40, 0], y: [0, 25, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
-              <line x1="70%" y1="80%" x2="90%" y2="50%" stroke="#3b82f6" strokeWidth="2" opacity="0.8" />
-              <circle cx="70%" cy="80%" r="10" fill="#2563eb" />
-              <circle cx="90%" cy="50%" r="7" fill="#60a5fa" />
-            </motion.g>
-          </svg>
-
-          {/* Scanning Laser Line */}
-          <motion.div 
-            animate={{ top: ['-10%', '110%'] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-[4px] bg-[#c20f24] shadow-[0_0_25px_8px_rgba(194,15,36,0.8)] opacity-90"
-          />
-
-          {/* Slow Moving Gradients for Atmosphere */}
-          <motion.div 
-            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.15, 0.3, 0.15] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-[#c20f24] blur-[100px] rounded-full mix-blend-screen" 
+        {/* Logo Background */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+          <img 
+            src="/images/pd-logo.png" 
+            alt="" 
+            className="w-[120%] h-[120%] object-contain filter invert mix-blend-screen" 
           />
         </div>
         
-        {/* Darkening Overlays so text is readable */}
-        <div className="absolute inset-0 bg-[#0a0c11]/40" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11]/80 via-transparent to-transparent" />
+        {/* Subtle Gradient Overlays */}
+        <div className="absolute inset-0 bg-[#0a0c11]/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11] via-[#0a0c11]/80 to-transparent pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12 min-h-[320px]">
           {/* Thumbnail */}
