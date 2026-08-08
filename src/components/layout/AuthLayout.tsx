@@ -48,9 +48,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
 
         <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
           <Link to="/" className="flex items-center gap-2.5 w-fit">
-            <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center">
-              <GraduationCapIcon className="w-6 h-6 text-white" />
-            </div>
+            <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="w-10 h-10 object-contain drop-shadow-md" />
             <span className="font-bold text-xl tracking-tight">Pasindu Dissanayake</span>
           </Link>
 
@@ -89,9 +87,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
 
         {/* mobile logo */}
         <Link to="/" className="flex lg:hidden items-center gap-2 mb-8">
-          <div className="w-10 h-10 bg-[#c20f24] rounded-xl flex items-center justify-center text-white">
-            <GraduationCapIcon className="w-6 h-6" />
-          </div>
+          <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="w-10 h-10 object-contain" />
           <span className="font-bold text-2xl tracking-tight text-apple-text">Pasindu Dissanayake</span>
         </Link>
 
