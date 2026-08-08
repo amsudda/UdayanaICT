@@ -267,7 +267,7 @@ export function LandingPage() {
                 className="flex flex-col items-center text-center pb-10 lg:pb-20 pt-4"
               >
                 {/* Pixel "level up" chip */}
-                <div className="font-pixel inline-flex items-center gap-2 mb-5 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900">
+                <div className="font-pixel inline-flex items-center gap-2 mb-2 md:mb-1 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900 z-10">
                   <PixelStar className="w-3 h-3 text-amber-400" />
                   LEVEL UP YOUR ICT
                   <span className="pixel-cursor">_</span>
@@ -277,7 +277,7 @@ export function LandingPage() {
                 <img
                   src="/images/pd-logo.png"
                   alt="Pasindu Dissanayake Logo"
-                  className="w-40 h-40 md:w-56 md:h-56 mb-5 object-contain drop-shadow-lg"
+                  className="w-40 h-40 md:w-56 md:h-56 -mt-4 mb-1 md:-mt-6 md:-mb-2 object-contain drop-shadow-lg"
                 />
 
                 {/* Name */}
