@@ -529,19 +529,7 @@ export function LandingPage() {
             </div>
 
             {/* Bottom CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-12 text-center"
-            >
-              <Link to="/signup">
-                <Button size="lg" className="font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
-                  ඔබේ ජය ගමන ආරම්භ කරන්න →
-                </Button>
-              </Link>
-            </motion.div>
+
           </div>
         </section>
         )}
