@@ -76,8 +76,8 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-30 w-full bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-30 w-full bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-gray-200/50 dark:border-slate-800/50 transition-colors duration-300">
+      <div className="w-full px-4 sm:px-6 lg:px-10">
         <div className="flex justify-between items-center h-16">
           <Link to={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2">
             <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="w-9 h-9 object-contain" />
@@ -110,20 +110,20 @@ export function Navbar() {
                 )}
                 <NotificationBell />
                 <div className="h-8 w-px bg-gray-200 dark:bg-slate-800 mx-2 transition-colors" />
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-apple-text dark:text-apple-light">{displayName}</p>
-                    <p className="text-xs text-apple-subtext dark:text-slate-400">{user?.studentId || 'Student'}</p>
+                <div className="flex items-center gap-3 pl-2 pr-1 py-1 bg-gray-50 dark:bg-slate-900/50 rounded-full border border-gray-200/60 dark:border-slate-800/60 shadow-sm transition-all hover:shadow-md">
+                  <div className="text-right pl-3 pr-1 hidden sm:block">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{displayName}</p>
+                    <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{user?.studentId || 'Student'}</p>
                   </div>
                   {user?.avatar ? (
-                    <img src={user.avatar} alt={displayName} className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-800 object-cover" />
+                    <img src={user.avatar} alt={displayName} className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-800 object-cover shadow-sm" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-[#c20f24]/10 dark:bg-white/10 border border-gray-200 dark:border-slate-800 flex items-center justify-center text-[#c20f24] dark:text-apple-light font-semibold text-sm">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-[#c20f24] flex items-center justify-center text-white font-bold text-sm shadow-sm border-2 border-white dark:border-slate-800">
                       {initials}
                     </div>
                   )}
                 </div>
-                <Button variant="ghost" size="sm" onClick={handleLogout} className="dark:text-apple-light dark:hover:bg-slate-800">Log Out</Button>
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="ml-2 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-colors rounded-full px-4 font-semibold">Log Out</Button>
               </>
             ) : (
               <>
