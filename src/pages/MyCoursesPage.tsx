@@ -14,7 +14,7 @@ import {
 import { useAuth } from '../auth/AuthContext';
 import { loadLibrary, watchedCount, type LibMonth, type LibPack } from '../data/library';
 
-const tabs = ['All', 'Video Packs', 'Monthly Recordings'] as const;
+const tabs = ['All', 'Lesson Packs', 'Monthly Lessons'] as const;
 type Tab = (typeof tabs)[number];
 
 const pct = (w: number, t: number) => (t > 0 ? Math.round((w / t) * 100) : 0);
@@ -56,7 +56,8 @@ export function MyCoursesPage() {
     return () => { cancelAnimationFrame(raf); window.clearTimeout(t); };
   }, [loading, highlightId, packs]);
 
-  const unlockedMonths = recordings.filter((r) => r.unlocked).length;
+  const unlockedRecordings = recordings.filter((r) => r.unlocked);
+  const unlockedMonths = unlockedRecordings.length;
 
   return (
     <motion.div
@@ -114,14 +115,14 @@ export function MyCoursesPage() {
         <p className="text-sm text-apple-subtext dark:text-slate-400">Loading your classes…</p>
       ) : (
         <>
-          {/* ── video packs ── */}
-          {(tab === 'All' || tab === 'Video Packs') && (
+          {/* ── lesson packs ── */}
+          {(tab === 'All' || tab === 'Lesson Packs') && (
             <section className="space-y-5">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-[#c20f24]/10 dark:bg-[#c20f24]/20 flex items-center justify-center">
                   <FilmIcon className="w-4 h-4 text-[#c20f24]" />
                 </div>
-                <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Your Video Packs</h2>
+                <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Your Lesson Packs</h2>
               </div>
 
               {packs.length === 0 ? (
@@ -173,60 +174,54 @@ export function MyCoursesPage() {
             </section>
           )}
 
-          {/* ── monthly recordings ── */}
-          {(tab === 'All' || tab === 'Monthly Recordings') && (
+          {/* ── monthly lessons ── */}
+          {(tab === 'All' || tab === 'Monthly Lessons') && (
             <section className="space-y-5">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center">
                   <BookOpenIcon className="w-4 h-4 text-violet-600 dark:text-violet-300" />
                 </div>
-                <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Monthly Class Recordings</h2>
+                <h2 className="text-xl font-bold text-apple-text dark:text-apple-light">Monthly Lessons</h2>
               </div>
 
-              {recordings.length === 0 ? (
+              {unlockedRecordings.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-8 text-center">
-                  <p className="text-sm text-apple-subtext dark:text-slate-400">No recordings published for your batch yet.</p>
+                  <p className="text-sm text-apple-subtext dark:text-slate-400 mb-3">You haven't bought any monthly lessons yet.</p>
+                  <button onClick={() => navigate('/dashboard/extra-classes')} className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:underline">
+                    <ShoppingCartIcon className="w-4 h-4" /> Browse the store
+                  </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {recordings.map((m) => {
+                  {unlockedRecordings.map((m) => {
                     const w = watchedCount(m.id);
                     const progress = pct(w, m.sessionCount);
                     return (
                       <button
                         key={m.id}
-                        onClick={() => (m.unlocked ? navigate(`/dashboard/courses/${m.id}`) : navigate('/dashboard/payments'))}
-                        className={`group text-left bg-white dark:bg-slate-900 rounded-3xl border overflow-hidden transition-transform active:scale-[0.98] ${
-                          m.unlocked ? 'border-gray-100 dark:border-slate-800' : 'border-amber-200 dark:border-amber-500/30'
-                        }`}
+                        onClick={() => navigate(`/dashboard/courses/${m.id}`)}
+                        className={`group text-left bg-white dark:bg-slate-900 rounded-3xl border overflow-hidden transition-transform active:scale-[0.98] border-gray-100 dark:border-slate-800`}
                       >
                         <div className="relative overflow-hidden bg-violet-100 dark:bg-slate-800" style={{ aspectRatio: '16/9' }}>
                           {m.thumbnailUrl ? (
-                            <img src={m.thumbnailUrl} alt="" className={`w-full h-full object-cover ${m.unlocked ? '' : 'opacity-40'}`} />
+                            <img src={m.thumbnailUrl} alt="" className={`w-full h-full object-cover`} />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-violet-400"><CalendarIcon className="w-8 h-8" /></div>
                           )}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                          {m.unlocked ? (
-                            <span className="absolute top-3 right-3 text-[11px] font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">Unlocked</span>
-                          ) : (
-                            <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-white">
-                              <LockIcon className="w-6 h-6" />
-                              <span className="text-xs font-semibold">Pay this month's fee to unlock</span>
-                            </span>
-                          )}
+                          <span className="absolute top-3 right-3 text-[11px] font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">Unlocked</span>
                         </div>
                         <div className="p-4">
                           <h3 className="text-sm font-bold text-apple-text dark:text-apple-light leading-snug">{m.month} {m.year}</h3>
                           <p className="text-xs text-apple-subtext dark:text-slate-400 mt-1 flex items-center gap-1">
                             <ClockIcon className="w-3 h-3" /> {m.sessionCount} session{m.sessionCount === 1 ? '' : 's'}
                           </p>
-                          {m.unlocked && progress > 0 && (
+                          {progress > 0 && (
                             <div className="mt-2 h-1.5 w-full rounded-full bg-gray-100 dark:bg-slate-800 overflow-hidden">
                               <div className="h-full rounded-full bg-emerald-500" style={{ width: `${progress}%` }} />
                             </div>
                           )}
-                          {m.unlocked && progress >= 100 && (
+                          {progress >= 100 && (
                             <p className="text-[11px] text-emerald-600 font-semibold mt-1.5 flex items-center gap-1"><CheckCircleIcon className="w-3 h-3" /> Completed</p>
                           )}
                         </div>

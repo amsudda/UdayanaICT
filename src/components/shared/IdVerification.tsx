@@ -60,7 +60,7 @@ function Shell({ children }: { children: ReactNode }) {
           <ShieldCheckIcon className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="font-bold text-apple-text dark:text-apple-light leading-tight">Identity verification</h2>
+          <h2 className="font-bold text-apple-text dark:text-apple-light leading-tight">Identity Verification</h2>
           <p className="text-xs text-apple-subtext dark:text-slate-400 mt-0.5">
             Verify your ID to watch lessons, recordings and buy packs.
           </p>
@@ -93,7 +93,7 @@ export function IdVerificationPanel() {
         <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-4 py-4">
           <CheckCircleIcon className="w-6 h-6 text-emerald-600 shrink-0" />
           <div>
-            <p className="font-semibold text-emerald-800 dark:text-emerald-300">You're verified ✓</p>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-300">You're Verified ✓</p>
             <p className="text-sm text-emerald-700/80 dark:text-emerald-400/70">
               Your identity is confirmed — you have full access.
             </p>

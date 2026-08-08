@@ -37,9 +37,9 @@ export interface Promotion {
 }
 
 export const promotions: Promotion[] = [
-  { id: 'p_001', tag: 'සීමිත කාලයක්', title: 'විශේෂ පුනරීක්ෂණ කඳවුර', description: 'සම්පූර්ණ විෂය නිර්දේශය ආවරණය වන දින 3ක දැඩි පුනරීක්ෂණ කඳවුරට සම්බන්ධ වන්න.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=600&fit=crop', ctaText: 'දැන්ම ලියාපදිංචි වන්න', ctaLink: '/signup' },
-  { id: 'p_002', tag: 'නව පාඨමාලාව', title: 'Python ක්‍රමලේඛන මාස්ටර්ක්ලාස්', description: 'ප්‍රායෝගික ප්‍රශ්න පත්‍රය සඳහා අත්‍යවශ්‍ය Python ක්‍රමලේඛනය මූලික සිට උසස් දක්වා ඉගෙන ගන්න.', image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bfce8?w=1200&h=600&fit=crop', ctaText: 'පාඨමාලාව බලන්න', ctaLink: '/signup' },
-  { id: 'p_003', tag: '2025 බඳවා ගැනීම්', title: 'A/L ICT 2025 සිද්ධාන්ත පන්ති', description: 'සජීවී අන්තර් ක්‍රියාකාරී පන්ති, වීඩියෝ පාඩම් සහ පසුගිය විභාග ප්‍රශ්න සාකච්ඡා සියල්ල එකම තැනකින්.', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=600&fit=crop', ctaText: 'ඉගෙනීම අරඹන්න', ctaLink: '/signup' }
+  { id: 'p_001', tag: 'Limited Time', title: 'Special Revision Camp', description: 'Join the 3-day intensive revision camp covering the entire syllabus.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=600&fit=crop', ctaText: 'Register Now', ctaLink: '/signup' },
+  { id: 'p_002', tag: 'New Course', title: 'Python Programming Masterclass', description: 'Learn Python programming essential for the practical paper from basic to advanced.', image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bfce8?w=1200&h=600&fit=crop', ctaText: 'View Course', ctaLink: '/signup' },
+  { id: 'p_003', tag: '2025 Intakes', title: 'A/L ICT 2025 Theory Classes', description: 'Live interactive classes, video lessons and past exam question discussions all in one place.', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=600&fit=crop', ctaText: 'Start Learning', ctaLink: '/signup' }
 ];
 
 export const extraClasses = [

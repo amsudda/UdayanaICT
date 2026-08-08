@@ -1,6 +1,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeftIcon,
@@ -28,6 +28,9 @@ const tileCls =
 export function BuyPackPage() {
   const { packId } = useParams<{ packId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const isMonth = searchParams.get('type') === 'month';
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
@@ -50,16 +53,46 @@ export function BuyPackPage() {
     if (!packId || !user) return;
     (async () => {
       setLoading(true);
-      const [{ data: p }, { count }, { data: st }, { data: pays }] = await Promise.all([
-        supabase.from('packs').select('*').eq('id', packId).single(),
-        supabase.from('pack_videos').select('id', { count: 'exact', head: true }).eq('pack_id', packId),
+
+      let p = null;
+      let count = 0;
+
+      if (isMonth) {
+        const { data: monthData } = await supabase.from('theory_months').select('*').eq('id', packId).single();
+        if (monthData) {
+          p = {
+            id: monthData.id,
+            title: `${monthData.month} ${monthData.year} — Monthly Recordings`,
+            price: monthData.price,
+            thumbnail_url: monthData.thumbnail_url,
+            duration_label: 'Monthly access',
+            type: 'Monthly Lessons',
+            is_free: false,
+            description: 'After purchasing this monthly pass, you will have lifetime access to the live recordings of this month in your My Classes tab.'
+          };
+          count = monthData.session_count || 0;
+        }
+      } else {
+        const [{ data: packData }, { count: vCount }] = await Promise.all([
+          supabase.from('packs').select('*').eq('id', packId).single(),
+          supabase.from('pack_videos').select('id', { count: 'exact', head: true }).eq('pack_id', packId)
+        ]);
+        p = packData;
+        count = vCount ?? 0;
+      }
+
+      const [{ data: st }, { data: pays }] = await Promise.all([
         supabase.from('settings').select('*').eq('id', 1).single(),
-        supabase.from('payments').select('status').eq('student_id', user.id).eq('pack_id', packId).in('status', ['pending', 'approved']).order('created_at', { ascending: false }).limit(1)
+        supabase.from('payments').select('status')
+          .eq('student_id', user.id)
+          .eq(isMonth ? 'theory_month_id' : 'pack_id', packId)
+          .in('status', ['pending', 'approved']).order('created_at', { ascending: false }).limit(1)
       ]);
+
       if (!p) { setNotFound(true); setLoading(false); return; }
       if (p.is_free) { navigate(`/dashboard/watch/${p.id}`, { replace: true }); return; }
       setPack(p);
-      setVideoCount(count ?? 0);
+      setVideoCount(count);
       if (st) {
         setBank({
           bank: st.bank_name || FALLBACK_BANK.bank,
@@ -101,8 +134,9 @@ export function BuyPackPage() {
 
     const { error: insErr } = await supabase.from('payments').insert({
       student_id: user.id,
-      kind: 'pack',
-      pack_id: pack.id,
+      kind: isMonth ? 'theory' : 'pack',
+      pack_id: isMonth ? null : pack.id,
+      theory_month_id: isMonth ? pack.id : null,
       amount: pack.price,
       reference: reference.trim() || null,
       slip_url: path,
@@ -195,7 +229,7 @@ export function BuyPackPage() {
             <div className="mt-7">
               <h3 className="text-sm font-bold uppercase tracking-wider text-apple-subtext dark:text-slate-400 mb-2.5">About this class</h3>
               <p className="text-[15px] leading-relaxed text-apple-text dark:text-slate-300 whitespace-pre-line transition-colors">
-                {pack.description || 'මෙම pack එක මිලදී ගැනීමෙන් පසු ඔබට සියලුම වීඩියෝ පාඩම් ඕනෑම වේලාවක නැරඹිය හැක. ගෙවීම තහවුරු වූ වහාම "My Classes" තුළ pack එක unlock වේ.'}
+                {pack.description || 'After purchasing this pack, you can watch all video lessons at any time. The pack will be unlocked in "My Classes" as soon as the payment is confirmed.'}
               </p>
             </div>
           </div>
@@ -224,8 +258,8 @@ export function BuyPackPage() {
             <div className="rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-6 text-center transition-colors">
               <div className="mx-auto w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-500/15 flex items-center justify-center mb-4"><CheckCircleIcon className="w-7 h-7 text-emerald-500" /></div>
               <h3 className="text-lg font-bold text-apple-text dark:text-apple-light mb-1.5">You already own this pack</h3>
-              <Link to={`/dashboard/watch/${pack.id}`} className="mt-4 inline-flex w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors items-center justify-center gap-2">
-                <PlayCircleIcon className="w-5 h-5" /> Watch now
+              <Link to={isMonth ? `/dashboard/courses?tab=Monthly+Lessons` : `/dashboard/watch/${pack.id}`} className="mt-4 inline-flex w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors items-center justify-center gap-2">
+                {isMonth ? <PlayCircleIcon className="w-5 h-5" /> : <PlayCircleIcon className="w-5 h-5" />} Watch now
               </Link>
             </div>
           ) : pendingAlready ? (

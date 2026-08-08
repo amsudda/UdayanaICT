@@ -256,6 +256,38 @@ export function CourseDetailsPage() {
       {/* Layout */}
       <div className="space-y-12">
         
+        {/* Compact Blue Live Classes */}
+        {liveLinks.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+            
+            <div className="flex items-center gap-3 relative z-10 shrink-0">
+              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                <RadioIcon className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-900 leading-none">Live Classes</h2>
+                <p className="text-xs font-semibold text-blue-600 mt-1 uppercase tracking-widest">Available via Zoom</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 relative z-10 w-full md:w-auto md:justify-end">
+              {liveLinks.map(l => (
+                <a
+                  key={l.id}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-sm group"
+                >
+                  <span className="truncate max-w-[200px]">{l.label || 'Join Live Class'}</span>
+                  <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Horizontal Lessons Row */}
         <div className="space-y-6">
           <div className="flex items-center justify-between mb-8">
@@ -343,39 +375,9 @@ export function CourseDetailsPage() {
           </div>
         </div>
 
-        {/* Bottom Section: Live Classes & Study Materials */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Bottom Section: Study Materials */}
+        <div className="grid grid-cols-1 gap-8">
           
-          {liveLinks.length > 0 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
-              {/* decorative circle */}
-              <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl" />
-              
-              <h3 className="flex items-center gap-2.5 text-lg font-black text-emerald-900 mb-5 relative">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                  <RadioIcon className="w-4 h-4" />
-                </div>
-                Live Classes
-              </h3>
-              
-              <div className="space-y-3 relative">
-                {liveLinks.map(l => (
-                  <a
-                    key={l.id}
-                    href={l.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 w-full p-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all shadow-[0_8px_20px_-6px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-6px_rgba(16,185,129,0.6)] group"
-                  >
-                    <RadioIcon className="w-5 h-5 shrink-0 opacity-80 group-hover:animate-pulse" />
-                    <span className="truncate flex-1">{l.label || 'Join Live Class'}</span>
-                    <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
             <h3 className="flex items-center gap-2.5 text-lg font-black text-slate-900 mb-5">
               <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">

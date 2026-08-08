@@ -80,10 +80,10 @@ export function LoginPage() {
 
         <div className="mb-8">
           <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">
-            මුරපදය අමතක වුණාද?
+            Forgot password?
           </h2>
           <p className="text-sm text-apple-subtext">
-            ඔබේ email එක ඇතුළත් කරන්න — මුරපදය නැවත සැකසීමට link එකක් අපි එවන්නෙමු.
+            Enter your email — we will send you a link to reset your password.
           </p>
         </div>
 
@@ -122,10 +122,10 @@ export function LoginPage() {
     <AuthLayout>
       <div className="mb-8">
         <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">
-          නැවත සාදරයෙන් පිළිගනිමු 👋
+          Welcome back 👋
         </h2>
         <p className="text-sm text-apple-subtext">
-          ඔබේ පාඨමාලා වෙත පිවිසීමට පිවිසුම් තොරතුරු ඇතුළත් කරන්න.
+          Enter your login details to access your courses.
         </p>
       </div>
 

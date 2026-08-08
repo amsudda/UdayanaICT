@@ -16,7 +16,7 @@ import { useAuth } from '../auth/AuthContext';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
-import { districts, examYears, genders, mediums, programs } from '../data/studentOptions';
+import { districts, examYears, genders, mediums, programs, streams } from '../data/studentOptions';
 import { IdVerificationPanel } from '../components/shared/IdVerification';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -59,6 +59,7 @@ export function ProfilePage() {
   const [district, setDistrict] = useState('');
   const [school, setSchool] = useState('');
   const [medium, setMedium] = useState('');
+  const [stream, setStream] = useState('');
   const [program, setProgram] = useState('');
   const [examYear, setExamYear] = useState('');
   const [guardianName, setGuardianName] = useState('');
@@ -81,6 +82,7 @@ export function ProfilePage() {
     setDistrict(user.district ?? '');
     setSchool(user.school ?? '');
     setMedium(user.medium ?? '');
+    setStream(user.stream ?? '');
     setProgram(user.program ?? '');
     setExamYear(user.examYear ?? '');
     setGuardianName(user.guardianName ?? '');
@@ -129,6 +131,7 @@ export function ProfilePage() {
       district: district || undefined,
       school: school.trim() || undefined,
       medium: medium || undefined,
+      stream: stream || undefined,
       program: program || undefined,
       examYear: examYear || undefined,
       guardianName: guardianName.trim() || undefined,
@@ -169,7 +172,7 @@ export function ProfilePage() {
       <div>
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c20f24]">My Profile</p>
         <h1 className="text-3xl font-bold text-apple-text dark:text-apple-light mt-2 transition-colors">
-          Manage your account
+          Manage Your Account
         </h1>
         <p className="text-apple-subtext dark:text-slate-400 mt-2 text-sm transition-colors">
           Update your personal details, contact information and profile picture.
@@ -396,6 +399,13 @@ export function ProfilePage() {
                 placeholder="e.g. Ananda College, Colombo"
               />
             </div>
+            <Select
+              label="Stream"
+              placeholder="Select stream"
+              options={streams}
+              value={stream}
+              onChange={(e) => setStream(e.target.value)}
+            />
             <Select
               label="Medium"
               placeholder="Select medium"

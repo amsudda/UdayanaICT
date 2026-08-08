@@ -4,6 +4,7 @@ import {
   PencilIcon,
   Trash2Icon,
   VideoIcon,
+  LinkIcon,
   FileTextIcon,
   SearchIcon,
   UploadCloudIcon,
@@ -30,6 +31,7 @@ const now = new Date();
 const emptyMonth = {
   month: MONTHS[now.getMonth()],
   year: String(now.getFullYear()),
+  price: '',
   topics: '',
   audience_scope: 'batches' as 'batches' | 'program' | 'public',
   audience_program: 'A/L',
@@ -52,6 +54,39 @@ export function AdminTheoryPage() {
   const [saving, setSaving] = useState(false);
   const thumbRef = useRef<HTMLInputElement>(null);
 
+  // live links popup
+  const [linksMonth, setLinksMonth] = useState<any | null>(null);
+  const [activeLinks, setActiveLinks] = useState<any[]>([]);
+  const [newLinkLabel, setNewLinkLabel] = useState('');
+  const [newLinkUrl, setNewLinkUrl] = useState('');
+  
+  const openLinks = async (m: any) => {
+    setLinksMonth(m);
+    const { data } = await supabase.from('theory_live_links').select('*').eq('theory_month_id', m.id).order('sort_order');
+    setActiveLinks(data ?? []);
+  };
+  const reloadLinks = async (monthId: string) => {
+    const { data } = await supabase.from('theory_live_links').select('*').eq('theory_month_id', monthId).order('sort_order');
+    setActiveLinks(data ?? []);
+  };
+  const addLink = async () => {
+    if (!newLinkUrl.trim() || !linksMonth) return;
+    const nextOrder = activeLinks.length ? Math.max(...activeLinks.map(l => l.sort_order ?? 0)) + 1 : 0;
+    await supabase.from('theory_live_links').insert({
+      theory_month_id: linksMonth.id,
+      label: newLinkLabel.trim() || 'Join Live Class',
+      url: newLinkUrl.trim(),
+      sort_order: nextOrder
+    });
+    setNewLinkLabel('');
+    setNewLinkUrl('');
+    reloadLinks(linksMonth.id);
+  };
+  const deleteLink = async (id: string) => {
+    await supabase.from('theory_live_links').delete().eq('id', id);
+    if (linksMonth) reloadLinks(linksMonth.id);
+  };
+
   const [videosMonth, setVideosMonth] = useState<any | null>(null);
   const [videos, setVideos] = useState<any[]>([]);
   const [vForm, setVForm] = useState<{ id: string; title: string; youtube: string; duration: string; kind: 'lesson' | 'paper'; tutes: { name: string; url: string }[] }>({ id: '', title: '', youtube: '', duration: '', kind: 'lesson', tutes: [] });
@@ -60,7 +95,6 @@ export function AdminTheoryPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const [videoSavedMsg, setVideoSavedMsg] = useState('');
-  const [liveLinks, setLiveLinks] = useState<{ label: string; url: string }[]>([]);
 
   // list organisation
   const [search, setSearch] = useState('');
@@ -95,7 +129,6 @@ export function AdminTheoryPage() {
   const openCreate = () => {
     setEditing(null);
     setForm(emptyMonth);
-    setLiveLinks([]);
     setThumbFile(null);
     setThumbPreview(undefined);
     setEditorOpen(true);
@@ -105,6 +138,7 @@ export function AdminTheoryPage() {
     setForm({
       month: m.month,
       year: String(m.year),
+      price: m.price != null ? String(m.price) : '',
       topics: (m.topics ?? []).join(', '),
       audience_scope: m.audience_scope ?? 'batches',
       audience_program: m.audience_program ?? 'A/L',
@@ -114,10 +148,8 @@ export function AdminTheoryPage() {
     });
     setThumbFile(null);
     setThumbPreview(m.thumbnail_url ?? undefined);
-    setLiveLinks([]);
     setEditorOpen(true);
-    const { data: links } = await supabase.from('theory_live_links').select('*').eq('theory_month_id', m.id).order('sort_order');
-    setLiveLinks((links ?? []).map((l: any) => ({ label: l.label ?? '', url: l.url ?? '' })));
+
   };
   const onThumb = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -142,6 +174,7 @@ export function AdminTheoryPage() {
     const payload = {
       month: form.month,
       year: Number(form.year),
+      price: form.price ? Number(form.price) : 0,
       topics: form.topics ? form.topics.split(',').map((t) => t.trim()).filter(Boolean) : [],
       audience_scope: form.audience_scope,
       audience_program: form.audience_scope === 'program' ? form.audience_program : null,
@@ -163,17 +196,7 @@ export function AdminTheoryPage() {
       alert(`Could not save the month:\n${error.message}`);
       return;
     }
-    // sync live links (replace the set)
-    if (monthId) {
-      await supabase.from('theory_live_links').delete().eq('theory_month_id', monthId);
-      const rows = liveLinks
-        .filter((l) => l.url.trim())
-        .map((l, i) => ({ theory_month_id: monthId, label: l.label.trim() || 'Join Live Class', url: l.url.trim(), sort_order: i }));
-      if (rows.length) {
-        const { error: linkErr } = await supabase.from('theory_live_links').insert(rows);
-        if (linkErr) alert(`Month saved, but the live links could not be saved:\n${linkErr.message}\n\nIf this mentions a missing table, run supabase/migration_monthly_live.sql in the Supabase SQL editor.`);
-      }
-    }
+
     setSaving(false);
     setEditorOpen(false);
     load();
@@ -345,6 +368,9 @@ export function AdminTheoryPage() {
                 <button onClick={() => openVideos(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <VideoIcon className="w-4 h-4" /> <span className="hidden sm:inline">Sessions</span>
                 </button>
+                <button onClick={() => openLinks(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50">
+                  <LinkIcon className="w-4 h-4" /> <span className="hidden sm:inline">Live Links</span>
+                </button>
                 <button onClick={() => togglePublish(m)} title={m.is_published ? 'Unpublish' : 'Publish'} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100">
                   {m.is_published ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                 </button>
@@ -356,6 +382,45 @@ export function AdminTheoryPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Live Links Popup */}
+      {linksMonth && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setLinksMonth(null)} />
+          <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
+              <h3 className="font-bold text-slate-900 text-lg">{linksMonth.month} {linksMonth.year} — Live Links</h3>
+              <button onClick={() => setLinksMonth(null)} className="p-2 text-slate-400 hover:bg-slate-100 rounded-full"><XIcon className="w-5 h-5" /></button>
+            </div>
+            
+            <div className="p-5 overflow-y-auto">
+              <p className="text-sm text-slate-500 mb-4">Add Zoom/Meet links for live classes. These update instantly.</p>
+              
+              <div className="space-y-3 mb-6">
+                {activeLinks.length === 0 && <p className="text-sm text-slate-400">No live links added yet.</p>}
+                {activeLinks.map(l => (
+                  <div key={l.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
+                    <div className="min-w-0 pr-4">
+                      <p className="font-semibold text-slate-800 text-sm">{l.label}</p>
+                      <a href={l.url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline truncate block mt-0.5">{l.url}</a>
+                    </div>
+                    <button onClick={() => deleteLink(l.id)} className="h-9 px-3 rounded-lg text-red-500 hover:bg-red-100 shrink-0 text-sm font-medium">Remove</button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-slate-100">
+                <h4 className="text-sm font-semibold text-slate-800 mb-3">Add new link</h4>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input className="h-11 px-3 rounded-xl border border-slate-200 text-sm sm:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500" value={newLinkLabel} onChange={e => setNewLinkLabel(e.target.value)} placeholder="Label (e.g. Sunday 8PM)" />
+                  <input className="h-11 px-3 rounded-xl border border-slate-200 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500" value={newLinkUrl} onChange={e => setNewLinkUrl(e.target.value)} placeholder="https://zoom.us/j/..." />
+                  <button onClick={addLink} disabled={!newLinkUrl.trim()} className="h-11 px-4 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 disabled:opacity-50">Add</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -382,7 +447,7 @@ export function AdminTheoryPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Month</label>
               <select className={inputCls} value={form.month} onChange={(e) => setForm({ ...form, month: e.target.value })}>
@@ -392,6 +457,10 @@ export function AdminTheoryPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Year</label>
               <input type="number" className={inputCls} value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Price (Rs.)</label>
+              <input type="number" className={inputCls} value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="e.g. 4500" />
             </div>
           </div>
 
@@ -424,24 +493,6 @@ export function AdminTheoryPage() {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* monthly live class links — visible to students only after the monthly fee is approved */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Live class links</label>
-            <p className="text-[11px] text-slate-400 mb-2">Zoom/Meet links for this month's live classes. Students see a "Join" button once their monthly payment is approved.</p>
-            <div className="space-y-2">
-              {liveLinks.map((l, i) => (
-                <div key={i} className="flex gap-2">
-                  <input className={`${inputCls} !w-[38%]`} value={l.label} onChange={(e) => setLiveLinks((ls) => ls.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} placeholder="Label (e.g. Saturday 7PM)" />
-                  <input className={inputCls} value={l.url} onChange={(e) => setLiveLinks((ls) => ls.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))} placeholder="https://zoom.us/j/…" />
-                  <button type="button" aria-label="Remove link" onClick={() => setLiveLinks((ls) => ls.filter((_, j) => j !== i))} className="h-11 px-2.5 rounded-lg text-red-500 hover:bg-red-50 shrink-0"><XIcon className="w-4 h-4" /></button>
-                </div>
-              ))}
-              <button type="button" onClick={() => setLiveLinks((ls) => [...ls, { label: '', url: '' }])} className="w-full h-10 rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500 hover:border-blue-400 hover:text-blue-600 flex items-center justify-center gap-2">
-                <PlusIcon className="w-4 h-4" /> Add live link
-              </button>
-            </div>
           </div>
 
           <label className="flex items-center gap-3 pt-1">

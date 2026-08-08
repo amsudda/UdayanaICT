@@ -31,10 +31,7 @@ export function PaymentsPage() {
   const [loading, setLoading] = useState(true);
 
   // form
-  const now = new Date();
-  const [payFor, setPayFor] = useState<'monthly_fee' | 'tute' | 'other'>('monthly_fee');
-  const [periodMonth, setPeriodMonth] = useState(monthName(now.getMonth()));
-  const [periodYear, setPeriodYear] = useState(String(now.getFullYear()));
+  const [payFor, setPayFor] = useState<'tute' | 'other'>('tute');
   const [amount, setAmount] = useState('');
   const [reference, setReference] = useState('');
   const [slipFile, setSlipFile] = useState<File | null>(null);
@@ -115,12 +112,11 @@ export function PaymentsPage() {
     }
 
     // 2. create the payment record (pending)
-    const isMonthly = payFor === 'monthly_fee';
     const { error: insErr } = await supabase.from('payments').insert({
       student_id: user.id,
       kind: payFor,
-      period_month: isMonthly ? periodMonth : null,
-      period_year: isMonthly ? Number(periodYear) : null,
+      period_month: null,
+      period_year: null,
       amount: Number(amount.replace(/[^0-9.]/g, '')) || 0,
       reference: reference.trim() || null,
       slip_url: path,
@@ -241,30 +237,18 @@ export function PaymentsPage() {
               onChange={(e) => setPayFor(e.target.value as typeof payFor)}
               className="mt-1.5 flex h-12 w-full rounded-xl border border-apple-border bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-[#c20f24]"
             >
-              <option value="monthly_fee">Monthly class fee</option>
               <option value="tute">Tute fee</option>
               <option value="other">Other</option>
             </select>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-3">
-            {payFor === 'monthly_fee' && (
-              <>
-                <div>
-                  <label className="text-sm font-medium text-apple-text ml-1">Month</label>
-                  <select value={periodMonth} onChange={(e) => setPeriodMonth(e.target.value)} className="mt-1.5 flex h-12 w-full rounded-xl border border-apple-border bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-[#c20f24]">
-                    {Array.from({ length: 12 }, (_, i) => monthName(i)).map((m) => <option key={m}>{m}</option>)}
-                  </select>
-                </div>
-                <Input label="Year" value={periodYear} onChange={(e) => setPeriodYear(e.target.value)} />
-              </>
-            )}
             <Input label="Amount" placeholder="LKR 4,500" value={amount} onChange={(e) => setAmount(e.target.value)} />
           </div>
 
           <Input
-            label={payFor === 'monthly_fee' ? 'Bank reference / note (optional)' : 'What is this for? (note)'}
-            placeholder={payFor === 'monthly_fee' ? 'Reference or note for the tutor' : 'e.g. April tute pack, exam paper fee…'}
+            label="What is this for? (note)"
+            placeholder="e.g. April tute pack, exam paper fee…"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
           />

@@ -6,7 +6,7 @@ import { useAuth } from '../auth/AuthContext';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { districts, examYears, genders, mediums, programs } from '../data/studentOptions';
+import { districts, examYears, genders, mediums, programs, streams } from '../data/studentOptions';
 
 /** Small labelled group heading inside the form. */
 function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
@@ -37,6 +37,7 @@ export function CompleteProfilePage() {
   const [district, setDistrict] = useState('');
   const [school, setSchool] = useState('');
   const [medium, setMedium] = useState('');
+  const [stream, setStream] = useState('');
   const [program, setProgram] = useState('A/L');
   const [examYear, setExamYear] = useState('');
   const [guardianName, setGuardianName] = useState('');
@@ -85,6 +86,7 @@ export function CompleteProfilePage() {
       [!examYear, 'Select your exam year.'],
       [!school.trim(), 'Enter your school.'],
       [!medium, 'Select your medium.'],
+      [!stream, 'Select your stream.'],
       [!guardianName.trim(), "Enter your guardian's name."],
       [!guardianPhone.trim(), "Enter your guardian's phone number."],
       [!nic.trim(), 'Enter your NIC number.']
@@ -127,27 +129,27 @@ export function CompleteProfilePage() {
     <AuthLayout formWidth="max-w-2xl">
       <div className="mb-7">
         <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">
-          ඔබේ පැතිකඩ සම්පූර්ණ කරන්න
+          Complete Your Profile
         </h2>
         <p className="text-sm text-apple-subtext">
           {user?.email ? (
             <>
-              <span className="font-semibold">{user.email}</span> ලෙස පිවිසී ඇත — ඔබේ විස්තර
-              එක් වරක් පුරවන්න, අපි ඉතිරිය සකසන්නෙමු.
+              Logged in as <span className="font-semibold">{user.email}</span> — fill in your details
+              once, and we'll set up the rest.
             </>
           ) : (
-            'ඔබේ විස්තර එක් වරක් පුරවන්න — අපි ඔබේ පැතිකඩ ස්වයංක්‍රීයව සකසන්නෙමු.'
+            'Fill in your details once — we will automatically set up your profile.'
           )}
         </p>
       </div>
 
       <div className="mb-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-apple-text">
-        සියලුම ක්ෂේත්‍ර <span className="font-semibold">අනිවාර්ය</span> වේ. පසුව ඔබට ඒවා වෙනස් කළ හැක.
+        All fields are <span className="font-semibold">required</span>. You can change them later.
       </div>
 
       <form className="space-y-8" onSubmit={handleSubmit}>
         {/* ── Personal ── */}
-        <FieldGroup title="පෞද්ගලික විස්තර / Personal">
+        <FieldGroup title="Personal Details">
           <div className="sm:col-span-2">
             <Input
               label="Full Name *"
@@ -198,7 +200,7 @@ export function CompleteProfilePage() {
         </FieldGroup>
 
         {/* ── Academic ── */}
-        <FieldGroup title="අධ්‍යාපන විස්තර / Academic">
+        <FieldGroup title="Academic Details">
           <Select
             label="Program *"
             placeholder="A/L"
@@ -223,6 +225,13 @@ export function CompleteProfilePage() {
             />
           </div>
           <Select
+            label="Stream *"
+            placeholder="Select stream"
+            options={streams}
+            value={stream}
+            onChange={(e) => setStream(e.target.value)}
+          />
+          <Select
             label="Medium *"
             placeholder="Select medium"
             options={mediums}
@@ -232,7 +241,7 @@ export function CompleteProfilePage() {
         </FieldGroup>
 
         {/* ── Guardian ── */}
-        <FieldGroup title="භාරකරු විස්තර / Guardian">
+        <FieldGroup title="Guardian Details">
           <Input
             label="Guardian Name *"
             placeholder="Parent / guardian name"
@@ -253,7 +262,7 @@ export function CompleteProfilePage() {
         {/* ── National ID ── */}
         <div>
           <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#c20f24] mb-4">
-            ජාතික හැඳුනුම්පත / National ID
+            National ID
           </h3>
           <div className="relative">
             <IdCardIcon className="absolute left-4 top-[42px] w-4 h-4 text-apple-subtext pointer-events-none z-10" />

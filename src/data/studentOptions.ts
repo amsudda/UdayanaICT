@@ -19,3 +19,5 @@ export const examYears = (() => {
 export const genders = ['Male', 'Female', 'Other'];
 
 export const mediums = ['Sinhala', 'English', 'Tamil'];
+
+export const streams = ['Maths', 'Technology', 'Commerce', 'Arts'];

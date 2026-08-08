@@ -19,19 +19,21 @@ type StorePack = {
   isFree?: boolean;
 };
 
-const categories = ['All', 'Paper Classes', 'Theory', 'Revision'] as const;
+const categories = ['Monthly Lessons', 'Paper Classes', 'Lesson Packs'] as const;
 const categoryDesc: Record<string, string> = {
-  All: 'Every video pack available to you right now',
   'Paper Classes': 'Full past-paper discussion sessions',
-  Theory: 'In-depth theory and concept classes',
-  Revision: 'Focused, intensive revision packs'
+  'Lesson Packs': 'In-depth theory and intensive revision packs',
+  'Monthly Lessons': 'Monthly live class recordings (available during the month)'
 };
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
 
 export function ExtraClassesPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [activeCategory, setActiveCategory] = useState<string>('Monthly Lessons');
   const [search, setSearch] = useState('');
 
   const [packs, setPacks] = useState<StorePack[]>([]);
@@ -43,28 +45,56 @@ export function ExtraClassesPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data: ps } = await supabase.from('packs').select('*').eq('is_published', true).order('created_at', { ascending: false });
+    const [{ data: ps }, { data: ms }, { data: enr }, { data: pend }] = await Promise.all([
+      supabase.from('packs').select('*').eq('is_published', true).order('created_at', { ascending: false }),
+      supabase.from('theory_months').select('*').eq('is_published', true).order('year', { ascending: false }).order('created_at', { ascending: false }),
+      supabase.from('enrollments').select('pack_id, theory_month_id'),
+      supabase.from('payments').select('pack_id, theory_month_id').in('kind', ['pack', 'theory']).eq('status', 'pending')
+    ]);
+
     const list = ps ?? [];
-    const ids = list.map((p: any) => p.id);
+    const monthList = ms ?? [];
+    const packIds = list.map((p: any) => p.id);
 
     let counts: Record<string, number> = {};
-    if (ids.length) {
-      const { data: pv } = await supabase.from('pack_videos').select('pack_id').in('pack_id', ids);
+    if (packIds.length) {
+      const { data: pv } = await supabase.from('pack_videos').select('pack_id').in('pack_id', packIds);
       counts = (pv ?? []).reduce<Record<string, number>>((a, r: any) => { a[r.pack_id] = (a[r.pack_id] ?? 0) + 1; return a; }, {});
     }
 
-    const [{ data: enr }, { data: pend }] = await Promise.all([
-      supabase.from('enrollments').select('pack_id').not('pack_id', 'is', null),
-      supabase.from('payments').select('pack_id').eq('kind', 'pack').eq('status', 'pending')
-    ]);
+    const ownedSet = new Set((enr ?? []).map((e: any) => e.pack_id || e.theory_month_id).filter(Boolean));
+    const pendingSet = new Set((pend ?? []).map((p: any) => p.pack_id || p.theory_month_id).filter(Boolean));
 
-    setOwned(new Set((enr ?? []).map((e: any) => e.pack_id)));
-    setPending(new Set((pend ?? []).map((p: any) => p.pack_id).filter(Boolean)));
-    setPacks(list.map((p: any) => ({
-      id: p.id, title: p.title, type: p.type ?? '', price: Number(p.price ?? 0),
-      thumbnailUrl: p.thumbnail_url ?? undefined, duration: p.duration_label ?? '',
-      videoCount: counts[p.id] ?? 0, isFree: p.is_free ?? false
-    })));
+    setOwned(ownedSet);
+    setPending(pendingSet);
+
+    const mappedPacks = list.map((p: any) => {
+      let type = p.type ?? '';
+      if (type === 'Theory' || type === 'Revision') type = 'Lesson Packs';
+      return {
+        id: p.id, title: p.title, type, price: Number(p.price ?? 0),
+        thumbnailUrl: p.thumbnail_url ?? undefined, duration: p.duration_label ?? '',
+        videoCount: counts[p.id] ?? 0, isFree: p.is_free ?? false
+      };
+    });
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    const mappedMonths = monthList.filter((m: any) => {
+      const mIdx = MONTHS.indexOf(m.month);
+      if (mIdx === -1) return true;
+      if (m.year < currentYear) return false;
+      if (m.year === currentYear && mIdx < currentMonth) return false;
+      return true;
+    }).map((m: any) => ({
+      id: m.id, title: `${m.month} ${m.year} — Monthly Recordings`, type: 'Monthly Lessons', price: Number(m.price ?? 0),
+      thumbnailUrl: m.thumbnail_url ?? undefined, duration: 'Monthly access',
+      videoCount: m.session_count ?? 0, isFree: false
+    }));
+
+    setPacks([...mappedPacks, ...mappedMonths]);
     setLoading(false);
   }, []);
 
@@ -73,11 +103,10 @@ export function ExtraClassesPage() {
   const statusFor = (id: string): 'none' | 'pending' | 'owned' =>
     owned.has(id) ? 'owned' : pending.has(id) ? 'pending' : 'none';
 
-  const countFor = (cat: string) =>
-    cat === 'All' ? packs.length : packs.filter((c) => c.type === cat).length;
+  const countFor = (cat: string) => packs.filter((c) => c.type === cat).length;
 
   const filtered = packs.filter((c) => {
-    const matchCat = activeCategory === 'All' || c.type === activeCategory;
+    const matchCat = c.type === activeCategory;
     const matchSearch = c.title.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
@@ -98,9 +127,9 @@ export function ExtraClassesPage() {
         <div className="relative p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
           <div className="sm:flex-1 min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-200/80">{examLabel} · Lesson Store</p>
-            <h1 className="text-2xl sm:text-3xl font-black leading-tight mt-1">ඔබට අවශ්‍ය පාඩම් pack එක තෝරන්න</h1>
+            <h1 className="text-2xl sm:text-3xl font-black leading-tight mt-1">Choose The Lesson Pack You Need</h1>
             <p className="flex items-center gap-2 text-sm text-rose-100/75 mt-2">
-              <InfinityIcon className="w-4 h-4 shrink-0" /> One-time payment · watch anytime · no deadline
+              <InfinityIcon className="w-4 h-4 shrink-0" /> One-Time Payment · Watch Anytime · No Deadline
             </p>
           </div>
           <div className="flex gap-3 shrink-0">
@@ -159,7 +188,7 @@ export function ExtraClassesPage() {
               <VideoPackCard
                 pack={pack}
                 status={statusFor(pack.id)}
-                onBuy={() => navigate(`/dashboard/buy/${pack.id}`)}
+                onBuy={() => navigate(`/dashboard/buy/${pack.id}?type=${pack.type === 'Monthly Lessons' ? 'month' : 'pack'}`)}
                 onOpen={() => navigate(`/dashboard/courses?highlight=${pack.id}`)}
               />
             </motion.div>

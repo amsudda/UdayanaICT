@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { CheckCircleIcon, GraduationCapIcon } from 'lucide-react';
 
 const HIGHLIGHTS = [
-  'උසස් තත්වයේ වීඩියෝ පාඩම් — ඕනෑම වේලාවක නැරඹිය හැක',
-  'සජීවී අන්තර් ක්‍රියාකාරී පන්ති සහ Q&A සැසි',
-  'පසුගිය විභාග ප්‍රශ්න පත්‍ර සවිස්තරාත්මක සාකච්ඡා',
-  'ඔබේ ප්‍රගතිය නිරීක්ෂණය කරන පෞද්ගලික උපකරණ පුවරුව',
+  'High Quality Video Lessons — Watch Anytime',
+  'Live Interactive Classes and Q&A Sessions',
+  'Past Exam Papers Detailed Discussions',
+  'Personal Dashboard to Monitor Your Progress',
 ];
 
 /* ── 8-bit pixel sprites ── */
@@ -59,7 +59,7 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
             </div>
 
             <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-3xl xl:text-4xl font-extrabold leading-tight mb-8 drop-shadow">
-              ඉගෙනීම ආරම්භ කරන්න.
+              Start Learning.
             </motion.h1>
 
             <ul className="space-y-4">
@@ -73,8 +73,8 @@ export function AuthLayout({ children, formWidth = 'max-w-md' }: { children: Rea
           </div>
 
           <p className="text-sm text-rose-100/70">
-            “ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!”
-            <span className="block mt-1 font-semibold text-white/90">— පසිඳු දිසානායක</span>
+            “Learn from someone who has actually learned..!”
+            <span className="block mt-1 font-semibold text-white/90">— Pasindu Dissanayake</span>
           </p>
         </div>
       </div>

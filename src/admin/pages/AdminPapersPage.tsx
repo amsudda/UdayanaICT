@@ -155,7 +155,10 @@ export function AdminPapersPage() {
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    await supabase.from('papers').delete().eq('id', deleteTarget.id);
+    const { error } = await supabase.from('papers').delete().eq('id', deleteTarget.id);
+    if (error) {
+      alert(`Could not delete paper: ${error.message}`);
+    }
     setDeleteTarget(null);
     load();
   };
@@ -331,9 +334,10 @@ export function AdminPapersPage() {
 
       {deleteTarget && (
         <ConfirmDialog
+          open={true}
           title="Delete Paper"
           message={`Are you sure you want to delete "${deleteTarget.title}"? This cannot be undone.`}
-          confirmText="Yes, delete it"
+          confirmLabel="Yes, delete it"
           onConfirm={confirmDelete}
           onCancel={() => setDeleteTarget(null)}
         />

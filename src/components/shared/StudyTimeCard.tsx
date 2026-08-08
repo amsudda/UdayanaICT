@@ -148,10 +148,10 @@ export function StudyTimeCard() {
             <button onClick={dismiss} className="absolute top-4 right-4 text-apple-subtext hover:text-apple-text" aria-label="Close"><XIcon className="w-5 h-5" /></button>
             <div className="flex items-center gap-2 mb-2">
               <ClockIcon className="w-5 h-5 text-[#c20f24]" />
-              <h3 className="text-lg font-bold text-apple-text dark:text-apple-light">අද දවසේ වැඩ කොහොමද?</h3>
+              <h3 className="text-lg font-bold text-apple-text dark:text-apple-light">How is today's work?</h3>
             </div>
             <p className="text-sm text-apple-subtext dark:text-slate-400 mb-5">
-              අද ඔබ අධ්‍යයනය කළ පැය ගණන සටහන් කරන්න. මෙය ඔබේ ප්‍රගතිය නිරීක්ෂණය කිරීමට උපකාරී වේ. 🚀
+              Log the number of hours you studied today. This will help you track your progress. 🚀
             </p>
 
             <div className="flex items-center justify-between mb-2">

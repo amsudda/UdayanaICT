@@ -6,9 +6,9 @@ import { AuthLayout } from '../components/layout/AuthLayout';
 import { GoogleSignInButton } from '../components/shared/GoogleSignInButton';
 
 const PERKS = [
-  'තත්පර කිහිපයකින් — වෙනම මුරපදයක් මතක තබා ගැනීමට අවශ්‍ය නැත',
-  'ඔබේ Google ගිණුම ආරක්ෂිතයි — ගිණුම බෙදාගැනීම වළක්වයි',
-  'පිවිසීමෙන් පසු ඔබේ පැතිකඩ විස්තර එක් වරක් පුරවන්න'
+  'In a few seconds — no need to remember a separate password',
+  'Your Google account is secure — prevents account sharing',
+  'Fill in your profile details once after logging in'
 ];
 
 /**
@@ -29,10 +29,10 @@ export function SignupPage() {
     <AuthLayout>
       <div className="mb-7">
         <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">
-          ගිණුමක් සාදන්න
+          Create an Account
         </h2>
         <p className="text-sm text-apple-subtext">
-          ඔබේ Google ගිණුම සමඟ ලියාපදිංචි වන්න — ඉන්පසු ඔබේ පැතිකඩ විස්තර පුරවන්න.
+          Sign up with your Google account — then fill in your profile details.
         </p>
       </div>
 

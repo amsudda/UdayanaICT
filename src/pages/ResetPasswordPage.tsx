@@ -59,8 +59,8 @@ export function ResetPasswordPage() {
           <div className="mx-auto w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
             <CheckCircleIcon className="w-7 h-7 text-emerald-500" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-apple-text mb-2">මුරපදය සාර්ථකව වෙනස් වුණා!</h2>
-          <p className="text-sm text-apple-subtext mb-6">ඔබට දැන් නව මුරපදයෙන් පිවිසිය හැක.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-apple-text mb-2">Password changed successfully!</h2>
+          <p className="text-sm text-apple-subtext mb-6">You can now log in with your new password.</p>
           <button
             onClick={() => navigate('/dashboard')}
             className="w-full h-12 rounded-full bg-[#c20f24] text-white font-semibold hover:bg-[#9c0c1d] transition-colors shadow-[0_8px_24px_rgba(194,15,36,0.35)]"
@@ -77,7 +77,7 @@ export function ResetPasswordPage() {
         <div className="text-center py-6">
           <h2 className="text-2xl font-bold tracking-tight text-apple-text mb-2">Link expired or invalid</h2>
           <p className="text-sm text-apple-subtext mb-6">
-            මෙම reset link එක කල් ඉකුත් වී හෝ භාවිත වී ඇත. Login පිටුවෙන් "Forgot password?" ඔබා නව link එකක් ලබාගන්න.
+            This reset link has expired or been used. Click "Forgot password?" on the login page to get a new link.
           </p>
           <Link
             to="/login"
@@ -89,8 +89,8 @@ export function ResetPasswordPage() {
       ) : (
         <>
           <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">නව මුරපදයක් සකසන්න</h2>
-            <p className="text-sm text-apple-subtext">ඔබේ ගිණුම සඳහා නව මුරපදයක් ඇතුළත් කරන්න.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-apple-text mb-2">Set a new password</h2>
+            <p className="text-sm text-apple-subtext">Enter a new password for your account.</p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>

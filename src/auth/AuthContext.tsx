@@ -16,6 +16,8 @@ export type AuthUser = {
   school?: string;
   district?: string;
   medium?: string;
+    stream?: string;
+  stream?: string;
   program?: string;
   examYear?: string;
   guardianName?: string;
@@ -40,6 +42,8 @@ export type StudentDetails = {
   school?: string;
   district?: string;
   medium?: string;
+    stream?: string;
+  stream?: string;
   program?: string;
   examYear?: string;
   guardianName?: string;
