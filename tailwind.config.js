@@ -20,7 +20,7 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', '"Noto Sans Sinhala"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         'apple': '0 4px 24px rgba(0, 0, 0, 0.04)',
