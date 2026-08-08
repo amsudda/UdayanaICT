@@ -266,19 +266,19 @@ export function LandingPage() {
                 transition={{ duration: 0.7 }}
                 className="flex flex-col items-center text-center pb-10 lg:pb-20 pt-4"
               >
-                {/* Brand Logo */}
-                <img
-                  src="/images/pd-logo.png"
-                  alt="Pasindu Dissanayake Logo"
-                  className="w-32 h-32 md:w-44 md:h-44 mb-5 object-contain drop-shadow-lg"
-                />
-
                 {/* Pixel "level up" chip */}
                 <div className="font-pixel inline-flex items-center gap-2 mb-5 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900">
                   <PixelStar className="w-3 h-3 text-amber-400" />
                   LEVEL UP YOUR ICT
                   <span className="pixel-cursor">_</span>
                 </div>
+
+                {/* Brand Logo */}
+                <img
+                  src="/images/pd-logo.png"
+                  alt="Pasindu Dissanayake Logo"
+                  className="w-32 h-32 md:w-44 md:h-44 mb-5 object-contain drop-shadow-lg"
+                />
 
                 {/* Name */}
                 <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors">
@@ -332,7 +332,7 @@ export function LandingPage() {
                 <img
                   src="/images/pasindu-hero.png"
                   alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                  className="relative w-[300px] sm:w-[380px] lg:w-[440px] max-w-full select-none pointer-events-none drop-shadow-[0_18px_40px_rgba(194,15,36,0.18)]"
+                  className="relative w-[340px] sm:w-[420px] lg:w-[500px] max-w-full select-none pointer-events-none drop-shadow-[0_18px_40px_rgba(194,15,36,0.18)]"
                   draggable={false}
                 />
               </motion.div>
