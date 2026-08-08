@@ -134,51 +134,43 @@ export function CourseDetailsPage() {
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative rounded-[2rem] overflow-hidden mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.06)] bg-[#0a0c11]"
       >
-        {/* Background Blur */}
-        <div className="absolute inset-0 opacity-20">
-          {thumbnail ? (
-             <img src={thumbnail} alt="" className="w-full h-full object-cover blur-3xl scale-125" />
-          ) : (
-            <div className="w-full h-full bg-slate-900" />
-          )}
+        {/* Tech/Pixel Grid Background */}
+        <div className="absolute inset-0 opacity-[0.15]" style={{
+          backgroundImage: `linear-gradient(to right, #4f4f4f 1px, transparent 1px), linear-gradient(to bottom, #4f4f4f 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+          backgroundPosition: 'center center'
+        }} />
+        
+        {/* Animated Moving Gradient Accents */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Tech/Pixel Grid Background */}
+          <div className="absolute inset-0 opacity-[0.15]" style={{
+            backgroundImage: `linear-gradient(to right, #4f4f4f 1px, transparent 1px), linear-gradient(to bottom, #4f4f4f 1px, transparent 1px)`,
+            backgroundSize: '40px 40px',
+            backgroundPosition: 'center center'
+          }} />
+          
+          <motion.div 
+            animate={{ x: ['-50%', '50%', '-50%'], y: ['-50%', '50%', '-50%'], opacity: [0.1, 0.3, 0.1] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute top-0 left-0 w-full h-full rounded-full bg-[#c20f24] blur-[150px]" 
+          />
+          <motion.div 
+            animate={{ x: ['50%', '-50%', '50%'], y: ['50%', '-50%', '50%'], opacity: [0.1, 0.2, 0.1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-0 right-0 w-full h-full rounded-full bg-blue-600 blur-[150px]" 
+          />
+          
+          {/* Animated Pixel Squares */}
+          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[20%] left-[30%] w-2 h-2 bg-[#c20f24]" />
+          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, delay: 1.2 }} className="absolute top-[60%] left-[70%] w-2 h-2 bg-blue-500" />
+          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 2.5, repeat: Infinity, delay: 2 }} className="absolute top-[80%] left-[40%] w-2 h-2 bg-white/50" />
+          <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, delay: 0.8 }} className="absolute top-[30%] left-[80%] w-2 h-2 bg-[#c20f24]" />
         </div>
         
-        {/* Moving Abstract Elements */}
-        <div className="absolute inset-0 overflow-hidden mix-blend-screen pointer-events-none">
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              x: [0, 100, 0],
-              y: [0, -50, 0],
-              rotate: [0, 90, 0]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-[20%] -left-[10%] w-[50%] h-[80%] rounded-full bg-[#c20f24] opacity-20 blur-[100px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.5, 1],
-              x: [0, -100, 0],
-              y: [0, 100, 0],
-              rotate: [0, -90, 0]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute top-[20%] -right-[10%] w-[60%] h-[90%] rounded-full bg-[#ff3b3b] opacity-10 blur-[120px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.3, 1],
-              x: [0, 50, 0],
-              y: [0, 100, 0]
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 5 }}
-            className="absolute -bottom-[20%] left-[20%] w-[40%] h-[60%] rounded-full bg-blue-600 opacity-10 blur-[100px]" 
-          />
-        </div>
-        
-        {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c11] via-[#0a0c11]/80 to-transparent mix-blend-multiply" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11] via-[#0a0c11]/90 to-transparent" />
+        {/* Darkening Overlays so text is readable */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c11] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0c11] via-[#0a0c11]/60 to-transparent" />
 
         <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 md:p-12 min-h-[320px]">
           {/* Thumbnail */}
