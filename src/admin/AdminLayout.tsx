@@ -186,9 +186,9 @@ export function AdminLayout() {
     <div className="flex flex-col h-full">
       {/* brand */}
       <div className="px-5 py-5 flex items-center gap-2.5">
-        <img src="/images/pd-logo.png" alt="Pasindu Dissanayake ICT Logo" className="w-9 h-9 object-contain" />
+        <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="w-9 h-9 object-contain" />
         <div className="leading-tight">
-          <p className="font-bold text-slate-900 text-[15px]">Pasindu Dissanayake ICT</p>
+          <p className="font-bold text-slate-900 text-[15px]">Pasindu Dissanayake</p>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Admin</p>
         </div>
       </div>

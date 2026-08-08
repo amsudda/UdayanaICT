@@ -80,9 +80,9 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2">
-            <img src="/images/pd-logo.png" alt="Pasindu Dissanayake ICT Logo" className="w-9 h-9 object-contain" />
+            <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="w-9 h-9 object-contain" />
             <span className="font-bold text-xl tracking-tight text-apple-text dark:text-apple-light transition-colors duration-300">
-              Pasindu Dissanayake ICT
+              Pasindu Dissanayake
             </span>
           </Link>
 
