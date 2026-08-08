@@ -107,47 +107,80 @@ export function PapersPage() {
           {activeTab === 'main' && (
             <motion.div key="main" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
-              <button onClick={() => setActiveTab('past')} className="text-left group relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-indigo-500 to-blue-600 hover:shadow-xl hover:shadow-blue-500/20 transition-all border border-blue-400/20">
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <motion.button 
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveTab('past')} 
+                className="text-left group relative overflow-hidden rounded-[2rem] p-8 bg-[#0a0c11] hover:shadow-[0_20px_40px_rgba(194,15,36,0.2)] transition-all border border-slate-800 hover:border-red-500/40"
+              >
+                <div className="absolute inset-0 overflow-hidden opacity-40 group-hover:opacity-100 transition-opacity duration-700">
+                  <motion.div 
+                    animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                    className="absolute -top-[50%] -right-[50%] w-[200%] h-[200%] bg-[radial-gradient(ellipse_at_center,rgba(194,15,36,0.3)_0%,transparent_50%)]" 
+                  />
+                  <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(to right, rgba(194,15,36,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(194,15,36,0.15) 1px, transparent 1px)`, backgroundSize: '30px 30px' }} />
+                </div>
+                
                 <div className="relative z-10">
-                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white mb-6">
+                  <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-800 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-red-500/30 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
                     <CalendarIcon className="w-7 h-7" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2">Past Papers</h2>
-                  <p className="text-blue-100 text-sm font-medium">Browse G.C.E. papers from previous years with official marking schemes.</p>
-                  <div className="mt-6 inline-flex items-center gap-2 text-white text-sm font-semibold group-hover:gap-3 transition-all">
-                    View Collection <ArrowLeftIcon className="w-4 h-4 rotate-180" />
+                  <h2 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-red-400 transition-colors">Past Papers</h2>
+                  <p className="text-slate-400 text-sm font-medium leading-relaxed group-hover:text-slate-300 transition-colors">Browse G.C.E. papers from previous years with official marking schemes.</p>
+                  <div className="mt-6 inline-flex items-center gap-2 text-red-500 text-sm font-bold group-hover:gap-3 transition-all uppercase tracking-wide">
+                    Explore Past Papers <ArrowLeftIcon className="w-4 h-4 rotate-180" />
                   </div>
                 </div>
-              </button>
+              </motion.button>
 
-              <button onClick={() => setActiveTab('provincial')} className="text-left group relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-emerald-500 to-teal-600 hover:shadow-xl hover:shadow-teal-500/20 transition-all border border-teal-400/20">
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <motion.button 
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveTab('provincial')} 
+                className="text-left group relative overflow-hidden rounded-[2rem] p-8 bg-[#0a0c11] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] transition-all border border-slate-800 hover:border-red-500/40"
+              >
+                <div className="absolute inset-0 overflow-hidden opacity-40 group-hover:opacity-100 transition-opacity duration-700">
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -bottom-[20%] -left-[20%] w-[140%] h-[140%] bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.25)_0%,transparent_60%)]" 
+                  />
+                  <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(to right, rgba(220,38,38,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(220,38,38,0.15) 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
+                </div>
+                
                 <div className="relative z-10">
-                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white mb-6">
+                  <div className="w-14 h-14 bg-gradient-to-br from-red-600 to-red-900 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-red-600/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
                     <MapPinIcon className="w-7 h-7" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2">Provincial</h2>
-                  <p className="text-teal-100 text-sm font-medium">Access term test papers from various provinces across Sri Lanka.</p>
-                  <div className="mt-6 inline-flex items-center gap-2 text-white text-sm font-semibold group-hover:gap-3 transition-all">
-                    View Collection <ArrowLeftIcon className="w-4 h-4 rotate-180" />
+                  <h2 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-red-400 transition-colors">Provincial</h2>
+                  <p className="text-slate-400 text-sm font-medium leading-relaxed group-hover:text-slate-300 transition-colors">Access term test papers from various provinces across Sri Lanka.</p>
+                  <div className="mt-6 inline-flex items-center gap-2 text-red-500 text-sm font-bold group-hover:gap-3 transition-all uppercase tracking-wide">
+                    Explore Provincial <ArrowLeftIcon className="w-4 h-4 rotate-180" />
                   </div>
                 </div>
-              </button>
+              </motion.button>
 
-              <button onClick={() => setActiveTab('model')} className="text-left group relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-violet-500 to-purple-600 hover:shadow-xl hover:shadow-purple-500/20 transition-all border border-purple-400/20">
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <motion.button 
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveTab('model')} 
+                className="text-left group relative overflow-hidden rounded-[2rem] p-8 bg-[#0a0c11] hover:shadow-[0_20px_40px_rgba(239,68,68,0.2)] transition-all border border-slate-800 hover:border-red-500/40"
+              >
+                <div className="absolute inset-0 overflow-hidden opacity-40 group-hover:opacity-100 transition-opacity duration-700">
+                  <motion.div 
+                    animate={{ rotate: -360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[0%] left-[0%] w-[150%] h-[150%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,rgba(239,68,68,0.25)_180deg,transparent_360deg)]" 
+                  />
+                  <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(to right, rgba(239,68,68,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(239,68,68,0.15) 1px, transparent 1px)`, backgroundSize: '30px 30px', transform: 'rotate(45deg) scale(1.5)' }} />
+                </div>
+                
                 <div className="relative z-10">
-                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white mb-6">
+                  <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-red-700 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform duration-500">
                     <LayoutIcon className="w-7 h-7" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2">Model Papers</h2>
-                  <p className="text-purple-100 text-sm font-medium">Practice with specially designed model papers to prepare for exams.</p>
-                  <div className="mt-6 inline-flex items-center gap-2 text-white text-sm font-semibold group-hover:gap-3 transition-all">
-                    View Collection <ArrowLeftIcon className="w-4 h-4 rotate-180" />
+                  <h2 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-red-400 transition-colors">Model Papers</h2>
+                  <p className="text-slate-400 text-sm font-medium leading-relaxed group-hover:text-slate-300 transition-colors">Practice with specially designed model papers to prepare for exams.</p>
+                  <div className="mt-6 inline-flex items-center gap-2 text-red-500 text-sm font-bold group-hover:gap-3 transition-all uppercase tracking-wide">
+                    Explore Models <ArrowLeftIcon className="w-4 h-4 rotate-180" />
                   </div>
                 </div>
-              </button>
+              </motion.button>
 
             </motion.div>
           )}
