@@ -277,7 +277,7 @@ export function LandingPage() {
                 <img
                   src="/images/pd-logo.png"
                   alt="Pasindu Dissanayake Logo"
-                  className="w-40 h-40 md:w-56 md:h-56 -mt-4 mb-1 md:-mt-6 md:-mb-2 object-contain drop-shadow-lg"
+                  className="w-40 h-40 md:w-56 md:h-56 -mt-4 -mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
                 />
 
                 {/* Name */}
