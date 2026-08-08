@@ -149,10 +149,10 @@ export function PapersPage() {
                   <div className="w-14 h-14 bg-gradient-to-br from-red-600 to-red-900 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-red-600/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
                     <MapPinIcon className="w-7 h-7" />
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-red-400 transition-colors">Provincial</h2>
+                  <h2 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-red-400 transition-colors">Provincial Papers</h2>
                   <p className="text-slate-400 text-sm font-medium leading-relaxed group-hover:text-slate-300 transition-colors">Access term test papers from various provinces across Sri Lanka.</p>
                   <div className="mt-6 inline-flex items-center gap-2 text-red-500 text-sm font-bold group-hover:gap-3 transition-all uppercase tracking-wide">
-                    Explore Provincial <ArrowLeftIcon className="w-4 h-4 rotate-180" />
+                    Explore Provincial Papers <ArrowLeftIcon className="w-4 h-4 rotate-180" />
                   </div>
                 </div>
               </motion.button>
