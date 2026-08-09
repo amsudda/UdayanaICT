@@ -258,7 +258,14 @@ export function AdminStudentDetailPage() {
   const handleDelete = async () => {
     setDeleting(true);
     setDeleteError('');
-    const { error } = await supabase.rpc('admin_delete_student', { p_student: id });
+    // Delete storage files first
+    await supabase.storage.from('id-cards').list(id).then(async ({ data }) => {
+      if (data?.length) {
+        await supabase.storage.from('id-cards').remove(data.map((f: any) => `${id}/${f.name}`));
+      }
+    });
+    // Delete from profiles — Supabase's own cascade trigger removes the auth user too
+    const { error } = await supabase.from('profiles').delete().eq('id', id).eq('role', 'student');
     setDeleting(false);
     if (error) {
       setConfirmDelete(false);
