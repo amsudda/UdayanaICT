@@ -147,8 +147,9 @@ export function AdminOverviewPage() {
 
   const monthKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}`;
   const thisMonth = monthKey(new Date());
-  const revenueThisMonth = approved
-    .filter((p) => monthKey(new Date(p.created_at)) === thisMonth)
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86_400_000);
+  const revenueLast30Days = approved
+    .filter((p) => new Date(p.created_at) >= thirtyDaysAgo)
     .reduce((s, p) => s + Number(p.amount ?? 0), 0);
 
   const todayStr = new Date().toDateString();
@@ -368,7 +369,7 @@ export function AdminOverviewPage() {
     { label: 'Students', value: profiles.length, icon: UsersIcon, to: '/admin/students', tone: 'bg-blue-50 text-blue-600', spark: signupSpark, sparkColor: '#2563eb', trend: `+${regsThisMonth} this month` },
     { label: 'Active Batches', value: batches.length, icon: LayersIcon, to: '/admin/batches', tone: 'bg-violet-50 text-violet-600', spark: null, sparkColor: '', trend: null as string | null },
     { label: 'Video Packs', value: packCount, icon: PackageIcon, to: '/admin/packs', tone: 'bg-emerald-50 text-emerald-600', spark: null, sparkColor: '', trend: null },
-    { label: 'Revenue (This Month)', value: fmtLKR(revenueThisMonth), icon: BanknoteIcon, to: '/admin/payments', tone: 'bg-rose-50 text-rose-600', spark: revenueSpark, sparkColor: '#e11d48', trend: revTrend },
+    { label: 'Revenue (Last 30 Days)', value: fmtLKR(revenueLast30Days), icon: BanknoteIcon, to: '/admin/payments', tone: 'bg-rose-50 text-rose-600', spark: revenueSpark, sparkColor: '#e11d48', trend: revTrend },
     { label: "Today's Registrations", value: regsToday, icon: UserPlusIcon, to: '/admin/students', tone: 'bg-cyan-50 text-cyan-600', spark: signupSpark, sparkColor: '#0891b2', trend: regsTodayTrend }
   ];
 
