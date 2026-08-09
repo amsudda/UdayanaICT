@@ -16,7 +16,6 @@ export type AuthUser = {
   school?: string;
   district?: string;
   medium?: string;
-    stream?: string;
   stream?: string;
   program?: string;
   examYear?: string;
@@ -42,7 +41,6 @@ export type StudentDetails = {
   school?: string;
   district?: string;
   medium?: string;
-    stream?: string;
   stream?: string;
   program?: string;
   examYear?: string;
@@ -114,6 +112,7 @@ function detailsToColumns(d: StudentDetails) {
     school: d.school ?? null,
     district: d.district ?? null,
     medium: d.medium ?? null,
+    stream: d.stream ?? null,
     program: d.program ?? null,
     exam_year: d.examYear ? Number(d.examYear) : null,
     guardian_name: d.guardianName ?? null,
