@@ -54,7 +54,7 @@ export function Navbar() {
     if (isPill && !hasBurst) {
       setHasBurst(true);
       setShowBurst(true);
-      const t = setTimeout(() => setShowBurst(false), 2800);
+      const t = setTimeout(() => setShowBurst(false), 5000);
       return () => clearTimeout(t);
     }
   }, [isPill, hasBurst]);
@@ -145,7 +145,7 @@ export function Navbar() {
                   initial={{ x: '-110%' }}
                   animate={{ x: '120%' }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 4.0, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute inset-0 z-50 pointer-events-none"
                   style={{
                     background: 'linear-gradient(90deg, transparent 0%, rgba(194,15,36,0.5) 25%, rgba(139,92,246,0.4) 55%, rgba(59,130,246,0.4) 75%, transparent 100%)',
@@ -156,7 +156,7 @@ export function Navbar() {
                 <motion.div
                   initial={{ x: '-110%' }}
                   animate={{ x: '150%' }}
-                  transition={{ duration: 2.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 4.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute inset-y-0 z-40 w-24 pointer-events-none"
                   style={{
                     background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
@@ -173,7 +173,7 @@ export function Navbar() {
                       scale: [0, 1.4, 0],
                       opacity: [0, 1, 0],
                     }}
-                    transition={{ duration: 1.8, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
+                    transition={{ duration: 3.5, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
                     className="absolute z-50 pointer-events-none rounded-full"
                     style={{
                       width: i % 2 === 0 ? '5px' : '4px',
