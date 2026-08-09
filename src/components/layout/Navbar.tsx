@@ -18,6 +18,8 @@ import { NotificationBell } from '../shared/NotificationBell';
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hasBurst, setHasBurst] = useState(false);
+  const [showBurst, setShowBurst] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
@@ -45,6 +47,18 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const isPill = isLanding && scrolled;
+
+  /* Fire the burst once on first pill transform */
+  useEffect(() => {
+    if (isPill && !hasBurst) {
+      setHasBurst(true);
+      setShowBurst(true);
+      const t = setTimeout(() => setShowBurst(false), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [isPill, hasBurst]);
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -64,8 +78,6 @@ export function Navbar() {
     navigate('/');
   };
 
-  /* Only transform into pill on the landing page */
-  const isPill = isLanding && scrolled;
 
   const navLinks = [
     { label: 'Promotions', href: '#promos' },
@@ -93,38 +105,92 @@ export function Navbar() {
         <motion.nav
           layout
           transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="pointer-events-auto"
+          className="pointer-events-auto overflow-hidden"
           style={{
             width: isPill ? 'min(96%, 100%)' : '100%',
             borderRadius: isPill ? '16px' : '0px',
             background: isPill
               ? isDarkMode
-                ? 'rgba(15,23,42,0.75)'
-                : 'rgba(255,255,255,0.72)'
+                ? 'rgba(10,15,30,0.45)'
+                : 'rgba(255,255,255,0.45)'
               : isLanding && !scrolled
               ? 'transparent'
               : isDarkMode
-              ? 'rgba(2,6,23,0.80)'
-              : 'rgba(255,255,255,0.80)',
-            backdropFilter: (isPill || scrolled) ? 'blur(40px) saturate(200%) brightness(1.05)' : 'none',
-            WebkitBackdropFilter: (isPill || scrolled) ? 'blur(40px) saturate(200%) brightness(1.05)' : 'none',
+              ? 'rgba(2,6,23,0.55)'
+              : 'rgba(255,255,255,0.55)',
+            backdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
+            WebkitBackdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
             border: isPill
               ? isDarkMode
-                ? '1px solid rgba(255,255,255,0.12)'
-                : '1px solid rgba(255,255,255,0.9)'
+                ? '1px solid rgba(255,255,255,0.1)'
+                : '1px solid rgba(255,255,255,0.85)'
+              : !isLanding || scrolled
+              ? `1px solid rgba(${isDarkMode ? '255,255,255,0.06' : '0,0,0,0.06'})`
               : 'none',
             boxShadow: isPill
               ? isDarkMode
-                ? '0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)'
-                : '0 8px 32px rgba(0,0,0,0.1), 0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95)'
+                ? '0 8px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)'
+                : '0 4px 40px rgba(0,0,0,0.08), 0 1px 12px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1)'
               : scrolled
-              ? '0 1px 0 rgba(0,0,0,0.06)'
+              ? '0 1px 0 rgba(0,0,0,0.05)'
               : 'none',
           }}
         >
+          {/* ── One-shot transform burst: fires once when navbar becomes pill ── */}
+          <AnimatePresence>
+            {showBurst && (
+              <>
+                {/* Red-to-blue gradient sweep left → right */}
+                <motion.div
+                  initial={{ x: '-110%' }}
+                  animate={{ x: '120%' }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 z-50 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(194,15,36,0.5) 25%, rgba(139,92,246,0.4) 55%, rgba(59,130,246,0.4) 75%, transparent 100%)',
+                    filter: 'blur(8px)',
+                  }}
+                />
+                {/* Shimmer trail */}
+                <motion.div
+                  initial={{ x: '-110%' }}
+                  animate={{ x: '150%' }}
+                  transition={{ duration: 1.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-y-0 z-40 w-24 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
+                    filter: 'blur(3px)',
+                  }}
+                />
+                {/* Particle sparks */}
+                {[...Array(7)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ left: `${8 + i * 13}%`, top: '50%', scale: 0, opacity: 1 }}
+                    animate={{
+                      top: `${20 + (i % 3) * 28}%`,
+                      scale: [0, 1.4, 0],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{ duration: 0.9, delay: 0.1 + i * 0.07, ease: 'easeOut' }}
+                    className="absolute z-50 pointer-events-none rounded-full"
+                    style={{
+                      width: i % 2 === 0 ? '5px' : '4px',
+                      height: i % 2 === 0 ? '5px' : '4px',
+                      background: i % 3 === 0 ? '#c20f24' : i % 3 === 1 ? '#8b5cf6' : '#3b82f6',
+                      boxShadow: `0 0 8px 2px ${i % 3 === 0 ? 'rgba(194,15,36,0.7)' : i % 3 === 1 ? 'rgba(139,92,246,0.7)' : 'rgba(59,130,246,0.7)'}`,
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </AnimatePresence>
+
           <div className={`flex justify-between items-center transition-all duration-500 ${
             isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'
           }`}>
+
 
             {/* Logo */}
             <Link to={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2 group flex-shrink-0">
