@@ -230,22 +230,28 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-20 pb-0 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
-          {/* Soft layered red wash — very subtle, warms up the white */}
+        <section className="relative pt-16 pb-0 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
+          {/* Soft layered red wash */}
           <div
             className="absolute inset-0 -z-10 dark:hidden"
             style={{
               background:
-                'linear-gradient(180deg, rgba(194,15,36,0.055) 0%, rgba(255,255,255,0) 40%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.10), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.075), transparent 70%)'
+                'linear-gradient(180deg, rgba(194,15,36,0.07) 0%, rgba(255,255,255,0) 50%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.13), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.09), transparent 70%)'
             }}
           />
           <div
             className="absolute inset-0 -z-10 hidden dark:block"
             style={{
               background:
-                'linear-gradient(180deg, rgba(194,15,36,0.12) 0%, rgba(2,6,23,0) 45%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.20), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.15), transparent 70%)'
+                'linear-gradient(180deg, rgba(194,15,36,0.15) 0%, rgba(2,6,23,0) 45%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.22), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.15), transparent 70%)'
             }}
           />
+
+          {/* Floating animated orbs */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <div className="absolute top-1/4 left-[8%] w-72 h-72 rounded-full bg-[#c20f24]/5 dark:bg-[#c20f24]/10 blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
+            <div className="absolute bottom-1/3 right-[5%] w-96 h-96 rounded-full bg-[#c20f24]/4 dark:bg-[#c20f24]/8 blur-3xl animate-pulse" style={{ animationDuration: '9s', animationDelay: '3s' }} />
+          </div>
 
           {/* floating 8-bit sprites */}
           <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
@@ -280,8 +286,11 @@ export function LandingPage() {
                   className="w-40 h-40 md:w-56 md:h-56 -mt-4 -mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
                 />
 
-                {/* Name */}
-                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors">
+                {/* Name — Bebas Neue display font */}
+                <h1
+                  className="text-5xl md:text-7xl font-extrabold tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
+                  style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.03em' }}
+                >
                   Pasindu Dissanayake
                 </h1>
                 <p className="mt-3 text-[11px] md:text-xs font-semibold tracking-[0.22em] md:tracking-[0.32em] uppercase text-apple-subtext dark:text-slate-400 transition-colors">
@@ -301,8 +310,13 @@ export function LandingPage() {
                     href="https://whatsapp.com/channel/0029Vb6zVpy4tRrtEpCZ7n1i"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 h-12 px-7 text-base rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                    className="relative inline-flex items-center gap-2.5 h-12 px-7 text-base rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                   >
+                    {/* Live ping dot */}
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400" />
+                    </span>
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                     </svg>
@@ -318,6 +332,20 @@ export function LandingPage() {
                     පන්ති පිළිබඳ විමසීම්
                   </a>
                 </div>
+
+                {/* Scroll-down arrow */}
+                <motion.a
+                  href="#promos"
+                  animate={{ y: [0, 8, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                  className="mt-10 inline-flex flex-col items-center gap-1 text-apple-subtext dark:text-slate-500 hover:text-[#c20f24] dark:hover:text-[#c20f24] transition-colors"
+                  aria-label="Scroll down"
+                >
+                  <span className="text-[10px] font-semibold uppercase tracking-widest">Scroll</span>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path d="M12 5v14M5 12l7 7 7-7" />
+                  </svg>
+                </motion.a>
               </motion.div>
 
               {/* RIGHT: cutout portrait rising from the section edge */}
@@ -460,7 +488,13 @@ export function LandingPage() {
           <section id="courses" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors mb-4">
+                <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold text-xs mb-4 border border-blue-100 dark:border-blue-800 uppercase tracking-wider">
+                  ⭐ Featured Courses
+                </span>
+                <h2
+                  className="text-4xl md:text-5xl font-extrabold text-apple-text dark:text-apple-light transition-colors mb-4"
+                  style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.04em' }}
+                >
                   Featured Courses
                 </h2>
                 <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-2xl mx-auto transition-colors">
@@ -502,14 +536,17 @@ export function LandingPage() {
               transition={{ duration: 0.6 }}
               className="text-center mb-14"
             >
-              <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900">
-                සිසුන්ගේ අදහස්
+              <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-semibold text-xs mb-4 border border-red-100 dark:border-red-900 uppercase tracking-wider">
+                ⭐ සිසුන්ගේ අදහස්
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light mb-4 transition-colors">
+              <h2
+                className="text-4xl md:text-5xl font-extrabold text-apple-text dark:text-apple-light mb-4 transition-colors"
+                style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.04em' }}
+              >
                 අපගේ සිසුන් පවසන දේ
               </h2>
               <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-xl mx-auto transition-colors">
-                Pasindu Dissanayake හරහා A/L තොරතුරු තාක්ෂණය ජය ගත් සිසුන් ගේ අත්දැකීම්
+                Pasindu Dissanayake හරහා A/L තොරතුරු තාක්ෂනයය ජය ගත් සිසුන් ගේ අත්දෆන්
               </p>
             </motion.div>
 
@@ -680,8 +717,14 @@ export function LandingPage() {
               transition={{ duration: 0.6 }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-bold uppercase text-apple-text dark:text-apple-light transition-colors">
-                OUR PROCESS <PixelReveal className="w-5 h-5 text-[#c20f24]" />
+              <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-semibold text-xs mb-4 border border-red-100 dark:border-red-900 uppercase tracking-wider">
+                🎓 Our Process
+              </span>
+              <h2
+                className="text-4xl md:text-5xl font-extrabold uppercase text-apple-text dark:text-apple-light transition-colors"
+                style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.04em' }}
+              >
+                Our Process
               </h2>
             </motion.div>
 
@@ -693,8 +736,14 @@ export function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
-                  className={`group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:border-[#c20f24]/25 hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
+                  className={`relative group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] transition-all duration-300 hover:-translate-y-1 overflow-hidden ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
                 >
+                  {/* Colored top border accent */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-[#c20f24]/60 to-[#c20f24]/20`} />
+                  {/* Step number badge */}
+                  <span className="absolute top-4 right-4 text-[11px] font-black text-gray-200 dark:text-slate-600" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', lineHeight: 1 }}>
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
                   <div className="pop-icon mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-slate-700/60 group-hover:bg-[#c20f24]/[0.07]">
                     <step.icon className={`w-8 h-8 ${step.color}`} strokeWidth={2.2} />
                   </div>
