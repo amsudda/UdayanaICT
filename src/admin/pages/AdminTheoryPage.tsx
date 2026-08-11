@@ -15,7 +15,9 @@ import {
   EyeIcon,
   EyeOffIcon,
   CalendarIcon,
-  XIcon
+  XIcon,
+  ClipboardListIcon,
+  BookOpenIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { extractYouTubeId as parseYouTubeId } from '../../lib/youtube';
@@ -95,6 +97,19 @@ export function AdminTheoryPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
   const [videoSavedMsg, setVideoSavedMsg] = useState('');
+
+  // drawer tab: 'sessions' | 'homework'
+  const [drawerTab, setDrawerTab] = useState<'sessions' | 'homework'>('sessions');
+
+  // homework sheets state
+  const [homework, setHomework] = useState<any[]>([]);
+  const [hwForm, setHwForm] = useState({ id: '', title: '', week: '' });
+  const [hwFile, setHwFile] = useState<File | null>(null);
+  const [schemeFile, setSchemeFile] = useState<File | null>(null);
+  const [hwSaving, setHwSaving] = useState(false);
+  const [hwMsg, setHwMsg] = useState('');
+  const hwRef = useRef<HTMLInputElement>(null);
+  const schemeRef = useRef<HTMLInputElement>(null);
 
   // list organisation
   const [search, setSearch] = useState('');
@@ -216,10 +231,15 @@ export function AdminTheoryPage() {
   /* videos */
   const openVideos = async (m: any) => {
     setVideosMonth(m);
+    setDrawerTab('sessions');
     setVForm({ id: '', title: '', youtube: '', duration: '', kind: 'lesson', tutes: [] });
     setTuteFiles([]);
+    setHwForm({ id: '', title: '', week: '' });
+    setHwFile(null);
+    setSchemeFile(null);
     const { data } = await supabase.from('theory_videos').select('*').eq('theory_month_id', m.id).order('sort_order');
     setVideos(data ?? []);
+    loadHomework(m.id);
   };
   const reloadVideos = async (monthId: string) => {
     const { data } = await supabase.from('theory_videos').select('*').eq('theory_month_id', monthId).order('sort_order');
@@ -275,6 +295,59 @@ export function AdminTheoryPage() {
     await supabase.from('theory_videos').update({ sort_order: b.sort_order }).eq('id', a.id);
     await supabase.from('theory_videos').update({ sort_order: a.sort_order }).eq('id', b.id);
     if (videosMonth) reloadVideos(videosMonth.id);
+  };
+
+  /* ── Homework Sheets ── */
+  const loadHomework = async (monthId: string) => {
+    const { data } = await supabase.from('theory_homework').select('*').eq('theory_month_id', monthId).order('sort_order');
+    setHomework(data ?? []);
+  };
+
+  const saveHomework = async () => {
+    if (!videosMonth || !hwForm.title.trim()) return;
+    setHwSaving(true);
+    let homework_url: string | null = null;
+    let scheme_url: string | null = null;
+
+    if (hwFile) {
+      const path = `theory-homework/${videosMonth.id}/${Date.now()}-hw.pdf`;
+      const { error } = await supabase.storage.from('tutes').upload(path, hwFile, { upsert: true, contentType: 'application/pdf' });
+      if (error) { alert(`Could not upload homework PDF:\n${error.message}`); setHwSaving(false); return; }
+      homework_url = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+    }
+    if (schemeFile) {
+      const path = `theory-homework/${videosMonth.id}/${Date.now()}-scheme.pdf`;
+      const { error } = await supabase.storage.from('tutes').upload(path, schemeFile, { upsert: true, contentType: 'application/pdf' });
+      if (error) { alert(`Could not upload marking scheme PDF:\n${error.message}`); setHwSaving(false); return; }
+      scheme_url = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+    }
+
+    const payload: any = { title: hwForm.title.trim() };
+    if (homework_url) payload.homework_url = homework_url;
+    if (scheme_url) payload.scheme_url = scheme_url;
+
+    let error;
+    if (hwForm.id) {
+      ({ error } = await supabase.from('theory_homework').update(payload).eq('id', hwForm.id));
+    } else {
+      const { data: existing } = await supabase.from('theory_homework').select('sort_order').eq('theory_month_id', videosMonth.id).order('sort_order', { ascending: false }).limit(1);
+      const nextOrder = existing && existing.length ? (existing[0].sort_order ?? 0) + 1 : 0;
+      ({ error } = await supabase.from('theory_homework').insert({ ...payload, theory_month_id: videosMonth.id, sort_order: nextOrder }));
+    }
+    if (error) { alert(`Could not save homework:\n${error.message}`); setHwSaving(false); return; }
+
+    setHwForm({ id: '', title: '', week: '' });
+    setHwFile(null);
+    setSchemeFile(null);
+    setHwMsg(`"${payload.title}" saved ✓`);
+    window.setTimeout(() => setHwMsg(''), 5000);
+    loadHomework(videosMonth.id);
+    setHwSaving(false);
+  };
+
+  const deleteHomework = async (id: string) => {
+    await supabase.from('theory_homework').delete().eq('id', id);
+    if (videosMonth) loadHomework(videosMonth.id);
   };
 
   const filteredMonths = months.filter((m) => {
@@ -502,11 +575,25 @@ export function AdminTheoryPage() {
         </div>
       </Drawer>
 
-      {/* sessions drawer */}
-      <Drawer open={!!videosMonth} onClose={() => setVideosMonth(null)} title={videosMonth ? `${videosMonth.month} ${videosMonth.year} — sessions` : ''}>
-        <div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
+      {/* sessions + homework drawer */}
+      <Drawer open={!!videosMonth} onClose={() => setVideosMonth(null)} title={videosMonth ? `${videosMonth.month} ${videosMonth.year}` : ''}>
+
+        {/* Tab switcher */}
+        <div className="flex rounded-xl bg-slate-100 p-1 mb-5">
+          <button type="button" onClick={() => setDrawerTab('sessions')}
+            className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-semibold transition-colors ${drawerTab === 'sessions' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
+            <VideoIcon className="w-4 h-4" /> Sessions
+          </button>
+          <button type="button" onClick={() => setDrawerTab('homework')}
+            className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-semibold transition-colors ${drawerTab === 'homework' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
+            <ClipboardListIcon className="w-4 h-4" /> Homework Sheets
+          </button>
+        </div>
+
+        {/* ── SESSIONS TAB ── */}
+        {drawerTab === 'sessions' && <><div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
           <p className="text-sm font-semibold text-slate-700">{vForm.id ? 'Edit session' : 'Add a session'}</p>
-          <input className={inputCls} value={vForm.title} onChange={(e) => setVForm({ ...vForm, title: e.target.value })} placeholder="e.g. Session 1 — Networking basics" />
+          <input className={inputCls} value={vForm.title} onChange={(e) => setVForm({ ...vForm, title: e.target.value })} placeholder="Any title you like — e.g. Week 3 Networking" />
           <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID (optional — leave blank for PDF only)" />
           <input className={inputCls} value={vForm.duration} onChange={(e) => setVForm({ ...vForm, duration: e.target.value })} placeholder="Duration e.g. 1 hr 20 mins" />
 
@@ -576,7 +663,66 @@ export function AdminTheoryPage() {
             </div>
           ))}
           {videos.length === 0 && <p className="text-sm text-slate-400">No sessions yet.</p>}
-        </div>
+        </div></>}
+
+        {/* ── HOMEWORK SHEETS TAB ── */}
+        {drawerTab === 'homework' && (<>
+          <input ref={hwRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setHwFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
+          <input ref={schemeRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setSchemeFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
+
+          <div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
+            <p className="text-sm font-semibold text-slate-700">{hwForm.id ? 'Edit homework sheet' : 'Add a homework sheet'}</p>
+            <input className={inputCls} value={hwForm.title} onChange={(e) => setHwForm({ ...hwForm, title: e.target.value })} placeholder="Title — e.g. Week 3 Homework" />
+
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-1.5">Homework Sheet (PDF)</p>
+              <button type="button" onClick={() => hwRef.current?.click()}
+                className={`w-full h-10 rounded-lg border border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors ${hwFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-blue-400 hover:text-blue-600'}`}>
+                <BookOpenIcon className="w-4 h-4 shrink-0" />
+                {hwFile ? hwFile.name : 'Upload homework PDF'}
+                {hwFile && <span onClick={(e) => { e.stopPropagation(); setHwFile(null); }} className="ml-auto p-0.5 rounded text-emerald-500 hover:text-red-500 cursor-pointer"><XIcon className="w-3.5 h-3.5" /></span>}
+              </button>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-1.5">Marking Scheme (PDF)</p>
+              <button type="button" onClick={() => schemeRef.current?.click()}
+                className={`w-full h-10 rounded-lg border border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors ${schemeFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-purple-400 hover:text-purple-600'}`}>
+                <FileTextIcon className="w-4 h-4 shrink-0" />
+                {schemeFile ? schemeFile.name : 'Upload marking scheme PDF'}
+                {schemeFile && <span onClick={(e) => { e.stopPropagation(); setSchemeFile(null); }} className="ml-auto p-0.5 rounded text-emerald-500 hover:text-red-500 cursor-pointer"><XIcon className="w-3.5 h-3.5" /></span>}
+              </button>
+            </div>
+
+            <div className="flex gap-2">
+              {hwForm.id && <button onClick={() => { setHwForm({ id: '', title: '', week: '' }); setHwFile(null); setSchemeFile(null); }} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>}
+              <button onClick={saveHomework} disabled={hwSaving || !hwForm.title.trim()} className="flex-1 h-10 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                {hwSaving && <Loader2Icon className="w-4 h-4 animate-spin" />}
+                {hwForm.id ? 'Update sheet' : 'Add sheet'}
+              </button>
+            </div>
+            {hwMsg && <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">{hwMsg}</p>}
+          </div>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">{homework.length} homework sheet{homework.length === 1 ? '' : 's'}</p>
+          <div className="space-y-2">
+            {homework.map((h) => (
+              <div key={h.id} className="border border-slate-200 rounded-xl px-3 py-2.5 flex items-start gap-3">
+                <ClipboardListIcon className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 truncate">{h.title}</p>
+                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                    {h.homework_url && <a href={h.homework_url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline inline-flex items-center gap-1"><BookOpenIcon className="w-3 h-3" /> Homework</a>}
+                    {h.scheme_url && <a href={h.scheme_url} target="_blank" rel="noreferrer" className="text-xs text-purple-500 hover:underline inline-flex items-center gap-1"><FileTextIcon className="w-3 h-3" /> Marking Scheme</a>}
+                  </div>
+                </div>
+                <button onClick={() => setHwForm({ id: h.id, title: h.title, week: '' })} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 shrink-0"><PencilIcon className="w-4 h-4" /></button>
+                <button onClick={() => deleteHomework(h.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 shrink-0"><Trash2Icon className="w-4 h-4" /></button>
+              </div>
+            ))}
+            {homework.length === 0 && <p className="text-sm text-slate-400">No homework sheets uploaded yet.</p>}
+          </div>
+        </>)}
       </Drawer>
 
       <ConfirmDialog

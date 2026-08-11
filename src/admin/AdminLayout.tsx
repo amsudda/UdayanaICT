@@ -30,7 +30,7 @@ const nav = [
   { name: 'Payments', path: '/admin/payments', icon: ReceiptTextIcon, badge: 'payments' },
   { name: 'Batches', path: '/admin/batches', icon: LayersIcon },
   { name: 'Packs', path: '/admin/packs', icon: PackageIcon },
-  { name: 'Recordings', path: '/admin/theory', icon: VideoIcon },
+  { name: 'Monthly Recordings', path: '/admin/theory', icon: VideoIcon },
   { name: 'Students', path: '/admin/students', icon: UsersIcon, badge: 'ids' },
   { name: 'Papers', path: '/admin/papers', icon: FileTextIcon },
   { name: 'Paper Marks', path: '/admin/marks', icon: TrendingUpIcon },
