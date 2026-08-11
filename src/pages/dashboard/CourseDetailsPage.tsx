@@ -12,7 +12,10 @@ import {
   Loader2Icon,
   LockIcon,
   CheckIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  ClipboardListIcon,
+  BookOpenIcon,
+  CheckCircleIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { extractYouTubeId } from '../../lib/youtube';
@@ -34,6 +37,7 @@ export function CourseDetailsPage() {
   
   const [lessons, setLessons] = useState<VideoLesson[]>([]);
   const [liveLinks, setLiveLinks] = useState<any[]>([]);
+  const [homeworks, setHomeworks] = useState<any[]>([]);
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
 
   const storageKey = `ict-watched-${packId}`;
@@ -61,12 +65,14 @@ export function CourseDetailsPage() {
         resolvedTitle = `${month.month} ${month.year} — Recordings`;
         resolvedDesc = 'Monthly class recordings and materials.';
         resolvedThumb = month.thumbnail_url;
-        const [{ data }, { data: links }] = await Promise.all([
+        const [{ data }, { data: links }, { data: hw }] = await Promise.all([
           supabase.from('theory_videos').select('*').eq('theory_month_id', packId).order('sort_order'),
-          supabase.from('theory_live_links').select('*').eq('theory_month_id', packId).order('sort_order')
+          supabase.from('theory_live_links').select('*').eq('theory_month_id', packId).order('sort_order'),
+          supabase.from('theory_homework').select('*').eq('theory_month_id', packId).order('sort_order')
         ]);
         vids = data;
         live = links ?? [];
+        setHomeworks(hw ?? []);
       }
     }
 
@@ -414,6 +420,46 @@ export function CourseDetailsPage() {
               </div>
             )}
           </motion.div>
+
+          {/* Homework Sheets Section */}
+          {homeworks.length > 0 && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mt-6">
+              <h3 className="flex items-center gap-2.5 text-lg font-black text-slate-900 mb-5">
+                <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <ClipboardListIcon className="w-4 h-4" />
+                </div>
+                Homework Sheets
+              </h3>
+              
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                {homeworks.map((hw, idx) => (
+                  <div key={hw.id || idx} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-all">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
+                      <ClipboardListIcon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-700 truncate">{hw.title || 'Homework'}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Weekly Homework</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 sm:mt-0">
+                      {hw.homework_url && (
+                        <a href={hw.homework_url} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-sm">
+                          <BookOpenIcon className="w-3.5 h-3.5" /> Sheet
+                        </a>
+                      )}
+                      {hw.scheme_url && (
+                        <a href={hw.scheme_url} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-400 transition-colors shadow-sm">
+                          <CheckCircleIcon className="w-3.5 h-3.5" /> Scheme
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
         </div>
       </div>
