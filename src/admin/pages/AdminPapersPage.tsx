@@ -163,6 +163,20 @@ export function AdminPapersPage() {
     load();
   };
 
+  const [activeType, setActiveType] = useState<'past_paper' | 'provincial_paper' | 'model_paper'>('past_paper');
+
+  const CATEGORIES = [
+    { key: 'past_paper'       as const, label: 'Past Papers',       color: 'blue'   },
+    { key: 'provincial_paper' as const, label: 'Provincial Papers', color: 'violet' },
+    { key: 'model_paper'      as const, label: 'Model Papers',      color: 'emerald'},
+  ] as const;
+
+  const colorMap = {
+    blue:    { tab: 'bg-blue-600 text-white',   badge: 'bg-blue-100 text-blue-700',   dot: 'bg-blue-500'   },
+    violet:  { tab: 'bg-violet-600 text-white', badge: 'bg-violet-100 text-violet-700', dot: 'bg-violet-500' },
+    emerald: { tab: 'bg-emerald-600 text-white',badge: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500'},
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -175,41 +189,110 @@ export function AdminPapersPage() {
         </button>
       </div>
 
+      {/* Category Tabs */}
+      <div className="flex gap-2 mb-6 p-1 bg-slate-100 rounded-xl">
+        {CATEGORIES.map(({ key, label, color }) => {
+          const count = papers.filter(p => p.paper_type === key).length;
+          const isActive = activeType === key;
+          const c = colorMap[color];
+          return (
+            <button
+              key={key}
+              onClick={() => setActiveType(key)}
+              className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-semibold transition-all ${
+                isActive ? c.tab + ' shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'
+              }`}
+            >
+              {label}
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {loading ? (
         <div className="py-12 text-center text-slate-500"><Loader2Icon className="w-6 h-6 animate-spin mx-auto" /></div>
-      ) : papers.length === 0 ? (
-        <div className="text-center py-16 rounded-2xl border border-dashed border-slate-300 bg-white">
-          <FileTextIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-          <p className="font-semibold text-slate-700">No papers uploaded yet.</p>
-        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {papers.map(p => (
-            <div key={p.id} className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold text-slate-900">{p.title}</h3>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => openEdit(p)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md">
-                    <PencilIcon className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setDeleteTarget(p)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md">
-                    <Trash2Icon className="w-4 h-4" />
-                  </button>
+        <>
+          {CATEGORIES.map(({ key, label, color }) => {
+            if (key !== activeType) return null;
+            const filtered = papers.filter(p => p.paper_type === key);
+            const c = colorMap[color];
+
+            return (
+              <div key={key}>
+                {/* Category header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className={`w-2.5 h-2.5 rounded-full ${c.dot}`} />
+                  <h2 className="text-sm font-bold text-slate-700">{label}</h2>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${c.badge}`}>{filtered.length}</span>
                 </div>
+
+                {filtered.length === 0 ? (
+                  <div className="text-center py-14 rounded-2xl border border-dashed border-slate-300 bg-white">
+                    <FileTextIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+                    <p className="font-semibold text-slate-700">No {label} yet</p>
+                    <p className="text-sm text-slate-400 mt-1">Click <strong>New Paper</strong> and select {label.slice(0,-1)} to add one.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filtered.map(p => (
+                      <div key={p.id} className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col hover:shadow-sm transition-shadow">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1 min-w-0 pr-2">
+                            <h3 className="font-semibold text-slate-900 truncate">{p.title}</h3>
+                            {/* Type-specific metadata */}
+                            {p.year && (
+                              <p className="text-xs text-slate-400 mt-0.5">📅 {p.year}</p>
+                            )}
+                            {p.province && (
+                              <p className="text-xs text-slate-400 mt-0.5">📍 {p.province}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button onClick={() => openEdit(p)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                              <PencilIcon className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => setDeleteTarget(p)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                              <Trash2Icon className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {p.description && <p className="text-sm text-slate-500 line-clamp-2 mb-3">{p.description}</p>}
+
+                        {/* PDF links */}
+                        <div className="flex gap-2 mb-3">
+                          {p.pdf_url && (
+                            <a href={p.pdf_url} target="_blank" rel="noreferrer" className="text-xs font-medium text-blue-600 hover:underline flex items-center gap-1">
+                              <FileTextIcon className="w-3 h-3" /> Question Paper
+                            </a>
+                          )}
+                          {p.marking_scheme_url && (
+                            <a href={p.marking_scheme_url} target="_blank" rel="noreferrer" className="text-xs font-medium text-violet-600 hover:underline flex items-center gap-1">
+                              <FileTextIcon className="w-3 h-3" /> Marking Scheme
+                            </a>
+                          )}
+                        </div>
+
+                        <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium">
+                          <span className={`px-2 py-1 rounded-md ${p.is_published ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                            {p.is_published ? 'Published' : 'Draft'}
+                          </span>
+                          <span className="text-slate-500">
+                            {p.audience_scope === 'public' ? 'Public' : p.audience_scope === 'program' ? `All ${p.audience_program}` : `${p.batch_ids?.length || 0} Batches`}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              {p.description && <p className="text-sm text-slate-500 line-clamp-2 mb-3">{p.description}</p>}
-              
-              <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium">
-                <span className={`px-2 py-1 rounded-md ${p.is_published ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                  {p.is_published ? 'Published' : 'Draft'}
-                </span>
-                <span className="text-slate-500">
-                  {p.audience_scope === 'public' ? 'Public' : p.audience_scope === 'program' ? `All ${p.audience_program}` : `${p.batch_ids?.length || 0} Batches`}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+            );
+          })}
+        </>
       )}
 
       <Drawer open={editorOpen} onClose={() => setEditorOpen(false)} title={editing ? "Edit Paper" : "New Paper"}>
