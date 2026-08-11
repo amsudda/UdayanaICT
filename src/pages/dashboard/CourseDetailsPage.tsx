@@ -62,7 +62,7 @@ export function CourseDetailsPage() {
     } else {
       const { data: month } = await supabase.from('theory_months').select('*').eq('id', packId).maybeSingle();
       if (month) {
-        resolvedTitle = `${month.month} ${month.year} — Recordings`;
+        resolvedTitle = Array.isArray(month.topics) && month.topics.length > 0 ? month.topics.join(' · ') : `${month.month} ${month.year} — Recordings`;
         resolvedDesc = 'Monthly class recordings and materials.';
         resolvedThumb = month.thumbnail_url;
         const [{ data }, { data: links }, { data: hw }] = await Promise.all([

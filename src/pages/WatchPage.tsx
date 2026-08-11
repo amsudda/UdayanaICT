@@ -401,9 +401,9 @@ export function WatchPage() {
         const { data } = await supabase.from('pack_videos').select('*').eq('pack_id', packId).order('sort_order');
         vids = data;
       } else {
-        const { data: month } = await supabase.from('theory_months').select('month, year').eq('id', packId).maybeSingle();
+        const { data: month } = await supabase.from('theory_months').select('month, year, topics').eq('id', packId).maybeSingle();
         if (month) {
-          resolvedTitle = `${month.month} ${month.year} — Recordings`;
+          resolvedTitle = Array.isArray(month.topics) && month.topics.length > 0 ? month.topics.join(' · ') : `${month.month} ${month.year} — Recordings`;
           const [{ data }, { data: links }, { data: hw }] = await Promise.all([
             supabase.from('theory_videos').select('*').eq('theory_month_id', packId).order('sort_order'),
             supabase.from('theory_live_links').select('*').eq('theory_month_id', packId).order('sort_order'),
