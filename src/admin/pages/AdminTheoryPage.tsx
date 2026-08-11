@@ -440,12 +440,14 @@ export function AdminTheoryPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-semibold text-slate-900 truncate">{m.month} {m.year}</p>
+                  <p className="font-semibold text-slate-900 truncate">
+                    {Array.isArray(m.topics) && m.topics.length > 0 ? m.topics.join(' · ') : `${m.month} ${m.year}`}
+                  </p>
                   <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${m.is_published ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                     {m.is_published ? 'Published' : 'Draft'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">{counts[m.id] ?? 0} sessions · {audienceText(m)}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{m.month} {m.year} · {counts[m.id] ?? 0} sessions · {audienceText(m)}</p>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <button onClick={() => openVideos(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
