@@ -21,7 +21,7 @@ const pct = (w: number, t: number) => (t > 0 ? Math.round((w / t) * 100) : 0);
 
 export function MyCoursesPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [params] = useSearchParams();
   const highlightId = params.get('highlight');
   const [tab, setTab] = useState<Tab>('All');
@@ -34,11 +34,11 @@ export function MyCoursesPage() {
   const refresh = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { packs, recordings } = await loadLibrary(user.id);
+    const { packs, recordings } = await loadLibrary(user.id, isAdmin);
     setPacks(packs);
     setRecordings(recordings);
     setLoading(false);
-  }, [user]);
+  }, [user, isAdmin]);
 
   useEffect(() => {
     refresh();

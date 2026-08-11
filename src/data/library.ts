@@ -32,7 +32,7 @@ export function watchedCount(id: string) {
 }
 
 /** Load everything the student is entitled to: owned packs + visible months. */
-export async function loadLibrary(userId: string): Promise<{ packs: LibPack[]; recordings: LibMonth[] }> {
+export async function loadLibrary(userId: string, isAdmin: boolean = false): Promise<{ packs: LibPack[]; recordings: LibMonth[] }> {
   // approved monthly fees → which months are unlocked
   const { data: pays } = await supabase
     .from('payments')
@@ -65,7 +65,7 @@ export async function loadLibrary(userId: string): Promise<{ packs: LibPack[]; r
     thumbnailUrl: m.thumbnail_url ?? undefined,
     topics: m.topics ?? [],
     sessionCount: m.session_count ?? 0,
-    unlocked: paid.has(`${m.month}-${m.year}`) || grantedMonths.has(m.id)
+    unlocked: isAdmin || paid.has(`${m.month}-${m.year}`) || grantedMonths.has(m.id)
   }));
 
   // packs the student owns (via approved-payment enrollments)
@@ -85,7 +85,15 @@ export async function loadLibrary(userId: string): Promise<{ packs: LibPack[]; r
     .eq('is_free', true);
   const freePacks = (freeRows ?? []).filter((p: any) => !ownedIds.has(p.id));
 
-  const allPacks = [...ownedPacks, ...freePacks];
+  // If admin, they own ALL packs
+  let allPacks = [...ownedPacks, ...freePacks];
+  if (isAdmin) {
+    const { data: allRows } = await supabase.from('packs').select('*').eq('is_published', true);
+    if (allRows) {
+      allPacks = allRows;
+    }
+  }
+
   let videoCounts: Record<string, number> = {};
   if (allPacks.length) {
     const { data: pv } = await supabase

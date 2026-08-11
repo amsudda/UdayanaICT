@@ -32,7 +32,7 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 export function ExtraClassesPage() {
   const reduce = useReducedMotion();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string>('Monthly Lessons');
   const [search, setSearch] = useState('');
 
@@ -106,7 +106,7 @@ export function ExtraClassesPage() {
   useEffect(() => { load(); }, [load]);
 
   const statusFor = (id: string): 'none' | 'pending' | 'owned' =>
-    owned.has(id) ? 'owned' : pending.has(id) ? 'pending' : 'none';
+    isAdmin || owned.has(id) ? 'owned' : pending.has(id) ? 'pending' : 'none';
 
   const countFor = (cat: string) => packs.filter((c) => c.type === cat).length;
 
