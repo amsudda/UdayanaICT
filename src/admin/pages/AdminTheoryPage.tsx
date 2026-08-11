@@ -298,25 +298,35 @@ export function AdminTheoryPage() {
   };
 
   /* ── Homework Sheets ── */
+  const [homeworkMonth, setHomeworkMonth] = useState<any | null>(null);
+
+  const openHomeworkModal = async (m: any) => {
+    setHomeworkMonth(m);
+    setHwForm({ id: '', title: '', week: '' });
+    setHwFile(null);
+    setSchemeFile(null);
+    loadHomework(m.id);
+  };
+
   const loadHomework = async (monthId: string) => {
     const { data } = await supabase.from('theory_homework').select('*').eq('theory_month_id', monthId).order('sort_order');
     setHomework(data ?? []);
   };
 
   const saveHomework = async () => {
-    if (!videosMonth || !hwForm.title.trim()) return;
+    if (!homeworkMonth || !hwForm.title.trim()) return;
     setHwSaving(true);
     let homework_url: string | null = null;
     let scheme_url: string | null = null;
 
     if (hwFile) {
-      const path = `theory-homework/${videosMonth.id}/${Date.now()}-hw.pdf`;
+      const path = `theory-homework/${homeworkMonth.id}/${Date.now()}-hw.pdf`;
       const { error } = await supabase.storage.from('tutes').upload(path, hwFile, { upsert: true, contentType: 'application/pdf' });
       if (error) { alert(`Could not upload homework PDF:\n${error.message}`); setHwSaving(false); return; }
       homework_url = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
     }
     if (schemeFile) {
-      const path = `theory-homework/${videosMonth.id}/${Date.now()}-scheme.pdf`;
+      const path = `theory-homework/${homeworkMonth.id}/${Date.now()}-scheme.pdf`;
       const { error } = await supabase.storage.from('tutes').upload(path, schemeFile, { upsert: true, contentType: 'application/pdf' });
       if (error) { alert(`Could not upload marking scheme PDF:\n${error.message}`); setHwSaving(false); return; }
       scheme_url = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
@@ -330,9 +340,9 @@ export function AdminTheoryPage() {
     if (hwForm.id) {
       ({ error } = await supabase.from('theory_homework').update(payload).eq('id', hwForm.id));
     } else {
-      const { data: existing } = await supabase.from('theory_homework').select('sort_order').eq('theory_month_id', videosMonth.id).order('sort_order', { ascending: false }).limit(1);
+      const { data: existing } = await supabase.from('theory_homework').select('sort_order').eq('theory_month_id', homeworkMonth.id).order('sort_order', { ascending: false }).limit(1);
       const nextOrder = existing && existing.length ? (existing[0].sort_order ?? 0) + 1 : 0;
-      ({ error } = await supabase.from('theory_homework').insert({ ...payload, theory_month_id: videosMonth.id, sort_order: nextOrder }));
+      ({ error } = await supabase.from('theory_homework').insert({ ...payload, theory_month_id: homeworkMonth.id, sort_order: nextOrder }));
     }
     if (error) { alert(`Could not save homework:\n${error.message}`); setHwSaving(false); return; }
 
@@ -341,13 +351,13 @@ export function AdminTheoryPage() {
     setSchemeFile(null);
     setHwMsg(`"${payload.title}" saved ✓`);
     window.setTimeout(() => setHwMsg(''), 5000);
-    loadHomework(videosMonth.id);
+    loadHomework(homeworkMonth.id);
     setHwSaving(false);
   };
 
   const deleteHomework = async (id: string) => {
     await supabase.from('theory_homework').delete().eq('id', id);
-    if (videosMonth) loadHomework(videosMonth.id);
+    if (homeworkMonth) loadHomework(homeworkMonth.id);
   };
 
   const filteredMonths = months.filter((m) => {
@@ -440,6 +450,9 @@ export function AdminTheoryPage() {
               <div className="flex items-center gap-1 shrink-0">
                 <button onClick={() => openVideos(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
                   <VideoIcon className="w-4 h-4" /> <span className="hidden sm:inline">Sessions</span>
+                </button>
+                <button onClick={() => openHomeworkModal(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-50">
+                  <ClipboardListIcon className="w-4 h-4" /> <span className="hidden sm:inline">Homework</span>
                 </button>
                 <button onClick={() => openLinks(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50">
                   <LinkIcon className="w-4 h-4" /> <span className="hidden sm:inline">Live Links</span>
@@ -575,23 +588,10 @@ export function AdminTheoryPage() {
         </div>
       </Drawer>
 
-      {/* sessions + homework drawer */}
-      <Drawer open={!!videosMonth} onClose={() => setVideosMonth(null)} title={videosMonth ? `${videosMonth.month} ${videosMonth.year}` : ''}>
+      {/* sessions drawer — sessions only */}
+      <Drawer open={!!videosMonth} onClose={() => setVideosMonth(null)} title={videosMonth ? `${videosMonth.month} ${videosMonth.year} — Sessions` : ''}>
 
-        {/* Tab switcher */}
-        <div className="flex rounded-xl bg-slate-100 p-1 mb-5">
-          <button type="button" onClick={() => setDrawerTab('sessions')}
-            className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-semibold transition-colors ${drawerTab === 'sessions' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
-            <VideoIcon className="w-4 h-4" /> Sessions
-          </button>
-          <button type="button" onClick={() => setDrawerTab('homework')}
-            className={`flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-sm font-semibold transition-colors ${drawerTab === 'homework' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
-            <ClipboardListIcon className="w-4 h-4" /> Homework Sheets
-          </button>
-        </div>
-
-        {/* ── SESSIONS TAB ── */}
-        {drawerTab === 'sessions' && <><div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
+        <div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
           <p className="text-sm font-semibold text-slate-700">{vForm.id ? 'Edit session' : 'Add a session'}</p>
           <input className={inputCls} value={vForm.title} onChange={(e) => setVForm({ ...vForm, title: e.target.value })} placeholder="Any title you like — e.g. Week 3 Networking" />
           <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID (optional — leave blank for PDF only)" />
@@ -663,67 +663,116 @@ export function AdminTheoryPage() {
             </div>
           ))}
           {videos.length === 0 && <p className="text-sm text-slate-400">No sessions yet.</p>}
-        </div></>}
+        </div>
+      </Drawer>
 
-        {/* ── HOMEWORK SHEETS TAB ── */}
-        {drawerTab === 'homework' && (<>
-          <input ref={hwRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setHwFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
-          <input ref={schemeRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setSchemeFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
+      {/* ── HOMEWORK SHEETS MODAL (standalone) ── */}
+      {homeworkMonth && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setHomeworkMonth(null)} />
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
 
-          <div className="bg-slate-50 rounded-xl p-3 mb-5 space-y-3">
-            <p className="text-sm font-semibold text-slate-700">{hwForm.id ? 'Edit homework sheet' : 'Add a homework sheet'}</p>
-            <input className={inputCls} value={hwForm.title} onChange={(e) => setHwForm({ ...hwForm, title: e.target.value })} placeholder="Title — e.g. Week 3 Homework" />
-
-            <div>
-              <p className="text-xs font-medium text-slate-500 mb-1.5">Homework Sheet (PDF)</p>
-              <button type="button" onClick={() => hwRef.current?.click()}
-                className={`w-full h-10 rounded-lg border border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors ${hwFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-blue-400 hover:text-blue-600'}`}>
-                <BookOpenIcon className="w-4 h-4 shrink-0" />
-                {hwFile ? hwFile.name : 'Upload homework PDF'}
-                {hwFile && <span onClick={(e) => { e.stopPropagation(); setHwFile(null); }} className="ml-auto p-0.5 rounded text-emerald-500 hover:text-red-500 cursor-pointer"><XIcon className="w-3.5 h-3.5" /></span>}
-              </button>
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                  <ClipboardListIcon className="w-5 h-5 text-indigo-500" />
+                  {homeworkMonth.month} {homeworkMonth.year} — Homework Sheets
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">Upload weekly homework sheets and marking schemes for students.</p>
+              </div>
+              <button onClick={() => setHomeworkMonth(null)} className="p-2 text-slate-400 hover:bg-slate-100 rounded-full"><XIcon className="w-5 h-5" /></button>
             </div>
 
-            <div>
-              <p className="text-xs font-medium text-slate-500 mb-1.5">Marking Scheme (PDF)</p>
-              <button type="button" onClick={() => schemeRef.current?.click()}
-                className={`w-full h-10 rounded-lg border border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors ${schemeFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-purple-400 hover:text-purple-600'}`}>
-                <FileTextIcon className="w-4 h-4 shrink-0" />
-                {schemeFile ? schemeFile.name : 'Upload marking scheme PDF'}
-                {schemeFile && <span onClick={(e) => { e.stopPropagation(); setSchemeFile(null); }} className="ml-auto p-0.5 rounded text-emerald-500 hover:text-red-500 cursor-pointer"><XIcon className="w-3.5 h-3.5" /></span>}
-              </button>
-            </div>
+            <div className="p-6 overflow-y-auto space-y-6">
+              {/* Hidden file inputs */}
+              <input ref={hwRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setHwFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
+              <input ref={schemeRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setSchemeFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
 
-            <div className="flex gap-2">
-              {hwForm.id && <button onClick={() => { setHwForm({ id: '', title: '', week: '' }); setHwFile(null); setSchemeFile(null); }} className="h-10 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white">Cancel</button>}
-              <button onClick={saveHomework} disabled={hwSaving || !hwForm.title.trim()} className="flex-1 h-10 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
-                {hwSaving && <Loader2Icon className="w-4 h-4 animate-spin" />}
-                {hwForm.id ? 'Update sheet' : 'Add sheet'}
-              </button>
-            </div>
-            {hwMsg && <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">{hwMsg}</p>}
-          </div>
+              {/* Add / Edit form */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4">
+                <p className="text-sm font-bold text-slate-800">{hwForm.id ? '✏️ Edit Homework Sheet' : '➕ Add New Homework Sheet'}</p>
 
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">{homework.length} homework sheet{homework.length === 1 ? '' : 's'}</p>
-          <div className="space-y-2">
-            {homework.map((h) => (
-              <div key={h.id} className="border border-slate-200 rounded-xl px-3 py-2.5 flex items-start gap-3">
-                <ClipboardListIcon className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{h.title}</p>
-                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                    {h.homework_url && <a href={h.homework_url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline inline-flex items-center gap-1"><BookOpenIcon className="w-3 h-3" /> Homework</a>}
-                    {h.scheme_url && <a href={h.scheme_url} target="_blank" rel="noreferrer" className="text-xs text-purple-500 hover:underline inline-flex items-center gap-1"><FileTextIcon className="w-3 h-3" /> Marking Scheme</a>}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Title</label>
+                  <input className={inputCls} value={hwForm.title} onChange={(e) => setHwForm({ ...hwForm, title: e.target.value })} placeholder="e.g. Week 3 Homework — Data Structures" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Homework Sheet (PDF)</label>
+                    <button type="button" onClick={() => hwRef.current?.click()}
+                      className={`w-full h-11 rounded-xl border-2 border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors font-medium ${hwFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-indigo-400 hover:text-indigo-600'}`}>
+                      <BookOpenIcon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{hwFile ? hwFile.name : 'Upload homework PDF'}</span>
+                    </button>
+                    {hwFile && <button type="button" onClick={() => setHwFile(null)} className="text-xs text-red-400 hover:text-red-600 mt-1">Remove</button>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Marking Scheme (PDF)</label>
+                    <button type="button" onClick={() => schemeRef.current?.click()}
+                      className={`w-full h-11 rounded-xl border-2 border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors font-medium ${schemeFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-purple-400 hover:text-purple-600'}`}>
+                      <FileTextIcon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{schemeFile ? schemeFile.name : 'Upload marking scheme'}</span>
+                    </button>
+                    {schemeFile && <button type="button" onClick={() => setSchemeFile(null)} className="text-xs text-red-400 hover:text-red-600 mt-1">Remove</button>}
                   </div>
                 </div>
-                <button onClick={() => setHwForm({ id: h.id, title: h.title, week: '' })} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 shrink-0"><PencilIcon className="w-4 h-4" /></button>
-                <button onClick={() => deleteHomework(h.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 shrink-0"><Trash2Icon className="w-4 h-4" /></button>
+
+                {hwMsg && <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">{hwMsg}</p>}
+
+                <div className="flex gap-2 pt-1">
+                  {hwForm.id && (
+                    <button onClick={() => { setHwForm({ id: '', title: '', week: '' }); setHwFile(null); setSchemeFile(null); }}
+                      className="h-10 px-4 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                      Cancel
+                    </button>
+                  )}
+                  <button onClick={saveHomework} disabled={hwSaving || !hwForm.title.trim()}
+                    className="flex-1 h-10 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                    {hwSaving && <Loader2Icon className="w-4 h-4 animate-spin" />}
+                    {hwForm.id ? 'Update Sheet' : 'Add Sheet'}
+                  </button>
+                </div>
               </div>
-            ))}
-            {homework.length === 0 && <p className="text-sm text-slate-400">No homework sheets uploaded yet.</p>}
+
+              {/* Uploaded sheets list */}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{homework.length} Sheet{homework.length === 1 ? '' : 's'} Uploaded</p>
+                {homework.length === 0 ? (
+                  <div className="text-center py-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50">
+                    <ClipboardListIcon className="w-7 h-7 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-400">No homework sheets yet for this month.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {homework.map((h) => (
+                      <div key={h.id} className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 hover:shadow-sm transition-shadow">
+                        <ClipboardListIcon className="w-5 h-5 text-indigo-400 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 truncate">{h.title}</p>
+                          <div className="flex items-center gap-4 mt-0.5 flex-wrap">
+                            {h.homework_url
+                              ? <a href={h.homework_url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1 font-medium"><BookOpenIcon className="w-3 h-3" /> Homework PDF</a>
+                              : <span className="text-xs text-slate-300">No homework PDF</span>
+                            }
+                            {h.scheme_url
+                              ? <a href={h.scheme_url} target="_blank" rel="noreferrer" className="text-xs text-purple-600 hover:underline inline-flex items-center gap-1 font-medium"><FileTextIcon className="w-3 h-3" /> Marking Scheme</a>
+                              : <span className="text-xs text-slate-300">No marking scheme</span>
+                            }
+                          </div>
+                        </div>
+                        <button onClick={() => { setHwForm({ id: h.id, title: h.title, week: '' }); setHwFile(null); setSchemeFile(null); }} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 shrink-0"><PencilIcon className="w-4 h-4" /></button>
+                        <button onClick={() => deleteHomework(h.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 shrink-0"><Trash2Icon className="w-4 h-4" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </>)}
-      </Drawer>
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!deleteTarget}
