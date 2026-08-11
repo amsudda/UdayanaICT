@@ -89,9 +89,14 @@ export function ExtraClassesPage() {
       if (m.year === currentYear && mIdx < currentMonth) return false;
       return true;
     }).map((m: any) => ({
-      id: m.id, title: `${m.month} ${m.year} — Monthly Recordings`, type: 'Monthly Lessons', price: Number(m.price ?? 0),
-      thumbnailUrl: m.thumbnail_url ?? undefined, duration: 'Monthly access',
-      videoCount: m.session_count ?? 0, isFree: false
+      id: m.id, 
+      title: Array.isArray(m.topics) && m.topics.length > 0 ? m.topics.join(' · ') : `${m.month} ${m.year} — Monthly Recordings`, 
+      type: 'Monthly Lessons', 
+      price: Number(m.price ?? 0),
+      thumbnailUrl: m.thumbnail_url ?? undefined, 
+      duration: `${m.month} ${m.year}`,
+      videoCount: m.session_count ?? 0, 
+      isFree: false
     }));
 
     setPacks([...mappedPacks, ...mappedMonths]);

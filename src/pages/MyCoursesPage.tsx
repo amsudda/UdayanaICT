@@ -212,7 +212,12 @@ export function MyCoursesPage() {
                           <span className="absolute top-3 right-3 text-[11px] font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">Unlocked</span>
                         </div>
                         <div className="p-4">
-                          <h3 className="text-sm font-bold text-apple-text dark:text-apple-light leading-snug">{m.month} {m.year}</h3>
+                          <h3 className="text-sm font-bold text-apple-text dark:text-apple-light leading-snug line-clamp-2">
+                            {Array.isArray(m.topics) && m.topics.length > 0 ? m.topics.join(' · ') : `${m.month} ${m.year} — Monthly Recordings`}
+                          </h3>
+                          <p className="text-xs text-apple-subtext dark:text-slate-400 mt-1 flex items-center gap-1">
+                            <CalendarIcon className="w-3 h-3" /> {m.month} {m.year}
+                          </p>
                           <p className="text-xs text-apple-subtext dark:text-slate-400 mt-1 flex items-center gap-1">
                             <ClockIcon className="w-3 h-3" /> {m.sessionCount} session{m.sessionCount === 1 ? '' : 's'}
                           </p>
