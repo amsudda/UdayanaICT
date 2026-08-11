@@ -97,122 +97,56 @@ export function Navbar() {
   return (
     /* Sticky wrapper — always occupies space so content doesn't jump */
     <div className="sticky top-0 z-30 w-full pointer-events-none">
-      <div
-        className={`w-full flex justify-center pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-          isPill ? 'px-4 pt-3' : 'px-0 pt-0'
-        }`}
-      >
-        <motion.nav
-          layout
-          transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="pointer-events-auto overflow-hidden"
-          style={{
-            width: isPill ? 'min(96%, 100%)' : '100%',
-            borderRadius: isPill ? '16px' : '0px',
-            background: isPill
-              ? isDarkMode
-                ? 'rgba(10,15,30,0.45)'
-                : 'rgba(255,255,255,0.45)'
-              : isLanding && !scrolled
-              ? 'transparent'
-              : isDarkMode
-              ? 'rgba(2,6,23,0.55)'
-              : 'rgba(255,255,255,0.55)',
-            backdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
-            WebkitBackdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
-            border: isPill
-              ? isDarkMode
-                ? '1px solid rgba(255,255,255,0.1)'
-                : '1px solid rgba(255,255,255,0.85)'
-              : !isLanding || scrolled
-              ? `1px solid rgba(${isDarkMode ? '255,255,255,0.06' : '0,0,0,0.06'})`
-              : 'none',
-            boxShadow: isPill
-              ? isDarkMode
-                ? '0 8px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)'
-                : '0 4px 40px rgba(0,0,0,0.08), 0 1px 12px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1)'
-              : scrolled
-              ? '0 1px 0 rgba(0,0,0,0.05)'
-              : 'none',
-          }}
-        >
-          {/* ── One-shot transform burst: fires once when navbar becomes pill ── */}
-          <AnimatePresence>
-            {showBurst && (
-              <>
-                {/* Red-to-blue gradient sweep left → right */}
-                <motion.div
-                  initial={{ x: '-110%' }}
-                  animate={{ x: '120%' }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 4.0, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-0 z-50 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(194,15,36,0.5) 25%, rgba(139,92,246,0.4) 55%, rgba(59,130,246,0.4) 75%, transparent 100%)',
-                    filter: 'blur(8px)',
-                  }}
-                />
-                {/* Shimmer trail */}
-                <motion.div
-                  initial={{ x: '-110%' }}
-                  animate={{ x: '150%' }}
-                  transition={{ duration: 4.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-y-0 z-40 w-24 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
-                    filter: 'blur(3px)',
-                  }}
-                />
-                {/* Particle sparks */}
-                {[...Array(7)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ left: `${8 + i * 13}%`, top: '50%', scale: 0, opacity: 1 }}
-                    animate={{
-                      top: `${20 + (i % 3) * 28}%`,
-                      scale: [0, 1.4, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{ duration: 3.5, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
-                    className="absolute z-50 pointer-events-none rounded-full"
-                    style={{
-                      width: i % 2 === 0 ? '5px' : '4px',
-                      height: i % 2 === 0 ? '5px' : '4px',
-                      background: i % 3 === 0 ? '#c20f24' : i % 3 === 1 ? '#8b5cf6' : '#3b82f6',
-                      boxShadow: `0 0 8px 2px ${i % 3 === 0 ? 'rgba(194,15,36,0.7)' : i % 3 === 1 ? 'rgba(139,92,246,0.7)' : 'rgba(59,130,246,0.7)'}`,
-                    }}
-                  />
-                ))}
-              </>
-            )}
-          </AnimatePresence>
-
-          <div className={`flex justify-between items-center transition-all duration-500 ${
-            isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'
-          }`}>
+      <div className="w-full flex justify-center pointer-events-none">
+        {isDashboard ? (
+          <nav
+            className="pointer-events-auto overflow-hidden w-full"
+            style={{
+              background: isDarkMode ? 'rgba(2,6,23,0.55)' : 'rgba(255,255,255,0.55)',
+              backdropFilter: 'blur(48px) saturate(180%) brightness(1.04)',
+              WebkitBackdropFilter: 'blur(48px) saturate(180%) brightness(1.04)',
+              borderBottom: `1px solid rgba(${isDarkMode ? '255,255,255,0.06' : '0,0,0,0.06'})`,
+            }}
+          >
+          <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-10">
 
 
             {/* Logo */}
             <Link to={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2 group flex-shrink-0">
-              <motion.img
-                src="/images/pd-logo.png"
-                alt="Pasindu Dissanayake"
-                className="object-contain flex-shrink-0"
-                animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }}
-                transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-                whileHover={{ scale: 1.08, rotate: -4 }}
-              />
-              <motion.span
-                animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }}
-                transition={{ duration: 0.45 }}
-                className={`font-bold tracking-tight whitespace-nowrap ${
-                  isLanding && !scrolled
-                    ? 'text-white dark:text-white'
-                    : 'text-apple-text dark:text-apple-light'
-                }`}
-              >
-                Pasindu Dissanayake
-              </motion.span>
+              {isDashboard ? (
+                <>
+                  <img
+                    src="/images/pd-logo.png"
+                    alt="Pasindu Dissanayake"
+                    className="object-contain flex-shrink-0 w-9 h-9"
+                  />
+                  <span className="font-bold tracking-tight whitespace-nowrap text-[1.15rem] text-apple-text dark:text-apple-light">
+                    Pasindu Dissanayake
+                  </span>
+                </>
+              ) : (
+                <>
+                  <motion.img
+                    src="/images/pd-logo.png"
+                    alt="Pasindu Dissanayake"
+                    className="object-contain flex-shrink-0"
+                    animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }}
+                    transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    whileHover={{ scale: 1.08, rotate: -4 }}
+                  />
+                  <motion.span
+                    animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }}
+                    transition={{ duration: 0.45 }}
+                    className={`font-bold tracking-tight whitespace-nowrap ${
+                      isLanding && !scrolled
+                        ? 'text-white dark:text-white'
+                        : 'text-apple-text dark:text-apple-light'
+                    }`}
+                  >
+                    Pasindu Dissanayake
+                  </motion.span>
+                </>
+              )}
             </Link>
 
             {/* Desktop nav links — hidden in pill mode to save space, or shown compactly */}
@@ -339,7 +273,113 @@ export function Navbar() {
               </button>
             </div>
           </div>
-        </motion.nav>
+          </nav>
+          ) : (
+          /* ── Landing page nav (animated pill) ── */
+          <motion.nav
+            layout
+            transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="pointer-events-auto overflow-hidden"
+            style={{
+              width: isPill ? 'min(96%, 100%)' : '100%',
+              borderRadius: isPill ? '16px' : '0px',
+              background: isPill
+                ? isDarkMode
+                  ? 'rgba(10,15,30,0.45)'
+                  : 'rgba(255,255,255,0.45)'
+                : isLanding && !scrolled
+                ? 'transparent'
+                : isDarkMode
+                ? 'rgba(2,6,23,0.55)'
+                : 'rgba(255,255,255,0.55)',
+              backdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
+              WebkitBackdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
+              border: isPill
+                ? isDarkMode
+                  ? '1px solid rgba(255,255,255,0.1)'
+                  : '1px solid rgba(255,255,255,0.85)'
+                : !isLanding || scrolled
+                ? `1px solid rgba(${isDarkMode ? '255,255,255,0.06' : '0,0,0,0.06'})`
+                : 'none',
+              boxShadow: isPill
+                ? isDarkMode
+                  ? '0 8px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)'
+                  : '0 4px 40px rgba(0,0,0,0.08), 0 1px 12px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1)'
+                : scrolled
+                ? '0 1px 0 rgba(0,0,0,0.05)'
+                : 'none',
+            }}
+          >
+            {/* ── One-shot transform burst ── */}
+            <AnimatePresence>
+              {showBurst && (
+                <>
+                  <motion.div
+                    initial={{ x: '-110%' }}
+                    animate={{ x: '120%' }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 4.0, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0 z-50 pointer-events-none"
+                    style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(194,15,36,0.5) 25%, rgba(139,92,246,0.4) 55%, rgba(59,130,246,0.4) 75%, transparent 100%)', filter: 'blur(8px)' }}
+                  />
+                  <motion.div
+                    initial={{ x: '-110%' }}
+                    animate={{ x: '150%' }}
+                    transition={{ duration: 4.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-y-0 z-40 w-24 pointer-events-none"
+                    style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)', filter: 'blur(3px)' }}
+                  />
+                  {[...Array(7)].map((_, i) => (
+                    <motion.div key={i}
+                      initial={{ left: `${8 + i * 13}%`, top: '50%', scale: 0, opacity: 1 }}
+                      animate={{ top: `${20 + (i % 3) * 28}%`, scale: [0, 1.4, 0], opacity: [0, 1, 0] }}
+                      transition={{ duration: 3.5, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
+                      className="absolute z-50 pointer-events-none rounded-full"
+                      style={{ width: i % 2 === 0 ? '5px' : '4px', height: i % 2 === 0 ? '5px' : '4px', background: i % 3 === 0 ? '#c20f24' : i % 3 === 1 ? '#8b5cf6' : '#3b82f6', boxShadow: `0 0 8px 2px ${i % 3 === 0 ? 'rgba(194,15,36,0.7)' : i % 3 === 1 ? 'rgba(139,92,246,0.7)' : 'rgba(59,130,246,0.7)'}` }}
+                    />
+                  ))}
+                </>
+              )}
+            </AnimatePresence>
+            <div className={`flex justify-between items-center transition-all duration-500 ${isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'}`}>
+              <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+                <motion.img src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={{ scale: 1.08, rotate: -4 }} />
+                <motion.span animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: 0.45 }} className={`font-bold tracking-tight whitespace-nowrap ${isLanding && !scrolled ? 'text-white dark:text-white' : 'text-apple-text dark:text-apple-light'}`}>
+                  Pasindu Dissanayake
+                </motion.span>
+              </Link>
+              <div className="hidden md:flex items-center gap-0">
+                {navLinks.map((link) => (
+                  <a key={link.href} href={link.href} className={`relative px-2.5 py-1.5 text-[13px] font-medium rounded-full transition-all duration-200 group ${isLanding && !scrolled ? 'text-white/75 hover:text-white hover:bg-white/10' : 'text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light hover:bg-gray-100 dark:hover:bg-white/5'}`}>
+                    {link.label}
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#c20f24] opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200" />
+                  </a>
+                ))}
+              </div>
+              <div className="hidden md:flex items-center gap-2">
+                <button onClick={() => setIsDarkMode((d) => !d)} className={`p-1.5 rounded-full transition-colors ${isLanding && !scrolled ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-apple-subtext dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/5'}`} aria-label="Toggle dark mode">
+                  {isDarkMode ? <SunIcon className="w-4.5 h-4.5" /> : <MoonIcon className="w-4.5 h-4.5" />}
+                </button>
+                <Link to="/login"><button className={`h-8 px-4 text-sm font-semibold rounded-full transition-all duration-200 ${isLanding && !scrolled ? 'text-white/90 hover:text-white hover:bg-white/10 border border-white/20' : 'text-apple-text dark:text-apple-light border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-white/5'}`}>Log In</button></Link>
+                <Link to="/signup"><motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="h-8 px-4 text-sm font-semibold rounded-full bg-[#c20f24] hover:bg-[#9c0c1d] text-white shadow-sm hover:shadow-[0_4px_14px_rgba(194,15,36,0.45)] transition-all duration-200">Sign Up</motion.button></Link>
+              </div>
+              <div className="md:hidden flex items-center gap-1">
+                <button onClick={() => setIsDarkMode((d) => !d)} className={`p-1.5 rounded-full transition-colors ${isLanding && !scrolled ? 'text-white/80' : 'text-apple-text dark:text-apple-light'}`}>
+                  {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
+                </button>
+                <button onClick={() => setIsMobileMenuOpen((o) => !o)} className={`p-1.5 rounded-lg transition-colors ${isLanding && !scrolled ? 'text-white hover:bg-white/10' : 'text-apple-text dark:text-apple-light hover:bg-gray-100 dark:hover:bg-white/5'}`} aria-label="Menu">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {isMobileMenuOpen ? (
+                      <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.12 }}><XIcon className="w-5 h-5" /></motion.span>
+                    ) : (
+                      <motion.span key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.12 }}><MenuIcon className="w-5 h-5" /></motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+              </div>
+            </div>
+          </motion.nav>
+          )}
       </div>
 
       {/* ── Mobile Drawer ── */}
