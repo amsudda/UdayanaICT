@@ -105,7 +105,7 @@ function AnimatedRoutes() {
           <Route path="courses" element={<VerificationGate><MyCoursesPage /></VerificationGate>} />
           <Route path="courses/:packId" element={<VerificationGate><CourseDetailsPage /></VerificationGate>} />
           <Route path="extra-classes" element={<VerificationGate><ExtraClassesPage /></VerificationGate>} />
-          <Route path="papers" element={<VerificationGate><PapersPage /></VerificationGate>} />
+          <Route path="papers" element={<PapersPage />} />
           <Route path="history" element={<ClassHistoryPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="help" element={<HelpPage />} />
