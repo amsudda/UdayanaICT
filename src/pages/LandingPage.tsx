@@ -263,7 +263,7 @@ export function LandingPage() {
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-end">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
 
               {/* LEFT: brand block — poster style */}
               <motion.div
@@ -353,7 +353,7 @@ export function LandingPage() {
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.15 }}
-                className="relative flex justify-center lg:justify-end items-end"
+                className="relative flex justify-center lg:justify-end items-center"
               >
                 {/* soft glow behind the portrait */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 lg:left-auto lg:right-6 lg:translate-x-0 w-[420px] h-[420px] max-w-full rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.13),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(194,15,36,0.28),transparent_65%)] pointer-events-none" aria-hidden />
