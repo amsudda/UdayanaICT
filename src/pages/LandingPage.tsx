@@ -230,20 +230,20 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-16 pb-0 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
+        <section className="relative pt-16 pb-0 overflow-hidden bg-gradient-to-b from-red-50/80 via-white to-white dark:from-red-950/20 dark:via-slate-950 dark:to-slate-950 transition-colors">
           {/* Soft layered red wash */}
           <div
             className="absolute inset-0 -z-10 dark:hidden"
             style={{
               background:
-                'linear-gradient(180deg, rgba(194,15,36,0.07) 0%, rgba(255,255,255,0) 50%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.13), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.09), transparent 70%)'
+                'linear-gradient(180deg, rgba(194,15,36,0.1) 0%, rgba(255,255,255,0) 60%), radial-gradient(ellipse 80% 80% at 50% -20%, rgba(194,15,36,0.15), transparent 70%), radial-gradient(ellipse 60% 60% at 84% 80%, rgba(194,15,36,0.1), transparent 70%)'
             }}
           />
           <div
             className="absolute inset-0 -z-10 hidden dark:block"
             style={{
               background:
-                'linear-gradient(180deg, rgba(194,15,36,0.15) 0%, rgba(2,6,23,0) 45%), radial-gradient(ellipse 70% 80% at 35% 38%, rgba(194,15,36,0.22), transparent 65%), radial-gradient(ellipse 45% 55% at 84% 80%, rgba(194,15,36,0.15), transparent 70%)'
+                'linear-gradient(180deg, rgba(194,15,36,0.15) 0%, rgba(2,6,23,0) 45%), radial-gradient(ellipse 80% 80% at 50% -20%, rgba(194,15,36,0.22), transparent 70%), radial-gradient(ellipse 60% 60% at 84% 80%, rgba(194,15,36,0.15), transparent 70%)'
             }}
           />
 
