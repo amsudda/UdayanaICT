@@ -286,10 +286,9 @@ export function LandingPage() {
                   className="w-40 h-40 md:w-56 md:h-56 -mt-4 -mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
                 />
 
-                {/* Name — Bebas Neue display font */}
+                {/* Name */}
                 <h1
-                  className="text-5xl md:text-7xl font-extrabold tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
-                  style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.03em' }}
+                  className="text-5xl md:text-6xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
                 >
                   Pasindu Dissanayake
                 </h1>
@@ -740,10 +739,6 @@ export function LandingPage() {
                 >
                   {/* Colored top border accent */}
                   <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-[#c20f24]/60 to-[#c20f24]/20`} />
-                  {/* Step number badge */}
-                  <span className="absolute top-4 right-4 text-[11px] font-black text-gray-200 dark:text-slate-600" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', lineHeight: 1 }}>
-                    {String(idx + 1).padStart(2, '0')}
-                  </span>
                   <div className="pop-icon mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-slate-700/60 group-hover:bg-[#c20f24]/[0.07]">
                     <step.icon className={`w-8 h-8 ${step.color}`} strokeWidth={2.2} />
                   </div>
