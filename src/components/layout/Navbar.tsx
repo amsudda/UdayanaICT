@@ -18,8 +18,6 @@ import { NotificationBell } from '../shared/NotificationBell';
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hasBurst, setHasBurst] = useState(false);
-  const [showBurst, setShowBurst] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
@@ -48,16 +46,6 @@ export function Navbar() {
   }, []);
 
   const isPill = isLanding && scrolled;
-
-  /* Fire the burst once on first pill transform */
-  useEffect(() => {
-    if (isPill && !hasBurst) {
-      setHasBurst(true);
-      setShowBurst(true);
-      const t = setTimeout(() => setShowBurst(false), 5000);
-      return () => clearTimeout(t);
-    }
-  }, [isPill, hasBurst]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -299,37 +287,6 @@ export function Navbar() {
                 : 'none',
             }}
           >
-            {/* ── One-shot transform burst ── */}
-            <AnimatePresence>
-              {showBurst && (
-                <>
-                  <motion.div
-                    initial={{ x: '-110%' }}
-                    animate={{ x: '120%' }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 4.0, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 z-50 pointer-events-none"
-                    style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(194,15,36,0.5) 25%, rgba(139,92,246,0.4) 55%, rgba(59,130,246,0.4) 75%, transparent 100%)', filter: 'blur(8px)' }}
-                  />
-                  <motion.div
-                    initial={{ x: '-110%' }}
-                    animate={{ x: '150%' }}
-                    transition={{ duration: 4.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-y-0 z-40 w-24 pointer-events-none"
-                    style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)', filter: 'blur(3px)' }}
-                  />
-                  {[...Array(7)].map((_, i) => (
-                    <motion.div key={i}
-                      initial={{ left: `${8 + i * 13}%`, top: '50%', scale: 0, opacity: 1 }}
-                      animate={{ top: `${20 + (i % 3) * 28}%`, scale: [0, 1.4, 0], opacity: [0, 1, 0] }}
-                      transition={{ duration: 3.5, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
-                      className="absolute z-50 pointer-events-none rounded-full"
-                      style={{ width: i % 2 === 0 ? '5px' : '4px', height: i % 2 === 0 ? '5px' : '4px', background: i % 3 === 0 ? '#c20f24' : i % 3 === 1 ? '#8b5cf6' : '#3b82f6', boxShadow: `0 0 8px 2px ${i % 3 === 0 ? 'rgba(194,15,36,0.7)' : i % 3 === 1 ? 'rgba(139,92,246,0.7)' : 'rgba(59,130,246,0.7)'}` }}
-                    />
-                  ))}
-                </>
-              )}
-            </AnimatePresence>
             <div className={`flex justify-between items-center transition-all duration-500 ${isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'}`}>
               <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
                 <motion.img src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={{ scale: 1.08, rotate: -4 }} />
