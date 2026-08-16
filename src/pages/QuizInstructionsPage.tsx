@@ -134,7 +134,7 @@ export function QuizInstructionsPage() {
             <div className="font-semibold text-slate-900 dark:text-white text-lg">{questionCount}</div>
           </div>
           <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-            <ChartBarIcon className="h-8 w-8 text-red-500 mb-2" />
+            <BarChart3Icon className="h-8 w-8 text-red-500 mb-2" />
             <div className="text-sm text-slate-500 dark:text-slate-400">Marks per Q</div>
             <div className="font-semibold text-slate-900 dark:text-white text-lg">{marksPerQuestion}</div>
           </div>
