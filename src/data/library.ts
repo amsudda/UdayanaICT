@@ -47,6 +47,7 @@ export async function loadLibrary(userId: string, isAdmin: boolean = false): Pro
   const { data: grantedRows } = await supabase
     .from('enrollments')
     .select('theory_month_id')
+    .eq('student_id', userId)
     .not('theory_month_id', 'is', null);
   const grantedMonths = new Set((grantedRows ?? []).map((e: any) => e.theory_month_id));
 
@@ -72,6 +73,7 @@ export async function loadLibrary(userId: string, isAdmin: boolean = false): Pro
   const { data: enr } = await supabase
     .from('enrollments')
     .select('pack:packs(*)')
+    .eq('student_id', userId)
     .not('pack_id', 'is', null);
 
   const ownedPacks = (enr ?? []).map((e: any) => e.pack).filter(Boolean);
