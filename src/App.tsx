@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './auth/AuthContext';
+import { SmoothScroll } from './components/shared/SmoothScroll';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { ClassHistoryPage } from './pages/ClassHistoryPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -22,6 +23,7 @@ import { AdminLayout } from './admin/AdminLayout';
 import { AdminOverviewPage } from './admin/pages/AdminOverviewPage';
 import { AdminBatchesPage } from './admin/pages/AdminBatchesPage';
 import { AdminPaymentsPage } from './admin/pages/AdminPaymentsPage';
+import { AdminLivePage } from './admin/pages/AdminLivePage';
 import { AdminPacksPage } from './admin/pages/AdminPacksPage';
 import { AdminTheoryPage } from './admin/pages/AdminTheoryPage';
 import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
@@ -148,6 +150,7 @@ function AnimatedRoutes() {
           <Route index element={<AdminOverviewPage />} />
           <Route path="payments" element={<AdminPaymentsPage />} />
           <Route path="batches" element={<AdminBatchesPage />} />
+          <Route path="timetable" element={<AdminLivePage />} />
           <Route path="packs" element={<AdminPacksPage />} />
           <Route path="papers" element={<AdminPapersPage />} />
           <Route path="theory" element={<AdminTheoryPage />} />
@@ -168,9 +171,11 @@ function AnimatedRoutes() {
 export function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <SmoothScroll>
+        <BrowserRouter>
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </SmoothScroll>
     </AuthProvider>
   );
 }

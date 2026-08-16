@@ -2,8 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  CreditCardIcon,
+  HelpCircleIcon,
+  VideoIcon,
+  StarIcon,
   MessageCircleIcon,
+  BookOpenIcon,
+  CheckCircle2Icon,
   ArrowRightIcon,
+  LayersIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   GraduationCapIcon,
@@ -14,8 +21,10 @@ import {
   HistoryIcon,
   FileQuestionIcon,
   CalendarDaysIcon,
-  BookOpenIcon,
 } from 'lucide-react';
+
+import { FadeUp, SoftReveal, ImageReveal, Stagger, StaggerItem } from '../components/shared/motion';
+
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
@@ -23,6 +32,7 @@ import { CourseCard } from '../components/shared/CourseCard';
 import { PixelPageBurst, PixelReveal } from '../components/shared/PixelFx';
 import { ReviewCard, type Review } from '../components/shared/ReviewCard';
 import { BookMockup } from '../components/shared/BookMockup';
+import { LiquidyGradient } from '../components/shared/LiquidyGradient';
 import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
 
@@ -230,28 +240,8 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-16 pb-0 overflow-hidden bg-gradient-to-b from-red-50/80 via-white to-white dark:from-red-950/20 dark:via-slate-950 dark:to-slate-950 transition-colors">
-          {/* Soft layered red wash */}
-          <div
-            className="absolute inset-0 -z-10 dark:hidden"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(194,15,36,0.1) 0%, rgba(255,255,255,0) 60%), radial-gradient(ellipse 80% 80% at 50% -20%, rgba(194,15,36,0.15), transparent 70%), radial-gradient(ellipse 60% 60% at 84% 80%, rgba(194,15,36,0.1), transparent 70%)'
-            }}
-          />
-          <div
-            className="absolute inset-0 -z-10 hidden dark:block"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(194,15,36,0.15) 0%, rgba(2,6,23,0) 45%), radial-gradient(ellipse 80% 80% at 50% -20%, rgba(194,15,36,0.22), transparent 70%), radial-gradient(ellipse 60% 60% at 84% 80%, rgba(194,15,36,0.15), transparent 70%)'
-            }}
-          />
-
-          {/* Floating animated orbs */}
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-            <div className="absolute top-1/4 left-[8%] w-72 h-72 rounded-full bg-[#c20f24]/5 dark:bg-[#c20f24]/10 blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
-            <div className="absolute bottom-1/3 right-[5%] w-96 h-96 rounded-full bg-[#c20f24]/4 dark:bg-[#c20f24]/8 blur-3xl animate-pulse" style={{ animationDuration: '9s', animationDelay: '3s' }} />
-          </div>
+        <section className="relative pt-16 pb-24 lg:pb-32 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
+          <LiquidyGradient />
 
           {/* floating 8-bit sprites */}
           <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
@@ -262,54 +252,76 @@ export function LandingPage() {
             ))}
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
 
               {/* LEFT: brand block — poster style */}
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7 }}
-                className="flex flex-col items-center text-center pb-10 lg:pb-20 pt-4"
-              >
+              {/* LEFT: brand block — poster style */}
+              <div className="flex flex-col items-center text-center pb-6 sm:pb-10 lg:pb-20 pt-4">
                 {/* Pixel "level up" chip */}
-                <div className="font-pixel inline-flex items-center gap-2 mb-2 md:mb-1 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900 z-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  className="font-pixel inline-flex items-center gap-2 mb-3 md:mb-1 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900 z-10"
+                >
                   <PixelStar className="w-3 h-3 text-amber-400" />
                   LEVEL UP YOUR ICT
                   <span className="pixel-cursor">_</span>
-                </div>
+                </motion.div>
 
                 {/* Brand Logo */}
-                <img
+                <motion.img
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                   src="/images/pd-logo.png"
                   alt="Pasindu Dissanayake Logo"
-                  className="w-40 h-40 md:w-56 md:h-56 -mt-4 -mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
+                  className="w-32 h-32 sm:w-40 sm:h-40 md:w-56 md:h-56 -mt-2 -mb-2 sm:-mt-4 sm:-mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
                 />
 
                 {/* Name */}
-                <h1
-                  className="text-5xl md:text-6xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
+                <motion.h1
+                  initial={{ opacity: 0, y: 25 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-[2.5rem] leading-[1.05] sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
                 >
                   Pasindu Dissanayake
-                </h1>
-                <p className="mt-3 text-[11px] md:text-xs font-semibold tracking-[0.22em] md:tracking-[0.32em] uppercase text-apple-subtext dark:text-slate-400 transition-colors">
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-2 md:mt-3 text-[10px] sm:text-[11px] md:text-xs font-semibold tracking-[0.18em] sm:tracking-[0.22em] md:tracking-[0.32em] uppercase text-apple-subtext dark:text-slate-400 transition-colors px-2"
+                >
                   Advanced Level Information & Communication Technology
-                </p>
+                </motion.p>
 
                 {/* Tagline */}
-                <p className="mt-7 text-lg md:text-xl font-medium text-apple-text dark:text-apple-light leading-relaxed max-w-md transition-colors">
-                  <span className="text-[#c20f24] text-2xl font-serif leading-none mr-1">"</span>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-5 md:mt-7 text-[17px] sm:text-lg md:text-xl font-medium text-apple-text dark:text-apple-light leading-relaxed max-w-md transition-colors px-4"
+                >
+                  <span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none mr-1">"</span>
                   ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
-                  <span className="text-[#c20f24] text-2xl font-serif leading-none ml-1">"</span>
-                </p>
+                  <span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none ml-1">"</span>
+                </motion.p>
 
                 {/* CTA Buttons */}
-                <div className="mt-9 flex flex-col sm:flex-row items-center gap-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 w-full max-w-[280px] sm:max-w-none mx-auto"
+                >
                   <a
                     href="https://whatsapp.com/channel/0029Vb6zVpy4tRrtEpCZ7n1i"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative inline-flex items-center gap-2.5 h-12 px-7 text-base rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                    className="relative inline-flex items-center justify-center gap-2.5 h-12 px-7 text-[15px] sm:text-base rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
                   >
                     {/* Live ping dot */}
                     <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -325,43 +337,89 @@ export function LandingPage() {
                     href="https://wa.me/94719735601"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 h-12 px-7 text-base rounded-full font-semibold bg-[#c20f24] hover:bg-[#9c0c1d] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                    className="inline-flex items-center justify-center gap-2.5 h-12 px-7 text-[15px] sm:text-base rounded-full font-semibold bg-[#c20f24] hover:bg-[#9c0c1d] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
                   >
                     <MessageCircleIcon className="w-5 h-5 flex-shrink-0" />
                     පන්ති පිළිබඳ විමසීම්
                   </a>
-                </div>
+                </motion.div>
 
                 {/* Scroll-down arrow */}
                 <motion.a
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1.0, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
                   href="#promos"
-                  animate={{ y: [0, 8, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                  className="mt-10 inline-flex flex-col items-center gap-1 text-apple-subtext dark:text-slate-500 hover:text-[#c20f24] dark:hover:text-[#c20f24] transition-colors"
+                  className="mt-8 md:mt-10 inline-flex flex-col items-center gap-1 text-apple-subtext dark:text-slate-500 hover:text-[#c20f24] dark:hover:text-[#c20f24] transition-colors"
                   aria-label="Scroll down"
                 >
                   <span className="text-[10px] font-semibold uppercase tracking-widest">Scroll</span>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <motion.svg
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                    className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <path d="M12 5v14M5 12l7 7 7-7" />
-                  </svg>
+                  </motion.svg>
                 </motion.a>
-              </motion.div>
+              </div>
 
               {/* RIGHT: cutout portrait rising from the section edge */}
               <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.15 }}
+                initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 1.0, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 className="relative flex justify-center lg:justify-end items-center"
               >
-                {/* soft glow behind the portrait */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 lg:left-auto lg:right-6 lg:translate-x-0 w-[420px] h-[420px] max-w-full rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.13),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(194,15,36,0.28),transparent_65%)] pointer-events-none" aria-hidden />
-                <img
-                  src="/images/pasindu-hero.png"
-                  alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                  className="relative w-[340px] sm:w-[420px] lg:w-[500px] max-w-full select-none pointer-events-none drop-shadow-[0_18px_40px_rgba(194,15,36,0.18)]"
-                  draggable={false}
+                {/* 1. Atmospheric Background Blend: A large, soft, diffuse warm glow transition */}
+                <div 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:left-auto lg:right-[-10%] lg:translate-x-0 lg:translate-y-[10%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(220,20,45,0.12),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(220,20,45,0.22),transparent_65%)] blur-[60px] pointer-events-none" 
+                  aria-hidden 
                 />
+
+                {/* Container to bound the overlays perfectly to the image dimensions */}
+                <div className="relative">
+                  
+                  {/* 2. Contact / Grounding Shadow: Soft ambient occlusion at the base */}
+                  <div 
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[75%] h-[30px] bg-black/15 dark:bg-black/40 blur-xl rounded-full pointer-events-none" 
+                    aria-hidden 
+                  />
+                  
+                  {/* The Person Image */}
+                  <img
+                    src="/images/pasindu-hero.png"
+                    alt="Pasindu Dissanayake — ICT ගුරුවරයා"
+                    className="relative w-[340px] sm:w-[420px] lg:w-[500px] max-w-full select-none pointer-events-none"
+                    style={{
+                      // 3. Ribbon Light Interaction (via drop-shadow for atmospheric light wrap)
+                      // 5. Color Integration: warm highlights, reduce blue cast (sepia, saturate, contrast)
+                      filter: 'drop-shadow(-20px 20px 40px rgba(220, 20, 45, 0.12)) drop-shadow(0px 10px 20px rgba(220, 20, 45, 0.08)) sepia(0.12) hue-rotate(-5deg) saturate(1.1) contrast(1.02) brightness(1.02)',
+                      // 4. Edge Integration: Smoothly fade the hard bottom edge into the environment
+                      WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0.1) 98%, rgba(0,0,0,0) 100%)',
+                      maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0.1) 98%, rgba(0,0,0,0) 100%)'
+                    }}
+                    draggable={false}
+                  />
+
+                  {/* 3. & 5. Ribbon Light Interaction & Color Integration (Inner Rim Light)
+                      Uses the image itself as a mask to apply a subtle red overlay exactly onto the person.
+                  */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-40 dark:opacity-50"
+                    style={{
+                      WebkitMaskImage: 'url(/images/pasindu-hero.png)',
+                      maskImage: 'url(/images/pasindu-hero.png)',
+                      WebkitMaskSize: 'contain',
+                      maskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                      // Casts a subtle warm red glow from the bottom left where the ribbon passes
+                      background: 'radial-gradient(circle at 10% 80%, rgba(220, 20, 45, 0.8) 0%, rgba(255, 180, 180, 0.3) 40%, transparent 70%)'
+                    }}
+                  />
+                </div>
               </motion.div>
             </div>
 
@@ -486,7 +544,7 @@ export function LandingPage() {
         {featured.length > 0 && (
           <section id="courses" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-16">
+              <FadeUp className="text-center mb-16">
                 <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold text-xs mb-4 border border-blue-100 dark:border-blue-800 uppercase tracking-wider">
                   ⭐ Featured Courses
                 </span>
@@ -500,13 +558,15 @@ export function LandingPage() {
                   Comprehensive courses designed to help you excel in both theory
                   and practical examinations.
                 </p>
-              </div>
+              </FadeUp>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {featured.map((course) => (
-                  <CourseCard key={course.id} course={course} showProgress={false} />
+                  <StaggerItem key={course.id}>
+                    <CourseCard course={course} showProgress={false} />
+                  </StaggerItem>
                 ))}
-              </div>
+              </Stagger>
 
               <div className="mt-12 text-center">
                 <Link to="/signup">
@@ -528,13 +588,7 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {/* Section Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-14"
-            >
+            <FadeUp className="text-center mb-14">
               <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-semibold text-xs mb-4 border border-red-100 dark:border-red-900 uppercase tracking-wider">
                 ⭐ සිසුන්ගේ අදහස්
               </span>
@@ -544,25 +598,17 @@ export function LandingPage() {
               >
                 අපගේ සිසුන් පවසන දේ
               </h2>
-              <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-xl mx-auto transition-colors">
-                Pasindu Dissanayake හරහා A/L තොරතුරු තාක්ෂනයය ජය ගත් සිසුන් ගේ අත්දෆන්
-              </p>
-            </motion.div>
+
+            </FadeUp>
 
             {/* Testimonial Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Stagger staggerDelay={0.08} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {reviews.slice(0, reviewCount).map((t, idx) => (
-                <motion.div
-                  key={t.id ?? idx}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                >
+                <StaggerItem key={t.id ?? idx}>
                   <ReviewCard review={t} />
-                </motion.div>
+                </StaggerItem>
               ))}
-            </div>
+            </Stagger>
 
             {/* Bottom CTA */}
 
@@ -580,13 +626,7 @@ export function LandingPage() {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Section header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-14"
-            >
+            <FadeUp delay={0.1} className="text-center mb-14">
               <h2 className="flex items-center justify-center gap-3 text-3xl md:text-4xl font-bold text-apple-text dark:text-apple-light transition-colors">
                 <BookOpenIcon className="w-9 h-9 text-amber-400" strokeWidth={2.4} />
                 ආකර්ෂණීය ඉගැන්වීම් රටාව
@@ -594,17 +634,11 @@ export function LandingPage() {
               <p className="mt-3 text-base md:text-lg text-apple-subtext dark:text-slate-400 transition-colors">
                 - සරල, ආකර්ෂණීය, සහ ඵලදායී ඉගෙනුම් අත්දැකීමක් -
               </p>
-            </motion.div>
+            </FadeUp>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              {/* Media card — swap this img for the class video when it's ready */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="w-full max-w-[320px] mx-auto"
-              >
+              {/* Media card */}
+              <ImageReveal delay={0.15} className="w-full max-w-[320px] mx-auto">
                 {/* muted looping class video — oversized + pointer-events-none hides YouTube overlays */}
                 <div className="relative rounded-3xl overflow-hidden aspect-[9/16] bg-slate-900 shadow-[0_24px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
                   <iframe
@@ -615,15 +649,10 @@ export function LandingPage() {
                     frameBorder="0"
                   />
                 </div>
-              </motion.div>
+              </ImageReveal>
 
               {/* Text */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-              >
+              <FadeUp delay={0.25}>
                 <h3 className="text-2xl md:text-3xl font-bold text-apple-text dark:text-apple-light transition-colors mb-5">
                   How We Structure Our Classes
                 </h3>
@@ -648,7 +677,7 @@ export function LandingPage() {
                 >
                   Learn More
                 </a>
-              </motion.div>
+              </FadeUp>
             </div>
           </div>
         </section>
@@ -657,29 +686,19 @@ export function LandingPage() {
         {books.length > 0 && (
           <section id="books" className="py-24 bg-white dark:bg-slate-900 transition-colors scroll-mt-20 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-16"
-              >
+              <FadeUp className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold uppercase text-apple-text dark:text-apple-light transition-colors">
                   OUR BOOKS <PixelReveal className="w-5 h-5 text-[#c20f24]" />
                 </h2>
                 <p className="mt-3 text-base md:text-lg text-apple-subtext dark:text-slate-400 transition-colors">
                   Short Notes, Model Papers සහ තවත් පොත් — ඔබේ විභාග සූදානමට.
                 </p>
-              </motion.div>
+              </FadeUp>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 justify-items-center">
+              <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 justify-items-center">
                 {books.map((b, idx) => (
-                  <motion.div
+                  <StaggerItem
                     key={b.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: (idx % 3) * 0.12 }}
                     className="flex flex-col items-center w-full max-w-[240px]"
                   >
                     {b.cover_url && <BookMockup cover={b.cover_url} title={b.title} className="w-44 sm:w-48" />}
@@ -699,9 +718,9 @@ export function LandingPage() {
                         Order Now
                       </a>
                     )}
-                  </motion.div>
+                  </StaggerItem>
                 ))}
-              </div>
+              </Stagger>
             </div>
           </section>
         )}
@@ -709,32 +728,21 @@ export function LandingPage() {
         {/* Our Process */}
         <section id="process" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
+            <FadeUp className="text-center mb-12">
               <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-semibold text-xs mb-4 border border-red-100 dark:border-red-900 uppercase tracking-wider">
                 🎓 Our Process
               </span>
               <h2
-                className="text-4xl md:text-5xl font-extrabold uppercase text-apple-text dark:text-apple-light transition-colors"
-                style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.04em' }}
+                className="text-4xl md:text-5xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
               >
                 Our Process
               </h2>
-            </motion.div>
+            </FadeUp>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Stagger staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {PROCESS_STEPS.map((step, idx) => (
-                <motion.div
+                <StaggerItem
                   key={step.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
                   className={`relative group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] transition-all duration-300 hover:-translate-y-1 overflow-hidden ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
                 >
                   {/* Colored top border accent */}
@@ -748,9 +756,9 @@ export function LandingPage() {
                   <p className={`text-sm leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors ${step.wide ? 'max-w-3xl mx-auto' : ''}`}>
                     {step.text}
                   </p>
-                </motion.div>
+                </StaggerItem>
               ))}
-            </div>
+            </Stagger>
           </div>
         </section>
       </main>

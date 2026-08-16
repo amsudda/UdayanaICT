@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { ClockIcon, TrendingUpIcon, CalendarDaysIcon, PlusIcon, XIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
+import { DashboardCard, DashboardCardHeader, DashboardCardTitle, DashboardCardContent } from '../dashboard/DashboardCard';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -88,57 +89,56 @@ export function StudyTimeCard() {
   const todayLogged = todayKey in byDate;
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
-      <div className="flex items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2">
-          <ClockIcon className="w-5 h-5 text-[#c20f24]" />
-          <h2 className="text-base sm:text-xl font-bold text-apple-text dark:text-apple-light">Study Time</h2>
-        </div>
-        <button onClick={openLog} className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-[#c20f24] text-white text-sm font-semibold hover:bg-[#9c0c1d] transition-colors">
-          <PlusIcon className="w-4 h-4" /> {todayLogged ? 'Update today' : 'Log today'}
+    <DashboardCard delay={0.3} className="h-full flex flex-col">
+      <DashboardCardHeader>
+        <DashboardCardTitle icon={ClockIcon}>Study Time</DashboardCardTitle>
+        <button onClick={openLog} className="flex items-center gap-1.5 h-8 px-3 rounded-[10px] bg-[#F8FAFC] dark:bg-slate-800 text-[#172033] dark:text-white border border-[#E5EAF2] dark:border-slate-700 text-xs font-semibold hover:bg-gray-100 transition-colors">
+          <PlusIcon className="w-3.5 h-3.5" /> {todayLogged ? 'Update today' : 'Log today'}
         </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-5 items-center">
-        {/* weekly bar chart */}
-        <div>
-          <div className="flex items-end justify-between gap-2 h-40">
-            {weekHours.map((h, i) => {
-              const pct = Math.min(h, MAX_H) / MAX_H * 100;
-              const isToday = ymd(days[i]) === todayKey;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center justify-end h-full gap-2">
-                  <div className="relative w-full max-w-[34px] flex-1 flex items-end">
-                    <div
-                      className={`w-full rounded-t-lg transition-all duration-500 ${isToday ? 'bg-[#c20f24]' : 'bg-red-100 dark:bg-slate-700'}`}
-                      style={{ height: `${Math.max(pct, h > 0 ? 6 : 2)}%` }}
-                      title={`${h} h`}
-                    />
+      </DashboardCardHeader>
+      
+      <DashboardCardContent className="flex-1 flex flex-col justify-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-center">
+          {/* weekly bar chart */}
+          <div>
+            <div className="flex items-end justify-between gap-2 h-40">
+              {weekHours.map((h, i) => {
+                const pct = Math.min(h, MAX_H) / MAX_H * 100;
+                const isToday = ymd(days[i]) === todayKey;
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center justify-end h-full gap-2">
+                    <div className="relative w-full max-w-[34px] flex-1 flex items-end">
+                      <div
+                        className={`w-full rounded-t-[8px] transition-all duration-500 ${isToday ? 'bg-[#c20f24]' : 'bg-[#EFF6FF] dark:bg-slate-800'}`}
+                        style={{ height: `${Math.max(pct, h > 0 ? 6 : 2)}%` }}
+                        title={`${h} h`}
+                      />
+                    </div>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-[#c20f24]' : 'text-[#64748B] dark:text-slate-400'}`}>{DAY_LABELS[i].substring(0, 1)}</span>
                   </div>
-                  <span className={`text-[11px] font-medium ${isToday ? 'text-[#c20f24]' : 'text-apple-subtext dark:text-slate-400'}`}>{DAY_LABELS[i]}</span>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* stats */}
+          <div className="space-y-2.5">
+            {[
+              { label: 'Daily average', value: avg, icon: TrendingUpIcon, tone: 'text-[#c20f24]' },
+              { label: 'This week', value: Math.round(weeklyTotal * 10) / 10, icon: ClockIcon, tone: 'text-violet-600 dark:text-violet-300' },
+              { label: 'This month', value: Math.round(monthlyTotal * 10) / 10, icon: CalendarDaysIcon, tone: 'text-emerald-600 dark:text-emerald-300' }
+            ].map((s) => (
+              <div key={s.label} className="flex items-center gap-3 rounded-[14px] bg-[#F8FAFC] dark:bg-slate-800/60 border border-[#E5EAF2] dark:border-slate-700/50 px-4 py-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-slate-700 shadow-sm ${s.tone}`}><s.icon className="w-4 h-4" /></div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] dark:text-slate-400 leading-none mb-1">{s.label}</p>
+                  <p className="text-sm font-black text-[#172033] dark:text-apple-light leading-none">{loading ? '—' : `${s.value} h`}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
-
-        {/* stats */}
-        <div className="space-y-2.5">
-          {[
-            { label: 'Daily average', value: avg, icon: TrendingUpIcon, tone: 'bg-red-50 dark:bg-red-500/10 text-[#c20f24]' },
-            { label: 'This week', value: Math.round(weeklyTotal * 10) / 10, icon: ClockIcon, tone: 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-300' },
-            { label: 'This month', value: Math.round(monthlyTotal * 10) / 10, icon: CalendarDaysIcon, tone: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-300' }
-          ].map((s) => (
-            <div key={s.label} className="flex items-center gap-3 rounded-2xl bg-gray-50 dark:bg-slate-800/60 px-4 py-3">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${s.tone}`}><s.icon className="w-4 h-4" /></div>
-              <div>
-                <p className="text-[11px] text-apple-subtext dark:text-slate-400">{s.label}</p>
-                <p className="text-lg font-black text-apple-text dark:text-apple-light leading-none">{loading ? '—' : `${s.value} h`}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      </DashboardCardContent>
 
       {/* daily log modal */}
       {modalOpen && (
@@ -174,6 +174,6 @@ export function StudyTimeCard() {
           </div>
         </div>
       )}
-    </div>
+    </DashboardCard>
   );
 }

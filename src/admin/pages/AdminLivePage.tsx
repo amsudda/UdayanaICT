@@ -22,6 +22,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 const emptyForm = {
   title: '',
+  event_type: 'Class',
+  instructor_avatar: '',
+  description: [] as string[],
   kind: 'monthly' as 'monthly' | 'special',
   month: MONTHS[now.getMonth()],
   year: String(now.getFullYear()),
@@ -85,6 +88,9 @@ export function AdminLivePage() {
       meeting_id: c.meeting_id ?? '',
       passcode: c.passcode ?? '',
       instructor: c.instructor ?? '',
+      event_type: c.event_type ?? 'Class',
+      instructor_avatar: c.instructor_avatar ?? '',
+      description: Array.isArray(c.description) ? c.description : [],
       audience_scope: c.audience_scope ?? 'batches',
       audience_program: c.audience_program ?? 'A/L',
       batch_ids: c.batch_ids ?? []
@@ -110,6 +116,9 @@ export function AdminLivePage() {
       meeting_id: form.meeting_id.trim() || null,
       passcode: form.passcode.trim() || null,
       instructor: form.instructor.trim() || null,
+      event_type: form.event_type || 'Class',
+      instructor_avatar: form.instructor_avatar.trim() || null,
+      description: form.description.filter(d => d.trim().length > 0),
       course_label: null,
       audience_scope: form.audience_scope,
       audience_program: form.audience_scope === 'program' ? form.audience_program : null,
@@ -265,6 +274,76 @@ export function AdminLivePage() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Backup link (optional)</label>
             <input className={inputCls} value={form.backup_url} onChange={(e) => setForm({ ...form, backup_url: e.target.value })} placeholder="e.g. YouTube live link if Zoom fails" />
+          </div>
+
+          <div className="pt-4 border-t border-slate-100">
+            <h3 className="text-sm font-bold text-slate-900 mb-4">Timetable Display Details</h3>
+            
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Event Type</label>
+                <select className={inputCls} value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })}>
+                  <option value="Class">Class / Lecture</option>
+                  <option value="Meeting">Meeting</option>
+                  <option value="Practical">Practical group work</option>
+                  <option value="Exam">Exam / Quiz</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Instructor Avatar</label>
+                <div className="flex items-center gap-3">
+                  {[
+                    '/images/avatar-pasindu-1.jpg',
+                    '/images/avatar-pasindu-2.jpg',
+                    '/images/pd-logo.png'
+                  ].map((imgSrc, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setForm({ ...form, instructor_avatar: imgSrc })}
+                      className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${
+                        form.instructor_avatar === imgSrc ? 'border-blue-600 scale-110 shadow-md' : 'border-transparent hover:border-slate-300'
+                      }`}
+                    >
+                      <img src={imgSrc} alt={`Avatar ${i+1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                  <div className="flex-1 ml-4">
+                    <input className={inputCls} value={form.instructor_avatar} onChange={(e) => setForm({ ...form, instructor_avatar: e.target.value })} placeholder="Or paste a custom URL..." />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-slate-700">Description Points (Bullet points)</label>
+                <button type="button" onClick={() => setForm({ ...form, description: [...form.description, ''] })} className="text-xs text-blue-600 font-semibold hover:text-blue-700">+ Add Point</button>
+              </div>
+              {form.description.map((desc, idx) => (
+                <div key={idx} className="flex gap-2 mb-2">
+                  <input
+                    className={inputCls}
+                    value={desc}
+                    onChange={(e) => {
+                      const newDesc = [...form.description];
+                      newDesc[idx] = e.target.value;
+                      setForm({ ...form, description: newDesc });
+                    }}
+                    placeholder={`e.g. Read chapter ${idx + 1}`}
+                  />
+                  <button type="button" onClick={() => {
+                    const newDesc = form.description.filter((_, i) => i !== idx);
+                    setForm({ ...form, description: newDesc });
+                  }} className="p-2 text-slate-400 hover:bg-slate-100 rounded-lg shrink-0">
+                    <Trash2Icon className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {form.description.length === 0 && (
+                <p className="text-xs text-slate-400">No bullet points added.</p>
+              )}
+            </div>
           </div>
 
           {/* audience */}

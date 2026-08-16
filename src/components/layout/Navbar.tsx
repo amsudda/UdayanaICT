@@ -100,54 +100,43 @@ export function Navbar() {
       <div className="w-full flex justify-center pointer-events-none">
         {isDashboard ? (
           <nav
-            className="pointer-events-auto overflow-hidden w-full"
+            className="pointer-events-auto overflow-hidden w-full bg-transparent"
             style={{
-              background: isDarkMode ? 'rgba(2,6,23,0.55)' : 'rgba(255,255,255,0.55)',
-              backdropFilter: 'blur(48px) saturate(180%) brightness(1.04)',
-              WebkitBackdropFilter: 'blur(48px) saturate(180%) brightness(1.04)',
-              borderBottom: `1px solid rgba(${isDarkMode ? '255,255,255,0.06' : '0,0,0,0.06'})`,
+              borderBottom: isDashboard ? 'none' : `1px solid rgba(${isDarkMode ? '255,255,255,0.06' : '0,0,0,0.06'})`,
+              ...(isDashboard ? {} : {
+                background: isDarkMode ? 'rgba(2,6,23,0.55)' : 'rgba(255,255,255,0.55)',
+                backdropFilter: 'blur(48px) saturate(180%) brightness(1.04)',
+                WebkitBackdropFilter: 'blur(48px) saturate(180%) brightness(1.04)',
+              })
             }}
           >
           <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-10">
 
 
             {/* Logo */}
-            <Link to={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2 group flex-shrink-0">
-              {isDashboard ? (
-                <>
-                  <img
-                    src="/images/pd-logo.png"
-                    alt="Pasindu Dissanayake"
-                    className="object-contain flex-shrink-0 w-9 h-9"
-                  />
-                  <span className="font-bold tracking-tight whitespace-nowrap text-[1.15rem] text-apple-text dark:text-apple-light">
-                    Pasindu Dissanayake
-                  </span>
-                </>
-              ) : (
-                <>
-                  <motion.img
-                    src="/images/pd-logo.png"
-                    alt="Pasindu Dissanayake"
-                    className="object-contain flex-shrink-0"
-                    animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }}
-                    transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    whileHover={{ scale: 1.08, rotate: -4 }}
-                  />
-                  <motion.span
-                    animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }}
-                    transition={{ duration: 0.45 }}
-                    className={`font-bold tracking-tight whitespace-nowrap ${
-                      isLanding && !scrolled
-                        ? 'text-white dark:text-white'
-                        : 'text-apple-text dark:text-apple-light'
-                    }`}
-                  >
-                    Pasindu Dissanayake
-                  </motion.span>
-                </>
-              )}
-            </Link>
+            {!isDashboard && (
+              <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+                <motion.img
+                  src="/images/pd-logo.png"
+                  alt="Pasindu Dissanayake"
+                  className="object-contain flex-shrink-0"
+                  animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }}
+                  transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  whileHover={{ scale: 1.08, rotate: -4 }}
+                />
+                <motion.span
+                  animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }}
+                  transition={{ duration: 0.45 }}
+                  className={`font-bold tracking-tight whitespace-nowrap ${
+                    isLanding && !scrolled
+                      ? 'text-white dark:text-white'
+                      : 'text-apple-text dark:text-apple-light'
+                  }`}
+                >
+                  Pasindu Dissanayake
+                </motion.span>
+              </Link>
+            )}
 
             {/* Desktop nav links — hidden in pill mode to save space, or shown compactly */}
             {!isDashboard && (

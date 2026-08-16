@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TrendingUpIcon } from 'lucide-react';
 
 export type Mark = {
   id: string;
@@ -35,9 +36,10 @@ export function MarksChart({ marks }: { marks: Mark[] }) {
 
   if (n === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-apple-subtext dark:text-slate-400">No marks yet.</p>
-        <p className="text-xs text-apple-subtext/70 dark:text-slate-500 mt-1">Your paper marks will appear here as the tutor adds them.</p>
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <TrendingUpIcon className="w-10 h-10 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
+        <h4 className="text-sm font-semibold text-[#172033] dark:text-white mb-1">No marks yet</h4>
+        <p className="text-xs text-[#64748B] dark:text-slate-400 max-w-[200px] mx-auto">Your performance graph will appear here once papers are marked.</p>
       </div>
     );
   }

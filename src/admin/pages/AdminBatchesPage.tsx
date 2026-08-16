@@ -20,6 +20,7 @@ type Batch = {
   program: string;
   grade: number | null;
   exam_year: number | null;
+  exam_date: string | null;
   medium: string | null;
   is_active: boolean;
   member_count?: number;
@@ -46,6 +47,7 @@ const emptyForm = {
   program: 'A/L',
   grade: '',
   exam_year: String(new Date().getFullYear() + 1),
+  exam_date: '',
   medium: 'Sinhala',
   is_active: true
 };
@@ -98,6 +100,7 @@ export function AdminBatchesPage() {
       program: b.program,
       grade: b.grade != null ? String(b.grade) : '',
       exam_year: b.exam_year != null ? String(b.exam_year) : '',
+      exam_date: b.exam_date ? b.exam_date.substring(0, 10) : '',
       medium: b.medium ?? '',
       is_active: b.is_active
     });
@@ -111,6 +114,7 @@ export function AdminBatchesPage() {
       program: form.program,
       grade: form.grade ? Number(form.grade) : null,
       exam_year: form.exam_year ? Number(form.exam_year) : null,
+      exam_date: form.exam_date ? new Date(form.exam_date).toISOString() : null,
       medium: form.medium || null,
       is_active: form.is_active
     };
@@ -260,8 +264,22 @@ export function AdminBatchesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Exam year</label>
-              <input type="number" className={inputCls} value={form.exam_year} onChange={(e) => setForm({ ...form, exam_year: e.target.value })} placeholder="2026" />
+              <label className="block text-sm font-medium text-slate-700 mb-1">Exam Year</label>
+              <input
+                type="number"
+                className={inputCls}
+                value={form.exam_year}
+                onChange={(e) => setForm({ ...form, exam_year: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Exact Exam Date (Optional)</label>
+              <input
+                type="date"
+                className={inputCls}
+                value={form.exam_date}
+                onChange={(e) => setForm({ ...form, exam_date: e.target.value })}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Grade (optional)</label>

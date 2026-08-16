@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   BookOpenIcon,
@@ -11,57 +12,25 @@ import {
   FileTextIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const menuGroups = [
   {
     label: 'Learning',
     items: [
-      {
-        name: 'Dashboard',
-        path: '/dashboard',
-        icon: LayoutDashboardIcon,
-        end: true
-      },
-      {
-        name: 'My Classes',
-        path: '/dashboard/courses',
-        icon: BookOpenIcon
-      },
-      {
-        name: 'Lesson Store',
-        path: '/dashboard/extra-classes',
-        icon: ShoppingCartIcon
-      },
-      {
-        name: 'Papers',
-        path: '/dashboard/papers',
-        icon: FileTextIcon
-      }
+      { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboardIcon, end: true },
+      { name: 'My Classes', path: '/dashboard/courses', icon: BookOpenIcon },
+      { name: 'Lesson Store', path: '/dashboard/extra-classes', icon: ShoppingCartIcon },
+      { name: 'Papers', path: '/dashboard/papers', icon: FileTextIcon }
     ]
   },
   {
-    label: 'Student Account',
+    label: 'Account',
     items: [
-      {
-        name: 'My Profile',
-        path: '/dashboard/profile',
-        icon: UserIcon
-      },
-      {
-        name: 'Payments',
-        path: '/dashboard/payments',
-        icon: CreditCardIcon
-      },
-      {
-        name: 'Class History',
-        path: '/dashboard/history',
-        icon: HistoryIcon
-      },
-      {
-        name: 'Help',
-        path: '/dashboard/help',
-        icon: HeadphonesIcon
-      }
+      { name: 'Profile', path: '/dashboard/profile', icon: UserIcon },
+      { name: 'Payments', path: '/dashboard/payments', icon: CreditCardIcon },
+      { name: 'History', path: '/dashboard/history', icon: HistoryIcon },
+      { name: 'Help', path: '/dashboard/help', icon: HeadphonesIcon }
     ]
   }
 ];
@@ -69,6 +38,7 @@ const menuGroups = [
 export function Sidebar() {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -83,51 +53,88 @@ export function Sidebar() {
     .toUpperCase();
 
   return (
-    <aside className="hidden lg:flex flex-col w-72 h-[calc(100vh-4rem)] fixed left-0 top-16 bg-white dark:bg-slate-950 border-r border-gray-100 dark:border-slate-800 py-5 px-4 transition-colors duration-300">
-      <div className="rounded-3xl bg-gray-50 dark:bg-slate-900 p-4 text-apple-text dark:text-white border border-gray-100 dark:border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-colors duration-300">
-        <div className="flex items-center gap-3">
-          {user?.avatar ? (
-            <img
-              src={user.avatar}
-              alt={user?.name ?? 'Student'}
-              className="h-14 w-14 rounded-2xl object-cover shrink-0"
-            />
-          ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#c20f24]/10 dark:bg-white/10 shrink-0 text-[#c20f24] dark:text-white font-bold">
-              {initials || <UserIcon className="w-7 h-7" />}
-            </div>
+    <aside
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="hidden lg:flex flex-col h-[calc(100vh-2rem)] sticky top-4 bg-[#18181B] dark:bg-[#121212] rounded-[2rem] py-6 px-3 shadow-2xl transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)] z-40"
+      style={{ width: isHovered ? '280px' : '88px' }}
+    >
+      {/* Top Logo */}
+      <div className="flex items-center gap-3 px-1 mb-10 overflow-hidden shrink-0 mt-2">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center ml-[2px]">
+          <img src="/images/pd-logo.png" alt="Logo" className="w-9 h-9 object-contain drop-shadow-md" />
+        </div>
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
+              className="whitespace-nowrap min-w-0"
+            >
+              <span className="font-bold tracking-tight text-[1.05rem] text-white">
+                Pasindu Dissanayake
+              </span>
+            </motion.div>
           )}
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-apple-text dark:text-white">{user?.name}</p>
-            <p className="truncate text-sm text-apple-subtext dark:text-slate-300">{user?.email}</p>
-          </div>
-        </div>
-        <div className="mt-4 rounded-2xl bg-white dark:bg-white/10 px-4 py-3 border border-gray-100 dark:border-transparent">
-          <p className="text-xs uppercase tracking-[0.18em] text-apple-subtext dark:text-slate-300">Student ID</p>
-          <p className="mt-1 text-xl font-bold tracking-wide text-apple-text dark:text-white">{user?.studentId}</p>
-        </div>
+        </AnimatePresence>
       </div>
 
-      <div className="mt-6 flex-1 overflow-y-auto pr-1">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar flex flex-col gap-8">
         {menuGroups.map((group) => (
-          <div key={group.label} className="mb-6">
-            <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              {group.label}
-            </p>
+          <div key={group.label} className="flex flex-col gap-2">
+            <AnimatePresence>
+              {isHovered && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                  className="px-5 text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1 whitespace-nowrap"
+                >
+                  {group.label}
+                </motion.p>
+              )}
+            </AnimatePresence>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5 px-2">
               {group.items.map((item) => (
                 <NavLink
                   key={item.name}
                   to={item.path}
                   end={item.end}
                   className={({ isActive }) => `
-                    flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200
-                    ${isActive ? 'bg-[#c20f24]/10 text-[#c20f24] dark:bg-[#c20f24]/20 dark:text-apple-light' : 'text-apple-subtext dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-900 hover:text-apple-text dark:hover:text-apple-light'}
+                    flex items-center gap-3 px-1.5 py-1.5 rounded-2xl transition-all duration-300
+                    ${isActive ? '' : 'hover:bg-white/5'}
                   `}
                 >
-                  <item.icon className="w-5 h-5" />
-                  {item.name}
+                  {({ isActive }) => (
+                    <>
+                      {/* Active State Background Circle around Icon */}
+                      <div className={`relative shrink-0 flex items-center justify-center w-[42px] h-[42px] rounded-[14px] transition-all ${isActive ? 'text-white' : 'text-white/40'}`}>
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeNav"
+                            className="absolute inset-0 bg-gradient-to-br from-[#FF2E54] to-[#c20f24] rounded-[14px] shadow-[0_0_18px_rgba(255,46,84,0.5)]"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          />
+                        )}
+                        <item.icon className="w-5 h-5 relative z-10" />
+                      </div>
+                      
+                      <AnimatePresence>
+                        {isHovered && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
+                            className={`relative z-10 whitespace-nowrap text-[15px] ${isActive ? 'text-white font-bold' : 'text-white/40 font-semibold group-hover:text-white/80'}`}
+                          >
+                            {item.name}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  )}
                 </NavLink>
               ))}
             </div>
@@ -135,14 +142,27 @@ export function Sidebar() {
         ))}
       </div>
 
-      <div className="mt-auto pt-5 border-t border-gray-100 dark:border-slate-800 transition-colors duration-300">
+      <div className="mt-auto pt-4 px-2 shrink-0">
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-200"
+          className="relative w-full flex items-center gap-4 px-3.5 py-3 rounded-2xl text-[15px] font-semibold text-white/40 hover:text-[#FF2E54] hover:bg-white/5 transition-all duration-300 group overflow-hidden"
         >
-          <LogOutIcon className="w-5 h-5" />
-          Log Out
+          <div className="relative z-10 shrink-0 flex items-center justify-center w-5 h-5 ml-[3px]">
+            <LogOutIcon className="w-5 h-5" />
+          </div>
+          <AnimatePresence>
+            {isHovered && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
+                className="relative z-10 whitespace-nowrap"
+              >
+                Log Out
+              </motion.span>
+            )}
+          </AnimatePresence>
         </button>
       </div>
     </aside>
