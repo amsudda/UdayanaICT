@@ -94,17 +94,19 @@ export function AdminQuizBuilderPage() {
   const saveQuiz = async (newStatus?: 'published' | 'draft') => {
     try {
       setSaving(true);
-      const quizData = {
+      const quizData: any = {
         id: quizId,
         title: title || 'Untitled Quiz',
         description,
         duration_minutes: duration,
-        pass_mark_percentage: passMark,
+        pass_mark_percent: passMark,
         status: newStatus || status,
         randomize_questions: randomizeQuestions,
         randomize_options: randomizeOptions,
-        updated_at: new Date().toISOString()
       };
+      if (newStatus === 'published' && status !== 'published') {
+        quizData.published_at = new Date().toISOString();
+      }
 
       const { error: quizError } = await supabase.from('quizzes').upsert(quizData);
       if (quizError) throw quizError;
