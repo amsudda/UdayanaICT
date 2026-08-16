@@ -37,6 +37,14 @@ import { AdminBooksPage } from './admin/pages/AdminBooksPage';
 import { PapersPage } from './pages/dashboard/PapersPage';
 import { CourseDetailsPage } from './pages/dashboard/CourseDetailsPage';
 import { AdminPapersPage } from './admin/pages/AdminPapersPage';
+import { AdminQuizListPage } from './admin/pages/AdminQuizListPage';
+import { AdminQuizBuilderPage } from './admin/pages/AdminQuizBuilderPage';
+import { AdminQuizResultsPage } from './admin/pages/AdminQuizResultsPage';
+import { QuizListPage } from './pages/QuizListPage';
+import { QuizInstructionsPage } from './pages/QuizInstructionsPage';
+import { QuizPlayerPage } from './pages/QuizPlayerPage';
+import { QuizResultPage } from './pages/QuizResultPage';
+import { QuizReviewPage } from './pages/QuizReviewPage';
 
 function FullSpinner() {
   return (
@@ -112,6 +120,10 @@ function AnimatedRoutes() {
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="help" element={<HelpPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="quizzes" element={<QuizListPage />} />
+          <Route path="quizzes/:id" element={<QuizInstructionsPage />} />
+          <Route path="quizzes/:id/result" element={<QuizResultPage />} />
+          <Route path="quizzes/:id/review" element={<QuizReviewPage />} />
         </Route>
 
         {/* Standalone watch page — outside DashboardLayout (no navbar/sidebar) */}
@@ -122,6 +134,16 @@ function AnimatedRoutes() {
               <VerificationGate>
                 <WatchPage />
               </VerificationGate>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Standalone quiz player — distraction-free, no sidebar/navbar */}
+        <Route
+          path="/dashboard/quizzes/:id/play"
+          element={
+            <ProtectedRoute>
+              <QuizPlayerPage />
             </ProtectedRoute>
           }
         />
@@ -162,6 +184,10 @@ function AnimatedRoutes() {
           <Route path="featured" element={<AdminFeaturedPage />} />
           <Route path="marks" element={<AdminMarksPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
+          <Route path="quizzes" element={<AdminQuizListPage />} />
+          <Route path="quizzes/new" element={<AdminQuizBuilderPage />} />
+          <Route path="quizzes/:id/edit" element={<AdminQuizBuilderPage />} />
+          <Route path="quizzes/:id/results" element={<AdminQuizResultsPage />} />
         </Route>
       </Routes>
     </AnimatePresence>

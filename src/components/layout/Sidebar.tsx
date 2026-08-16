@@ -9,7 +9,8 @@ import {
   LogOutIcon,
   UserIcon,
   ShoppingCartIcon,
-  FileTextIcon
+  FileTextIcon,
+  ClipboardListIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,6 +21,7 @@ const menuGroups = [
     items: [
       { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboardIcon, end: true },
       { name: 'My Classes', path: '/dashboard/courses', icon: BookOpenIcon },
+      { name: 'AQuiz', path: '/dashboard/quizzes', icon: ClipboardListIcon },
       { name: 'Lesson Store', path: '/dashboard/extra-classes', icon: ShoppingCartIcon },
       { name: 'Papers', path: '/dashboard/papers', icon: FileTextIcon }
     ]
