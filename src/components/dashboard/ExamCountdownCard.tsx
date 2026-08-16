@@ -18,12 +18,11 @@ export function ExamCountdownCard() {
         .from('batch_members')
         .select('batch:batches ( exam_date, exam_year )')
         .eq('student_id', user.id)
-        .limit(1)
-        .maybeSingle();
+        .limit(1);
         
       let targetDate: Date | null = null;
       
-      const batchData = data?.batch as any;
+      const batchData = data?.[0]?.batch as any;
       if (batchData?.exam_date) {
         targetDate = new Date(batchData.exam_date);
       } else if (batchData?.exam_year || user.examYear) {
