@@ -56,8 +56,11 @@ export function Sidebar() {
     <aside
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="hidden lg:flex flex-col h-[calc(100vh-2rem)] sticky top-4 bg-[#18181B] dark:bg-[#121212] rounded-[2rem] py-6 px-3 shadow-2xl transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)] z-40"
-      style={{ width: isHovered ? '280px' : '88px' }}
+      className="hidden lg:flex flex-col h-[calc(100vh-2rem)] sticky top-4 rounded-[2rem] py-6 px-3 shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)] z-40 border border-white/80"
+      style={{
+        width: isHovered ? '280px' : '88px',
+        background: 'linear-gradient(160deg, #ffffff 0%, #f5f5f7 60%, #ede8f0 100%)',
+      }}
     >
       {/* Top Logo */}
       <div className="flex items-center gap-3 px-1 mb-10 overflow-hidden shrink-0 mt-2">
@@ -72,7 +75,7 @@ export function Sidebar() {
               exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
               className="whitespace-nowrap min-w-0"
             >
-              <span className="font-bold tracking-tight text-[1.05rem] text-white">
+              <span className="font-bold tracking-tight text-[1.05rem] text-[#172033]">
                 Pasindu Dissanayake
               </span>
             </motion.div>
@@ -89,7 +92,7 @@ export function Sidebar() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                  className="px-5 text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1 whitespace-nowrap"
+                  className="px-5 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1 whitespace-nowrap"
                 >
                   {group.label}
                 </motion.p>
@@ -104,17 +107,17 @@ export function Sidebar() {
                   end={item.end}
                   className={({ isActive }) => `
                     flex items-center gap-3 px-1.5 py-1.5 rounded-2xl transition-all duration-300
-                    ${isActive ? '' : 'hover:bg-white/5'}
+                    ${isActive ? '' : 'hover:bg-black/[0.04]'}
                   `}
                 >
                   {({ isActive }) => (
                     <>
-                      {/* Active State Background Circle around Icon */}
-                      <div className={`relative shrink-0 flex items-center justify-center w-[42px] h-[42px] rounded-[14px] transition-all ${isActive ? 'text-white' : 'text-white/40'}`}>
+                      {/* Active State Background around Icon */}
+                      <div className={`relative shrink-0 flex items-center justify-center w-[42px] h-[42px] rounded-[14px] transition-all ${isActive ? 'text-white' : 'text-slate-400'}`}>
                         {isActive && (
                           <motion.div
                             layoutId="activeNav"
-                            className="absolute inset-0 bg-gradient-to-br from-[#FF2E54] to-[#c20f24] rounded-[14px] shadow-[0_0_18px_rgba(255,46,84,0.5)]"
+                            className="absolute inset-0 bg-gradient-to-br from-[#FF2E54] to-[#c20f24] rounded-[14px] shadow-[0_4px_16px_rgba(194,15,36,0.35)]"
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                           />
                         )}
@@ -127,7 +130,7 @@ export function Sidebar() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
-                            className={`relative z-10 whitespace-nowrap text-[15px] ${isActive ? 'text-white font-bold' : 'text-white/40 font-semibold group-hover:text-white/80'}`}
+                            className={`relative z-10 whitespace-nowrap text-[15px] ${isActive ? 'text-[#c20f24] font-bold' : 'text-slate-500 font-semibold'}`}
                           >
                             {item.name}
                           </motion.span>
@@ -146,7 +149,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="relative w-full flex items-center gap-4 px-3.5 py-3 rounded-2xl text-[15px] font-semibold text-white/40 hover:text-[#FF2E54] hover:bg-white/5 transition-all duration-300 group overflow-hidden"
+          className="relative w-full flex items-center gap-4 px-3.5 py-3 rounded-2xl text-[15px] font-semibold text-slate-400 hover:text-[#c20f24] hover:bg-[#c20f24]/5 transition-all duration-300 group overflow-hidden"
         >
           <div className="relative z-10 shrink-0 flex items-center justify-center w-5 h-5 ml-[3px]">
             <LogOutIcon className="w-5 h-5" />
