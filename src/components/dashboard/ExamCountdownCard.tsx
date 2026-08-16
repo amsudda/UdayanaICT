@@ -14,16 +14,16 @@ export function ExamCountdownCard() {
       if (!user?.id) return;
 
       // Fetch the student's batch membership and the exact exam date from the batch
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('batch_members')
-        .select('batches ( exam_date, exam_year )')
+        .select('batch:batches ( exam_date, exam_year )')
         .eq('student_id', user.id)
         .limit(1)
-        .single();
+        .maybeSingle();
         
       let targetDate: Date | null = null;
       
-      const batchData = data?.batches as any;
+      const batchData = data?.batch as any;
       if (batchData?.exam_date) {
         targetDate = new Date(batchData.exam_date);
       } else if (batchData?.exam_year || user.examYear) {
