@@ -115,7 +115,7 @@ export function QuizReviewPage() {
 
                   return (
                     <div key={opt.id} className={`p-4 rounded-2xl border-2 flex items-center justify-between gap-4 ${style}`}>
-                      <span className="text-base">{opt.option_text}</span>
+                      <span className="text-base">{opt.text}</span>
                       {Icon}
                     </div>
                   );

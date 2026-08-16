@@ -289,7 +289,7 @@ export function QuizPlayerPage() {
                         {isSelected && <div className="h-3 w-3 bg-red-500 rounded-full" />}
                       </div>
                       <span className={`text-base md:text-lg ${isSelected ? 'text-slate-900 dark:text-white font-medium' : 'text-slate-700 dark:text-slate-300'}`}>
-                        {opt.option_text}
+                        {opt.text}
                       </span>
                     </button>
                   );
