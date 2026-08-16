@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { loadLibrary, watchedCount, type LibMonth, type LibPack } from '../data/library';
+import { PageSkeleton } from '../components/shared/PageSkeleton';
 
 const tabs = ['All', 'Lesson Packs', 'Monthly Lessons'] as const;
 type Tab = (typeof tabs)[number];
@@ -112,7 +113,7 @@ export function MyCoursesPage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-apple-subtext dark:text-slate-400">Loading your classes…</p>
+        <PageSkeleton />
       ) : (
         <>
           {/* ── lesson packs ── */}
