@@ -1,7 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring, useAnimationFrame } from 'framer-motion';
 
 export function LiquidyGradient() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = '/images/hero-ribbon-bg.webp';
+    img.onload = () => setIsLoaded(true);
+  }, []);
+
   // Motion values for raw mouse position targets
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -61,7 +69,7 @@ export function LiquidyGradient() {
       className="absolute inset-0 pointer-events-none overflow-hidden z-0"
       aria-hidden
     >
-      {/* Ambient Red Glow behind the ribbon */}
+      {/* Ambient Red Glow behind the ribbon (loads instantly) */}
       <div 
         className="absolute inset-0 w-full h-full opacity-60 dark:opacity-30"
         style={{
@@ -69,34 +77,38 @@ export function LiquidyGradient() {
         }}
       />
 
-      {/* 
-        The Ribbon Image
-        Animated smoothly via framer-motion values outside the React render cycle.
-      */}
-      <motion.div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat mix-blend-multiply dark:mix-blend-screen opacity-100 dark:opacity-90 origin-center"
-        style={{
-          backgroundImage: 'url("/images/hero-ribbon-bg.png")',
-          filter: 'contrast(1.15) brightness(1.1) blur(4px)',
-          x,
-          y,
-          rotate,
-          scale,
-        }}
-      />
+      {/* Fade in the actual image and grain ONLY when image is fully loaded */}
+      <motion.div
+        className="absolute inset-0 w-full h-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+      >
+        <motion.div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat mix-blend-multiply dark:mix-blend-screen opacity-100 dark:opacity-90 origin-center"
+          style={{
+            backgroundImage: 'url("/images/hero-ribbon-bg.webp")',
+            filter: 'contrast(1.15) brightness(1.1) blur(4px)',
+            x,
+            y,
+            rotate,
+            scale,
+          }}
+        />
 
-      {/* 
-        Grain Layer 
-        Using mix-blend-overlay ensures the grain only affects the colored ribbon,
-        leaving the pure white background completely clean.
-      */}
-      <div 
-        className="absolute inset-0 opacity-[0.5] mix-blend-overlay pointer-events-none" 
-        style={{ 
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")',
-          backgroundRepeat: 'repeat'
-        }}
-      />
+        {/* 
+          Grain Layer 
+          Using mix-blend-overlay ensures the grain only affects the colored ribbon,
+          leaving the pure white background completely clean.
+        */}
+        <div 
+          className="absolute inset-0 opacity-[0.5] mix-blend-overlay pointer-events-none" 
+          style={{ 
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")',
+            backgroundRepeat: 'repeat'
+          }}
+        />
+      </motion.div>
 
       {/* ======================================================================
           SEAMLESS NEXT-SECTION TRANSITION
