@@ -31,7 +31,7 @@ export function QuizResultPage() {
           .eq('quiz_id', id)
           .eq('student_id', user.id)
           .eq('status', 'submitted')
-          .single();
+          .maybeSingle();
 
         if (!attData) {
           navigate(`/dashboard/quizzes/${id}`);

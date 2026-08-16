@@ -23,7 +23,7 @@ export function QuizReviewPage() {
           .eq('quiz_id', id)
           .eq('student_id', user.id)
           .eq('status', 'submitted')
-          .single();
+          .maybeSingle();
 
         if (!attempt) {
           navigate(`/dashboard/quizzes`);

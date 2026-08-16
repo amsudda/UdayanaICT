@@ -26,7 +26,7 @@ export function QuizInstructionsPage() {
           .select('status')
           .eq('quiz_id', id)
           .eq('student_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (attempt?.status === 'submitted') {
           navigate(`/dashboard/quizzes/${id}/result`);
@@ -129,7 +129,7 @@ export function QuizInstructionsPage() {
             <div className="font-semibold text-slate-900 dark:text-white text-lg">{quiz.duration_minutes} mins</div>
           </div>
           <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-            <DocumentTextIcon className="h-8 w-8 text-red-500 mb-2" />
+            <FileTextIcon className="h-8 w-8 text-red-500 mb-2" />
             <div className="text-sm text-slate-500 dark:text-slate-400">Questions</div>
             <div className="font-semibold text-slate-900 dark:text-white text-lg">{questionCount}</div>
           </div>

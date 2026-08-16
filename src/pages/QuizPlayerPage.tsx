@@ -61,7 +61,7 @@ export function QuizPlayerPage() {
           .eq('quiz_id', id)
           .eq('student_id', user.id)
           .eq('status', 'in_progress')
-          .single();
+          .maybeSingle();
 
         if (!attemptData) {
           const { data: newAttempt, error: attemptErr } = await supabase
