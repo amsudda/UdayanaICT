@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ClockIcon, TrendingUpIcon, CalendarDaysIcon, PlusIcon, XIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
@@ -141,9 +142,9 @@ export function StudyTimeCard() {
       </DashboardCardContent>
 
       {/* daily log modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={dismiss} />
+      {modalOpen && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={dismiss} />
           <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6">
             <button onClick={dismiss} className="absolute top-4 right-4 text-apple-subtext hover:text-apple-text" aria-label="Close"><XIcon className="w-5 h-5" /></button>
             <div className="flex items-center gap-2 mb-2">
@@ -172,7 +173,8 @@ export function StudyTimeCard() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </DashboardCard>
   );
