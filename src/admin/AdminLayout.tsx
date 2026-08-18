@@ -30,7 +30,7 @@ const nav = [
   { name: 'Overview', path: '/admin', icon: LayoutDashboardIcon, end: true },
   { name: 'Payments', path: '/admin/payments', icon: ReceiptTextIcon, badge: 'payments' },
   { name: 'Batches', path: '/admin/batches', icon: LayersIcon },
-  { name: 'Timetable', path: '/admin/timetable', icon: BellRingIcon },
+
   { name: 'Packs', path: '/admin/packs', icon: PackageIcon },
   { name: 'Monthly Recordings', path: '/admin/theory', icon: VideoIcon },
   { name: 'Students', path: '/admin/students', icon: UsersIcon, badge: 'ids' },

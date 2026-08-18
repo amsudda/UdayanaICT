@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { WelcomeCard } from '../components/dashboard/WelcomeCard';
 import { ExamCountdownCard } from '../components/dashboard/ExamCountdownCard';
 import { StudentProgressCard } from '../components/dashboard/StudentProgressCard';
-import { TimetableCard } from '../components/dashboard/TimetableCard';
+
 import { NoticesCard } from '../components/dashboard/NoticesCard';
 import { StudyTimeCard } from '../components/shared/StudyTimeCard';
 import { MarksChart, type Mark } from '../components/shared/MarksChart';
@@ -57,15 +57,12 @@ export function DashboardPage() {
         </motion.div>
       </div>
 
-      {/* Row 3: Timetable & Performance */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
-        <motion.div variants={item} className="h-full">
-          <TimetableCard />
-        </motion.div>
+      {/* Row 3: Performance */}
+      <div className="grid grid-cols-1">
         <motion.div variants={item} className="h-full">
           <DashboardCard delay={0.2} className="h-full">
             <DashboardCardHeader>
-              <DashboardCardTitle icon={TrendingUpIcon}>Performance</DashboardCardTitle>
+               <DashboardCardTitle icon={TrendingUpIcon}>Performance</DashboardCardTitle>
             </DashboardCardHeader>
             <DashboardCardContent>
               <MarksChart marks={marks} />
