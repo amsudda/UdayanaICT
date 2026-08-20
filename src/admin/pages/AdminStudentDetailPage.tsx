@@ -22,7 +22,8 @@ import {
   Trash2Icon,
   UserIcon,
   VideoIcon,
-  XCircleIcon
+  XCircleIcon,
+  ClipboardListIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
@@ -112,6 +113,7 @@ export function AdminStudentDetailPage() {
   const [batchIds, setBatchIds] = useState<Set<string>>(new Set());
   const [packs, setPacks] = useState<any[]>([]);
   const [months, setMonths] = useState<any[]>([]);
+  const [quizAttempts, setQuizAttempts] = useState<any[]>([]);
   const [packEnr, setPackEnr] = useState<Record<string, Enr>>({});
   const [monthEnr, setMonthEnr] = useState<Record<string, Enr>>({});
   const [paidMonths, setPaidMonths] = useState<Set<string>>(new Set());
@@ -155,7 +157,7 @@ export function AdminStudentDetailPage() {
   const load = useCallback(async () => {
     if (!id) return;
     setLoading(true);
-    const [{ data: s }, { data: bs }, { data: ps }, { data: ms }, { data: pays }] = await Promise.all([
+    const [{ data: s }, { data: bs }, { data: ps }, { data: ms }, { data: pays }, { data: qa }] = await Promise.all([
       supabase
         .from('profiles')
         .select('*, batch_members(batch:batches(id,name,program,exam_year))')
@@ -173,7 +175,13 @@ export function AdminStudentDetailPage() {
         .eq('is_published', true)
         .order('year', { ascending: false })
         .order('created_at', { ascending: false }),
-      supabase.from('payments').select('*').eq('student_id', id).order('created_at', { ascending: false })
+      supabase.from('payments').select('*').eq('student_id', id).order('created_at', { ascending: false }),
+      supabase
+        .from('quiz_attempts')
+        .select('*, quiz:quizzes(title)')
+        .eq('student_id', id)
+        .eq('status', 'submitted')
+        .order('submitted_at', { ascending: false })
     ]);
 
     if (!s) {
@@ -187,6 +195,7 @@ export function AdminStudentDetailPage() {
     setPacks(ps ?? []);
     setMonths(ms ?? []);
     setPayments(pays ?? []);
+    setQuizAttempts(qa ?? []);
     setPaidMonths(
       new Set(
         (pays ?? [])
@@ -617,6 +626,32 @@ export function AdminStudentDetailPage() {
                     <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0 ${statusBadge[p.status]}`}>
                       {p.status}
                     </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          <Card icon={ClipboardListIcon} title="Quiz Performance" desc="Completed AQuiz attempts." accent="text-amber-600 bg-amber-50">
+            {quizAttempts.length === 0 ? (
+              <p className="text-sm text-slate-400">No quizzes completed yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {quizAttempts.map((qa) => (
+                  <div
+                    key={qa.id}
+                    className="flex items-center justify-between gap-2 text-sm border border-slate-100 rounded-xl px-3 py-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-slate-800 font-medium truncate">{qa.quiz?.title || 'Unknown Quiz'}</p>
+                      <p className="text-[10px] text-slate-500">{new Date(qa.submitted_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <span className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded-md ${qa.passed ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                        {qa.percentage}%
+                      </span>
+                      <p className="text-[10px] text-slate-500 font-medium mt-0.5">{qa.score}/{qa.total_marks}</p>
+                    </div>
                   </div>
                 ))}
               </div>
