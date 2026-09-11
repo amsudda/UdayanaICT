@@ -1,24 +1,28 @@
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
+import { EASE, VIEWPORT } from './tokens';
 
 interface SoftRevealProps {
   children: ReactNode;
   delay?: number;
   className?: string;
+  amount?: number | 'some' | 'all';
 }
 
-const transition = {
-  duration: 1.0,
-  ease: [0.16, 1, 0.3, 1],
-};
-
-export function SoftReveal({ children, delay = 0, className = '' }: SoftRevealProps) {
+/** Opacity only — for things that shouldn't move, just arrive. Slightly longer
+ *  than a FadeUp because there is no travel to carry the eye. */
+export function SoftReveal({
+  children,
+  delay = 0,
+  className = '',
+  amount = VIEWPORT.amount
+}: SoftRevealProps) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, amount: 0.1, margin: "0px 0px -100px 0px" }}
-      transition={{ ...transition, delay }}
+      viewport={{ ...VIEWPORT, amount }}
+      transition={{ duration: 0.75, ease: EASE, delay }}
       className={className}
     >
       {children}

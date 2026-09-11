@@ -85,14 +85,15 @@
 }
 
 /* ── Smooth "pop" lift for feature / process cards ── */
+/* The card's own lift is driven by framer-motion (StaggerItem `hoverLift`),
+   not by CSS. The reveal animation leaves an inline `transform` on the element
+   and a stylesheet rule can never override an inline style, so a `:hover`
+   transform here would silently do nothing. Transitioning `transform` would
+   also smear framer's per-frame values, so this rule owns shadow + border
+   only, and the icon pop below stays in CSS because it targets a child. */
 .card-pop {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.3s ease;
-  will-change: transform;
-}
-.card-pop:hover {
-  transform: translateY(-8px);
 }
 /* icon springs a touch more than the card for a lively pop */
 .card-pop .pop-icon {
@@ -106,7 +107,6 @@
   .card-pop .pop-icon {
     transition: none;
   }
-  .card-pop:hover,
   .card-pop:hover .pop-icon {
     transform: none;
   }

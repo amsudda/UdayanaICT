@@ -23,7 +23,16 @@ import {
   CalendarDaysIcon,
 } from 'lucide-react';
 
-import { FadeUp, SoftReveal, ImageReveal, Stagger, StaggerItem } from '../components/shared/motion';
+import {
+  FadeUp,
+  SoftReveal,
+  ImageReveal,
+  SplitText,
+  Stagger,
+  StaggerItem,
+  DURATION,
+  EASE
+} from '../components/shared/motion';
 
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -262,7 +271,7 @@ export function LandingPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION, delay: 0.1, ease: EASE }}
                   className="font-pixel inline-flex items-center gap-2 mb-3 md:mb-1 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900 z-10"
                 >
                   <PixelStar className="w-3 h-3 text-amber-400" />
@@ -274,47 +283,49 @@ export function LandingPage() {
                 <motion.img
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
                   src="/images/pd-logo.png"
                   alt="Pasindu Dissanayake Logo"
                   className="w-32 h-32 sm:w-40 sm:h-40 md:w-56 md:h-56 -mt-2 -mb-2 sm:-mt-4 sm:-mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
                 />
 
                 {/* Name */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 25 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                <SplitText
+                  as="h1"
+                  trigger="mount"
+                  delay={0.25}
+                  tier="heading"
                   className="text-[2.5rem] leading-[1.05] sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
                 >
                   Pasindu Dissanayake
-                </motion.h1>
+                </SplitText>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION, delay: 0.44, ease: EASE }}
                   className="mt-2 md:mt-3 text-[10px] sm:text-[11px] md:text-xs font-semibold tracking-[0.18em] sm:tracking-[0.22em] md:tracking-[0.32em] uppercase text-apple-subtext dark:text-slate-400 transition-colors px-2"
                 >
                   Advanced Level Information & Communication Technology
                 </motion.p>
 
                 {/* Tagline */}
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                <SplitText
+                  as="p"
+                  trigger="mount"
+                  delay={0.52}
+                  tier="text"
+                  prefix={<span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none mr-1">"</span>}
+                  suffix={<span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none ml-1">"</span>}
                   className="mt-5 md:mt-7 text-[17px] sm:text-lg md:text-xl font-medium text-apple-text dark:text-apple-light leading-relaxed max-w-md transition-colors px-4"
                 >
-                  <span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none mr-1">"</span>
                   ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
-                  <span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none ml-1">"</span>
-                </motion.p>
+                </SplitText>
 
                 {/* CTA Buttons */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION, delay: 0.7, ease: EASE }}
                   className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 w-full max-w-[280px] sm:max-w-none mx-auto"
                 >
                   <a
@@ -348,7 +359,7 @@ export function LandingPage() {
                 <motion.a
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 1.0, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION, delay: 0.88, ease: EASE }}
                   href="#promos"
                   className="mt-8 md:mt-10 inline-flex flex-col items-center gap-1 text-apple-subtext dark:text-slate-500 hover:text-[#c20f24] dark:hover:text-[#c20f24] transition-colors"
                   aria-label="Scroll down"
@@ -367,7 +378,7 @@ export function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 15, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 1.0, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
                 className="relative flex justify-center lg:justify-end items-center"
               >
                 {/* 1. Atmospheric Background Blend: A large, soft, diffuse warm glow transition */}
@@ -602,7 +613,7 @@ export function LandingPage() {
             </FadeUp>
 
             {/* Testimonial Cards Grid */}
-            <Stagger staggerDelay={0.08} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {reviews.slice(0, reviewCount).map((t, idx) => (
                 <StaggerItem key={t.id ?? idx}>
                   <ReviewCard review={t} />
@@ -739,11 +750,12 @@ export function LandingPage() {
               </h2>
             </FadeUp>
 
-            <Stagger staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {PROCESS_STEPS.map((step, idx) => (
                 <StaggerItem
                   key={step.title}
-                  className={`relative group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] transition-all duration-300 hover:-translate-y-1 overflow-hidden ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
+                  hoverLift={8}
+                  className={`relative group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] transition-shadow duration-300 overflow-hidden ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
                 >
                   {/* Colored top border accent */}
                   <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-[#c20f24]/60 to-[#c20f24]/20`} />

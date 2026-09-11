@@ -1,25 +1,29 @@
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
+import { DURATION, EASE, TIER_Y, VIEWPORT, type RevealTier } from './tokens';
 
 interface FadeUpProps {
   children: ReactNode;
   delay?: number;
   className?: string;
-  amount?: number | "some" | "all";
+  amount?: number | 'some' | 'all';
+  /** How far the block travels before settling. Defaults to the heading tier. */
+  tier?: RevealTier;
 }
 
-const transition = {
-  duration: 0.8,
-  ease: [0.16, 1, 0.3, 1], // Custom premium ease-out
-};
-
-export function FadeUp({ children, delay = 0, className = '', amount = 0.15 }: FadeUpProps) {
+export function FadeUp({
+  children,
+  delay = 0,
+  className = '',
+  amount = VIEWPORT.amount,
+  tier = 'heading'
+}: FadeUpProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: TIER_Y[tier] }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount, margin: "0px 0px -50px 0px" }}
-      transition={{ ...transition, delay }}
+      viewport={{ ...VIEWPORT, amount }}
+      transition={{ duration: DURATION, ease: EASE, delay }}
       className={className}
     >
       {children}

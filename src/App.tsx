@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { SmoothScroll } from './components/shared/SmoothScroll';
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -28,6 +28,7 @@ import { AdminPacksPage } from './admin/pages/AdminPacksPage';
 import { AdminTheoryPage } from './admin/pages/AdminTheoryPage';
 import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
 import { AdminStudentDetailPage } from './admin/pages/AdminStudentDetailPage';
+import { AdminStudentEditPage } from './admin/pages/AdminStudentEditPage';
 import { AdminPromotionsPage } from './admin/pages/AdminPromotionsPage';
 import { AdminSettingsPage } from './admin/pages/AdminSettingsPage';
 import { AdminFeaturedPage } from './admin/pages/AdminFeaturedPage';
@@ -85,8 +86,11 @@ function AdminRoute({ children }: { children: ReactNode }) {
 function AnimatedRoutes() {
   const location = useLocation();
 
+  // No `initial={false}` on the AnimatePresence below: it propagates through
+  // PresenceContext to EVERY descendant motion component and suppresses their
+  // `initial` state, which silently kills every whileInView reveal in the app.
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -178,6 +182,7 @@ function AnimatedRoutes() {
           <Route path="theory" element={<AdminTheoryPage />} />
           <Route path="students" element={<AdminStudentsPage />} />
           <Route path="students/:id" element={<AdminStudentDetailPage />} />
+          <Route path="students/:id/edit" element={<AdminStudentEditPage />} />
           <Route path="promotions" element={<AdminPromotionsPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="books" element={<AdminBooksPage />} />
@@ -197,11 +202,15 @@ function AnimatedRoutes() {
 export function App() {
   return (
     <AuthProvider>
-      <SmoothScroll>
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </SmoothScroll>
+      {/* reducedMotion="user" makes every framer-motion animation respect the
+          OS setting. SmoothScroll already opts Lenis out; this covers the rest. */}
+      <MotionConfig reducedMotion="user">
+        <SmoothScroll>
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </SmoothScroll>
+      </MotionConfig>
     </AuthProvider>
   );
 }
