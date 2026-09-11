@@ -290,30 +290,30 @@ export function Navbar() {
             <div className={`flex justify-between items-center transition-all duration-500 ${isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'}`}>
               <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
                 <motion.img src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={{ scale: 1.08, rotate: -4 }} />
-                <motion.span animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: 0.45 }} className={`font-bold tracking-tight whitespace-nowrap ${isLanding && !scrolled ? 'text-white dark:text-white' : 'text-apple-text dark:text-apple-light'}`}>
+                <motion.span animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: 0.45 }} className="font-bold tracking-tight whitespace-nowrap text-apple-text dark:text-apple-light">
                   Pasindu Dissanayake
                 </motion.span>
               </Link>
               <div className="hidden md:flex items-center gap-0">
                 {navLinks.map((link) => (
-                  <a key={link.href} href={link.href} className={`relative px-2.5 py-1.5 text-[13px] font-medium rounded-full transition-all duration-200 group ${isLanding && !scrolled ? 'text-white/75 hover:text-white hover:bg-white/10' : 'text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light hover:bg-gray-100 dark:hover:bg-white/5'}`}>
+                  <a key={link.href} href={link.href} className="relative px-2.5 py-1.5 text-[13px] font-medium rounded-full transition-all duration-200 group text-apple-subtext dark:text-slate-400 hover:text-apple-text dark:hover:text-apple-light hover:bg-gray-100 dark:hover:bg-white/5">
                     {link.label}
                     <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#c20f24] opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200" />
                   </a>
                 ))}
               </div>
               <div className="hidden md:flex items-center gap-2">
-                <button onClick={() => setIsDarkMode((d) => !d)} className={`p-1.5 rounded-full transition-colors ${isLanding && !scrolled ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-apple-subtext dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/5'}`} aria-label="Toggle dark mode">
+                <button onClick={() => setIsDarkMode((d) => !d)} className="p-1.5 rounded-full transition-colors text-apple-subtext dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/5" aria-label="Toggle dark mode">
                   {isDarkMode ? <SunIcon className="w-4.5 h-4.5" /> : <MoonIcon className="w-4.5 h-4.5" />}
                 </button>
-                <Link to="/login"><button className={`h-8 px-4 text-sm font-semibold rounded-full transition-all duration-200 ${isLanding && !scrolled ? 'text-white/90 hover:text-white hover:bg-white/10 border border-white/20' : 'text-apple-text dark:text-apple-light border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-white/5'}`}>Log In</button></Link>
+                <Link to="/login"><button className="h-8 px-4 text-sm font-semibold rounded-full transition-all duration-200 text-apple-text dark:text-apple-light border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-white/5">Log In</button></Link>
                 <Link to="/signup"><motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="h-8 px-4 text-sm font-semibold rounded-full bg-[#c20f24] hover:bg-[#9c0c1d] text-white shadow-sm hover:shadow-[0_4px_14px_rgba(194,15,36,0.45)] transition-all duration-200">Sign Up</motion.button></Link>
               </div>
               <div className="md:hidden flex items-center gap-1">
-                <button onClick={() => setIsDarkMode((d) => !d)} className={`p-1.5 rounded-full transition-colors ${isLanding && !scrolled ? 'text-white/80' : 'text-apple-text dark:text-apple-light'}`}>
+                <button onClick={() => setIsDarkMode((d) => !d)} className="p-1.5 rounded-full transition-colors text-apple-text dark:text-apple-light">
                   {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
                 </button>
-                <button onClick={() => setIsMobileMenuOpen((o) => !o)} className={`p-1.5 rounded-lg transition-colors ${isLanding && !scrolled ? 'text-white hover:bg-white/10' : 'text-apple-text dark:text-apple-light hover:bg-gray-100 dark:hover:bg-white/5'}`} aria-label="Menu">
+                <button onClick={() => setIsMobileMenuOpen((o) => !o)} className="p-1.5 rounded-lg transition-colors text-apple-text dark:text-apple-light hover:bg-gray-100 dark:hover:bg-white/5" aria-label="Menu">
                   <AnimatePresence mode="wait" initial={false}>
                     {isMobileMenuOpen ? (
                       <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.12 }}><XIcon className="w-5 h-5" /></motion.span>
