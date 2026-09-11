@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { extractYouTubeId as parseYouTubeId } from '../../lib/youtube';
+import { VIDEO_KINDS, toVideoKind, videoKindLabel, type VideoKind } from '../../data/videoCategories';
 import { Drawer } from '../components/Drawer';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 
@@ -91,7 +92,7 @@ export function AdminTheoryPage() {
 
   const [videosMonth, setVideosMonth] = useState<any | null>(null);
   const [videos, setVideos] = useState<any[]>([]);
-  const [vForm, setVForm] = useState<{ id: string; title: string; youtube: string; duration: string; kind: 'lesson' | 'paper'; tutes: { name: string; url: string }[] }>({ id: '', title: '', youtube: '', duration: '', kind: 'lesson', tutes: [] });
+  const [vForm, setVForm] = useState<{ id: string; title: string; youtube: string; duration: string; kind: VideoKind; tutes: { name: string; url: string }[] }>({ id: '', title: '', youtube: '', duration: '', kind: 'lesson', tutes: [] });
   const [tuteFiles, setTuteFiles] = useState<File[]>([]);
   const tuteRef = useRef<HTMLInputElement>(null);
 
@@ -279,7 +280,7 @@ export function AdminTheoryPage() {
   const editVideo = (v: any) => {
     setVForm({
       id: v.id, title: v.title, youtube: v.youtube_id, duration: v.duration_label ?? '',
-      kind: v.kind === 'paper' ? 'paper' : 'lesson',
+      kind: toVideoKind(v.kind),
       tutes: Array.isArray(v.tutes) && v.tutes.length ? v.tutes : v.tute_url ? [{ name: 'Tute PDF', url: v.tute_url }] : []
     });
     setTuteFiles([]);
@@ -599,12 +600,12 @@ export function AdminTheoryPage() {
           <input className={inputCls} value={vForm.youtube} onChange={(e) => setVForm({ ...vForm, youtube: e.target.value })} placeholder="YouTube link or ID (optional — leave blank for PDF only)" />
           <input className={inputCls} value={vForm.duration} onChange={(e) => setVForm({ ...vForm, duration: e.target.value })} placeholder="Duration e.g. 1 hr 20 mins" />
 
-          {/* session type */}
+          {/* category — decides which section the video appears under on the course page */}
           <div className="flex rounded-lg bg-slate-100 p-0.5">
-            {([['lesson', 'Lesson video'], ['paper', 'Paper discussion']] as const).map(([key, label]) => (
+            {VIDEO_KINDS.map(({ key, short }) => (
               <button key={key} type="button" onClick={() => setVForm({ ...vForm, kind: key })}
                 className={`flex-1 h-8 rounded-md text-xs font-semibold transition-colors ${vForm.kind === key ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
-                {label}
+                {short}
               </button>
             ))}
           </div>
@@ -658,7 +659,7 @@ export function AdminTheoryPage() {
               <GripVerticalIcon className="w-4 h-4 text-slate-300 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-900 truncate">{v.title}</p>
-                <p className="text-xs text-slate-400 truncate">{v.kind === 'paper' ? '📝 Paper · ' : ''}{v.duration_label || '—'} · {v.youtube_id}{(() => { const n = Array.isArray(v.tutes) && v.tutes.length ? v.tutes.length : v.tute_url ? 1 : 0; return n ? ` · ${n} PDF${n > 1 ? 's' : ''}` : ''; })()}</p>
+                <p className="text-xs text-slate-400 truncate">{toVideoKind(v.kind) === 'lesson' ? '' : `📝 ${videoKindLabel(toVideoKind(v.kind), 'short')} · `}{v.duration_label || '—'} · {v.youtube_id}{(() => { const n = Array.isArray(v.tutes) && v.tutes.length ? v.tutes.length : v.tute_url ? 1 : 0; return n ? ` · ${n} PDF${n > 1 ? 's' : ''}` : ''; })()}</p>
               </div>
               <button onClick={() => editVideo(v)} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><PencilIcon className="w-4 h-4" /></button>
               <button onClick={() => deleteVideo(v.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"><Trash2Icon className="w-4 h-4" /></button>

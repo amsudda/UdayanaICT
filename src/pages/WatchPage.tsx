@@ -29,11 +29,19 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { extractYouTubeId } from '../lib/youtube';
+import { toVideoKind, videoKindLabel, type VideoKind } from '../data/videoCategories';
 
 type Tute = { name: string; url: string };
-type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind?: 'lesson' | 'paper' };
+type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind: VideoKind };
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+
+// category badge colours on the dark player page — lessons carry no badge
+const darkKindBadge: Record<VideoKind, string> = {
+  lesson: '',
+  question_book: 'text-sky-300 bg-sky-500/15 border-sky-500/30',
+  paper: 'text-amber-300 bg-amber-500/15 border-amber-500/30'
+};
 
 /* ── YouTube IFrame Player API ─────────────────── */
 declare global {
@@ -123,6 +131,11 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
   const seekingRef = useRef(false);
   const lastSeekRef = useRef(0); // grace period so the poll doesn't snap the bar back mid-seek
   const [playing, setPlaying] = useState(false);
+  // `playing` alone can't tell a mid-video pause from the poster or the end
+  // screen. The dimmed cover is only wanted for the latter two — dimming a
+  // paused frame just hides the lesson the student stopped on.
+  const [started, setStarted] = useState(false);
+  const [ended, setEnded] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
   const [rate, setRate] = useState(1);
@@ -145,6 +158,12 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
     return () => clearInterval(t);
   }, []);
 
+  // loadVideoById keeps this component mounted, so reset per-video UI state
+  useEffect(() => {
+    setStarted(false);
+    setEnded(false);
+  }, [videoId]);
+
   useEffect(() => {
     const fn = () => setIsFs(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', fn);
@@ -161,8 +180,9 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
   };
   const handleState = (s: number) => {
     if (!window.YT) return;
-    if (s === window.YT.PlayerState.PLAYING) setPlaying(true);
-    else if (s === window.YT.PlayerState.PAUSED || s === window.YT.PlayerState.ENDED) setPlaying(false);
+    if (s === window.YT.PlayerState.PLAYING) { setPlaying(true); setStarted(true); setEnded(false); }
+    else if (s === window.YT.PlayerState.PAUSED) setPlaying(false);
+    else if (s === window.YT.PlayerState.ENDED) { setPlaying(false); setEnded(true); }
   };
 
   const toggle = () => {
@@ -222,7 +242,7 @@ function CustomPlayer({ videoId, onEnded }: { videoId: string; onEnded: () => vo
 
       {/* interception layer — the YouTube iframe never receives clicks/hover */}
       <div
-        className={`absolute inset-0 z-10 transition-colors ${playing ? '' : 'bg-black/95'}`}
+        className={`absolute inset-0 z-10 transition-colors ${!started || ended ? 'bg-black/95' : ''}`}
         onClick={toggle}
         onDoubleClick={toggleFs}
       >
@@ -356,7 +376,7 @@ function PlaylistItem({ lesson, index, isActive, isWatched, onClick }: {
       <div className="flex-1 min-w-0 pt-0.5">
         <p className={`text-[13px] font-semibold leading-snug line-clamp-2 ${isActive ? 'text-white' : isWatched ? 'text-white/45' : 'text-white/85'}`}>{lesson.title}</p>
         <p className="flex items-center gap-1.5 text-[11px] text-white/45 mt-1 flex-wrap">
-          {lesson.kind === 'paper' && <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 rounded px-1.5 py-0.5">Paper</span>}
+          {lesson.kind !== 'lesson' && <span className={`text-[9px] font-black uppercase tracking-wider border rounded px-1.5 py-0.5 ${darkKindBadge[lesson.kind]}`}>{videoKindLabel(lesson.kind, 'short')}</span>}
           <ClockIcon className="w-3 h-3 shrink-0" />{lesson.duration}
           {isWatched && !isActive && <span className="text-emerald-400/70 ml-1 font-medium">· Watched</span>}
         </p>
@@ -423,7 +443,7 @@ export function WatchPage() {
       }
       const mapped: VideoLesson[] = vids.map((v: any) => ({
         id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? '',
-        kind: v.kind === 'paper' ? 'paper' : 'lesson',
+        kind: toVideoKind(v.kind),
         tutes: Array.isArray(v.tutes) && v.tutes.length ? v.tutes : v.tute_url ? [{ name: 'Tute PDF', url: v.tute_url }] : []
       }));
       let stored: string[] = [];
@@ -556,8 +576,8 @@ export function WatchPage() {
                   </button>
                 </div>
                 <div className="flex items-center gap-3 mt-2.5 text-sm text-white/50 flex-wrap">
-                  {active.kind === 'paper' && (
-                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 rounded-md px-2 py-0.5">Paper Discussion</span>
+                  {active.kind !== 'lesson' && (
+                    <span className={`text-[10px] font-black uppercase tracking-wider border rounded-md px-2 py-0.5 ${darkKindBadge[active.kind]}`}>{videoKindLabel(active.kind)}</span>
                   )}
                   <span className="flex items-center gap-1.5"><ClockIcon className="w-3.5 h-3.5" />{active.duration}</span>
                   <span className="text-white/25">·</span>

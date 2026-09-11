@@ -19,11 +19,24 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { extractYouTubeId } from '../../lib/youtube';
+import { VIDEO_KINDS, toVideoKind, videoKindLabel, type VideoKind } from '../../data/videoCategories';
 
 type Tute = { name: string; url: string };
-type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind?: 'lesson' | 'paper' };
+type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind: VideoKind };
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+
+// section-heading accent and card-badge colour per category
+const kindAccent: Record<VideoKind, string> = {
+  lesson: 'bg-[#c20f24]',
+  question_book: 'bg-sky-500',
+  paper: 'bg-amber-500'
+};
+const kindBadge: Record<VideoKind, string> = {
+  lesson: 'text-[#c20f24] bg-red-50',
+  question_book: 'text-sky-700 bg-sky-50',
+  paper: 'text-amber-600 bg-amber-50'
+};
 
 export function CourseDetailsPage() {
   const { packId } = useParams();
@@ -84,7 +97,7 @@ export function CourseDetailsPage() {
 
     const mapped: VideoLesson[] = vids.map((v: any) => ({
       id: v.id, title: v.title, youtubeId: extractYouTubeId(v.youtube_id), duration: v.duration_label ?? '', description: v.description ?? '',
-      kind: v.kind === 'paper' ? 'paper' : 'lesson',
+      kind: toVideoKind(v.kind),
       tutes: Array.isArray(v.tutes) && v.tutes.length ? v.tutes : v.tute_url ? [{ name: 'Tute PDF', url: v.tute_url }] : []
     }));
 
@@ -131,6 +144,19 @@ export function CourseDetailsPage() {
   
   // Extract all unique tutes from all lessons
   const allTutes = lessons.flatMap(l => l.tutes).filter((t, i, arr) => arr.findIndex(x => x.url === t.url) === i);
+
+  // Group videos into their admin-assigned categories, in VIDEO_KINDS order.
+  // The "Day" badge keeps each video's position in the full list, so the
+  // class chronology survives the regrouping.
+  const dayOf = new Map(lessons.map((l, i) => [l.id, i + 1]));
+  const sections = VIDEO_KINDS
+    .map((k) => ({ ...k, items: lessons.filter((l) => l.kind === k.key) }))
+    .filter((sec) => sec.items.length > 0);
+  // With only one category present — every pack, and any month not yet
+  // categorised — a heading would just restate the obvious, or mislabel a
+  // paper pack as "Lesson" since pack videos carry no category. Headings
+  // appear once there is something to tell apart.
+  const showSectionHeadings = sections.length > 1;
 
   return (
     <div className="max-w-6xl mx-auto pb-24 lg:pb-12">
@@ -308,76 +334,93 @@ export function CourseDetailsPage() {
              </span>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {lessons.map((lesson, idx) => {
-              const isWatched = watchedIds.has(lesson.id);
-              return (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: Math.min(idx * 0.05, 0.5) }}
-                  key={lesson.id}
-                  onClick={() => navigate(`/dashboard/watch/${packId}?v=${lesson.id}`)}
-                  className="w-full group text-left flex flex-col p-4 rounded-[1.5rem] bg-white border border-slate-100 hover:border-[#c20f24]/30 hover:shadow-[0_12px_30px_-10px_rgba(194,15,36,0.15)] transition-all duration-300"
-                >
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden shrink-0 bg-slate-100 mb-4 shadow-sm">
-                    {lesson.youtubeId ? (
-                      <img src={ytThumb(lesson.youtubeId)} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-red-500/5 text-[#c20f24]">
-                        <FileTextIcon className="w-8 h-8 opacity-50" />
-                      </div>
-                    )}
-                    
-                    {/* Dark Overlay on Hover */}
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
-                    
-                    {/* Play Button Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl ring-1 ring-white/40">
-                         <PlayIcon className="w-5 h-5 text-white fill-current ml-1" />
-                      </div>
-                    </div>
-                    
-                    {/* Duration Badge */}
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold rounded-md">
-                      {lesson.duration}
-                    </div>
-
-                    {/* Watched Overlay */}
-                    {isWatched && (
-                      <div className="absolute top-2 left-2 px-2 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-md flex items-center gap-1 shadow-sm">
-                        <CheckIcon className="w-3 h-3" /> WATCHED
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 w-full">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-black text-[#c20f24] tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded text-xs">
-                        Day {idx + 1}
-                      </span>
-                      {lesson.kind === 'paper' && (
-                        <span className="text-[10px] font-black text-amber-600 tracking-widest uppercase bg-amber-50 px-2 py-0.5 rounded text-xs">
-                          Paper
-                        </span>
-                      )}
-                    </div>
-                    
-                    <h3 className="text-base font-bold text-slate-900 group-hover:text-[#c20f24] transition-colors line-clamp-2 leading-snug mb-3">
-                      {lesson.title}
+          <div className="space-y-12">
+            {sections.map((section) => (
+              <section key={section.key}>
+                {showSectionHeadings && (
+                  <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-200/70">
+                    <h3 className="flex items-center gap-2.5 text-lg font-black text-slate-900 tracking-tight">
+                      <span className={`w-1.5 h-5 rounded-full ${kindAccent[section.key]}`} aria-hidden="true" />
+                      {section.label}
                     </h3>
-                    
-                    <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500 mt-auto">
-                      {lesson.tutes.length > 0 && (
-                        <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg border border-slate-100 text-slate-600">
-                           <FileTextIcon className="w-3.5 h-3.5 text-blue-500" /> 
-                           {lesson.tutes.length} {lesson.tutes.length === 1 ? 'Material' : 'Materials'}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-xs font-bold text-slate-400 tracking-wide">
+                      {section.items.length} {section.items.length === 1 ? 'VIDEO' : 'VIDEOS'}
+                    </span>
                   </div>
-                </motion.button>
-              );
-            })}
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {section.items.map((lesson, pos) => {
+                    const isWatched = watchedIds.has(lesson.id);
+                    return (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: Math.min(pos * 0.05, 0.5) }}
+                        key={lesson.id}
+                        onClick={() => navigate(`/dashboard/watch/${packId}?v=${lesson.id}`)}
+                        className="w-full group text-left flex flex-col p-4 rounded-[1.5rem] bg-white border border-slate-100 hover:border-[#c20f24]/30 hover:shadow-[0_12px_30px_-10px_rgba(194,15,36,0.15)] transition-all duration-300"
+                      >
+                        <div className="relative w-full aspect-video rounded-xl overflow-hidden shrink-0 bg-slate-100 mb-4 shadow-sm">
+                          {lesson.youtubeId ? (
+                            <img src={ytThumb(lesson.youtubeId)} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-red-500/5 text-[#c20f24]">
+                              <FileTextIcon className="w-8 h-8 opacity-50" />
+                            </div>
+                          )}
+                    
+                          {/* Dark Overlay on Hover */}
+                          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
+                    
+                          {/* Play Button Overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl ring-1 ring-white/40">
+                               <PlayIcon className="w-5 h-5 text-white fill-current ml-1" />
+                            </div>
+                          </div>
+                    
+                          {/* Duration Badge */}
+                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold rounded-md">
+                            {lesson.duration}
+                          </div>
+
+                          {/* Watched Overlay */}
+                          {isWatched && (
+                            <div className="absolute top-2 left-2 px-2 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-md flex items-center gap-1 shadow-sm">
+                              <CheckIcon className="w-3 h-3" /> WATCHED
+                            </div>
+                          )}
+                        </div>
+                  
+                        <div className="flex-1 w-full">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] font-black text-[#c20f24] tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded text-xs">
+                              Day {dayOf.get(lesson.id)}
+                            </span>
+                            {!showSectionHeadings && lesson.kind !== 'lesson' && (
+                              <span className={`text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded text-xs ${kindBadge[lesson.kind]}`}>
+                                {videoKindLabel(lesson.kind, 'short')}
+                              </span>
+                            )}
+                          </div>
+                    
+                          <h3 className="text-base font-bold text-slate-900 group-hover:text-[#c20f24] transition-colors line-clamp-2 leading-snug mb-3">
+                            {lesson.title}
+                          </h3>
+                    
+                          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500 mt-auto">
+                            {lesson.tutes.length > 0 && (
+                              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg border border-slate-100 text-slate-600">
+                                 <FileTextIcon className="w-3.5 h-3.5 text-blue-500" /> 
+                                 {lesson.tutes.length} {lesson.tutes.length === 1 ? 'Material' : 'Materials'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
           </div>
         </div>
 

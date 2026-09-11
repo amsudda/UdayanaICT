@@ -73,7 +73,7 @@ create table if not exists public.theory_videos (
   duration_label text, sort_order int not null default 0, description text,
   tute_url text,
   tutes jsonb not null default '[]'::jsonb,
-  kind text not null default 'lesson' check (kind in ('lesson','paper'))
+  kind text not null default 'lesson' check (kind in ('lesson','question_book','paper'))
 );
 
 create table if not exists public.theory_live_links (
