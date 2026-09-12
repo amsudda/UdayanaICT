@@ -112,6 +112,16 @@ export function AdminTheoryPage() {
   const hwRef = useRef<HTMLInputElement>(null);
   const schemeRef = useRef<HTMLInputElement>(null);
 
+  // paper class papers state — mirrors the homework sheets state above
+  const [papers, setPapers] = useState<any[]>([]);
+  const [ppForm, setPpForm] = useState({ id: '', title: '' });
+  const [ppFile, setPpFile] = useState<File | null>(null);
+  const [ppSchemeFile, setPpSchemeFile] = useState<File | null>(null);
+  const [ppSaving, setPpSaving] = useState(false);
+  const [ppMsg, setPpMsg] = useState('');
+  const ppRef = useRef<HTMLInputElement>(null);
+  const ppSchemeRef = useRef<HTMLInputElement>(null);
+
   // list organisation
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
@@ -361,6 +371,73 @@ export function AdminTheoryPage() {
     if (homeworkMonth) loadHomework(homeworkMonth.id);
   };
 
+  /* ── Paper Class Papers ── */
+  const [papersMonth, setPapersMonth] = useState<any | null>(null);
+
+  const openPapersModal = async (m: any) => {
+    setPapersMonth(m);
+    setPpForm({ id: '', title: '' });
+    setPpFile(null);
+    setPpSchemeFile(null);
+    loadPapers(m.id);
+  };
+
+  const loadPapers = async (monthId: string) => {
+    const { data } = await supabase.from('theory_papers').select('*').eq('theory_month_id', monthId).order('sort_order');
+    setPapers(data ?? []);
+  };
+
+  const savePaper = async () => {
+    if (!papersMonth || !ppForm.title.trim()) return;
+    setPpSaving(true);
+    let paper_url: string | null = null;
+    let scheme_url: string | null = null;
+
+    if (ppFile) {
+      const path = `theory-papers/${papersMonth.id}/${Date.now()}-paper.pdf`;
+      const { error } = await supabase.storage.from('tutes').upload(path, ppFile, { upsert: true, contentType: 'application/pdf' });
+      if (error) { alert(`Could not upload paper PDF:\n${error.message}`); setPpSaving(false); return; }
+      paper_url = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+    }
+    if (ppSchemeFile) {
+      const path = `theory-papers/${papersMonth.id}/${Date.now()}-scheme.pdf`;
+      const { error } = await supabase.storage.from('tutes').upload(path, ppSchemeFile, { upsert: true, contentType: 'application/pdf' });
+      if (error) { alert(`Could not upload marking scheme PDF:\n${error.message}`); setPpSaving(false); return; }
+      scheme_url = supabase.storage.from('tutes').getPublicUrl(path).data.publicUrl;
+    }
+
+    const payload: any = { title: ppForm.title.trim() };
+    if (paper_url) payload.paper_url = paper_url;
+    if (scheme_url) payload.scheme_url = scheme_url;
+
+    let error;
+    if (ppForm.id) {
+      ({ error } = await supabase.from('theory_papers').update(payload).eq('id', ppForm.id));
+    } else {
+      const { data: existing } = await supabase.from('theory_papers').select('sort_order').eq('theory_month_id', papersMonth.id).order('sort_order', { ascending: false }).limit(1);
+      const nextOrder = existing && existing.length ? (existing[0].sort_order ?? 0) + 1 : 0;
+      ({ error } = await supabase.from('theory_papers').insert({ ...payload, theory_month_id: papersMonth.id, sort_order: nextOrder }));
+    }
+    if (error) {
+      alert(`Could not save the paper:\n${error.message}\n\nIf this mentions a missing table, run supabase/migration_theory_papers.sql in the Supabase SQL editor.`);
+      setPpSaving(false);
+      return;
+    }
+
+    setPpForm({ id: '', title: '' });
+    setPpFile(null);
+    setPpSchemeFile(null);
+    setPpMsg(`"${payload.title}" saved ✓`);
+    window.setTimeout(() => setPpMsg(''), 5000);
+    loadPapers(papersMonth.id);
+    setPpSaving(false);
+  };
+
+  const deletePaper = async (id: string) => {
+    await supabase.from('theory_papers').delete().eq('id', id);
+    if (papersMonth) loadPapers(papersMonth.id);
+  };
+
   const filteredMonths = months.filter((m) => {
     const okStatus = statusFilter === 'all' || (statusFilter === 'published' ? m.is_published : !m.is_published);
     const hay = `${m.month} ${m.year} ${(m.topics ?? []).join(' ')}`.toLowerCase();
@@ -456,6 +533,9 @@ export function AdminTheoryPage() {
                 </button>
                 <button onClick={() => openHomeworkModal(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-50">
                   <ClipboardListIcon className="w-4 h-4" /> <span className="hidden sm:inline">Homework</span>
+                </button>
+                <button onClick={() => openPapersModal(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50">
+                  <FileTextIcon className="w-4 h-4" /> <span className="hidden sm:inline">Papers</span>
                 </button>
                 <button onClick={() => openLinks(m)} className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50">
                   <LinkIcon className="w-4 h-4" /> <span className="hidden sm:inline">Live Links</span>
@@ -767,6 +847,110 @@ export function AdminTheoryPage() {
                         </div>
                         <button onClick={() => { setHwForm({ id: h.id, title: h.title, week: '' }); setHwFile(null); setSchemeFile(null); }} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 shrink-0"><PencilIcon className="w-4 h-4" /></button>
                         <button onClick={() => deleteHomework(h.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 shrink-0"><Trash2Icon className="w-4 h-4" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Paper class papers modal ── */}
+      {papersMonth && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setPapersMonth(null)} />
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                  <FileTextIcon className="w-5 h-5 text-amber-500" />
+                  {papersMonth.month} {papersMonth.year} — Paper Class Papers
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">Upload paper class papers and their marking schemes for students.</p>
+              </div>
+              <button onClick={() => setPapersMonth(null)} className="p-2 text-slate-400 hover:bg-slate-100 rounded-full"><XIcon className="w-5 h-5" /></button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-6">
+              <input ref={ppRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setPpFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
+              <input ref={ppSchemeRef} type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => { setPpSchemeFile(e.target.files?.[0] ?? null); e.target.value = ''; }} />
+
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4">
+                <p className="text-sm font-bold text-slate-800">{ppForm.id ? 'Edit Paper' : 'Add New Paper'}</p>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Title</label>
+                  <input className={inputCls} value={ppForm.title} onChange={(e) => setPpForm({ ...ppForm, title: e.target.value })} placeholder="e.g. Paper Class 04 — Databases" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Paper (PDF)</label>
+                    <button type="button" onClick={() => ppRef.current?.click()}
+                      className={`w-full h-11 rounded-xl border-2 border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors font-medium ${ppFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-amber-400 hover:text-amber-600'}`}>
+                      <FileTextIcon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{ppFile ? ppFile.name : 'Upload paper PDF'}</span>
+                    </button>
+                    {ppFile && <button type="button" onClick={() => setPpFile(null)} className="text-xs text-red-400 hover:text-red-600 mt-1">Remove</button>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Marking Scheme (PDF)</label>
+                    <button type="button" onClick={() => ppSchemeRef.current?.click()}
+                      className={`w-full h-11 rounded-xl border-2 border-dashed text-sm flex items-center justify-center gap-2 px-3 transition-colors font-medium ${ppSchemeFile ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-300 bg-white text-slate-500 hover:border-purple-400 hover:text-purple-600'}`}>
+                      <BookOpenIcon className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{ppSchemeFile ? ppSchemeFile.name : 'Upload marking scheme'}</span>
+                    </button>
+                    {ppSchemeFile && <button type="button" onClick={() => setPpSchemeFile(null)} className="text-xs text-red-400 hover:text-red-600 mt-1">Remove</button>}
+                  </div>
+                </div>
+
+                {ppMsg && <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">{ppMsg}</p>}
+
+                <div className="flex gap-2 pt-1">
+                  {ppForm.id && (
+                    <button onClick={() => { setPpForm({ id: '', title: '' }); setPpFile(null); setPpSchemeFile(null); }}
+                      className="h-10 px-4 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                      Cancel
+                    </button>
+                  )}
+                  <button onClick={savePaper} disabled={ppSaving || !ppForm.title.trim()}
+                    className="flex-1 h-10 rounded-xl bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                    {ppSaving && <Loader2Icon className="w-4 h-4 animate-spin" />}
+                    {ppForm.id ? 'Update Paper' : 'Add Paper'}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{papers.length} Paper{papers.length === 1 ? '' : 's'} Uploaded</p>
+                {papers.length === 0 ? (
+                  <div className="text-center py-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50">
+                    <FileTextIcon className="w-7 h-7 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-400">No paper class papers yet for this month.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {papers.map((pp) => (
+                      <div key={pp.id} className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 hover:shadow-sm transition-shadow">
+                        <FileTextIcon className="w-5 h-5 text-amber-400 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 truncate">{pp.title}</p>
+                          <div className="flex items-center gap-4 mt-0.5 flex-wrap">
+                            {pp.paper_url
+                              ? <a href={pp.paper_url} target="_blank" rel="noreferrer" className="text-xs text-amber-600 hover:underline inline-flex items-center gap-1 font-medium"><FileTextIcon className="w-3 h-3" /> Paper PDF</a>
+                              : <span className="text-xs text-slate-300">No paper PDF</span>
+                            }
+                            {pp.scheme_url
+                              ? <a href={pp.scheme_url} target="_blank" rel="noreferrer" className="text-xs text-purple-600 hover:underline inline-flex items-center gap-1 font-medium"><BookOpenIcon className="w-3 h-3" /> Marking Scheme</a>
+                              : <span className="text-xs text-slate-300">No marking scheme</span>
+                            }
+                          </div>
+                        </div>
+                        <button onClick={() => { setPpForm({ id: pp.id, title: pp.title }); setPpFile(null); setPpSchemeFile(null); }} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 shrink-0"><PencilIcon className="w-4 h-4" /></button>
+                        <button onClick={() => deletePaper(pp.id)} className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 shrink-0"><Trash2Icon className="w-4 h-4" /></button>
                       </div>
                     ))}
                   </div>

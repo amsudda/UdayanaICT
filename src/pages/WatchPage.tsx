@@ -399,6 +399,7 @@ export function WatchPage() {
   const [watchedIds, setWatchedIds] = useState<Set<string>>(new Set());
   const [liveLinks, setLiveLinks] = useState<any[]>([]);
   const [homeworks, setHomeworks] = useState<any[]>([]);
+  const [papers, setPapers] = useState<any[]>([]);
   const [mobilePlaylistOpen, setMobilePlaylistOpen] = useState(false);
 
 
@@ -415,6 +416,7 @@ export function WatchPage() {
 
       let live: any[] = [];
       let hws: any[] = [];
+      let pps: any[] = [];
       const { data: pack } = await supabase.from('packs').select('title').eq('id', packId).maybeSingle();
       if (pack) {
         resolvedTitle = pack.title;
@@ -424,14 +426,16 @@ export function WatchPage() {
         const { data: month } = await supabase.from('theory_months').select('month, year, topics').eq('id', packId).maybeSingle();
         if (month) {
           resolvedTitle = Array.isArray(month.topics) && month.topics.length > 0 ? month.topics.join(' · ') : `${month.month} ${month.year} — Recordings`;
-          const [{ data }, { data: links }, { data: hw }] = await Promise.all([
+          const [{ data }, { data: links }, { data: hw }, { data: pp }] = await Promise.all([
             supabase.from('theory_videos').select('*').eq('theory_month_id', packId).order('sort_order'),
             supabase.from('theory_live_links').select('*').eq('theory_month_id', packId).order('sort_order'),
-            supabase.from('theory_homework').select('*').eq('theory_month_id', packId).order('sort_order')
+            supabase.from('theory_homework').select('*').eq('theory_month_id', packId).order('sort_order'),
+            supabase.from('theory_papers').select('*').eq('theory_month_id', packId).order('sort_order')
           ]);
           vids = data;
           live = links ?? [];
           hws = hw ?? [];
+          pps = pp ?? [];
         }
       }
       if (!active) return;
@@ -453,6 +457,7 @@ export function WatchPage() {
       setLessons(mapped);
       setLiveLinks(live);
       setHomeworks(hws);
+      setPapers(pps);
       setWatchedIds(watched);
       
       let initialIndex = Math.max(mapped.findIndex((l) => !watched.has(l.id)), 0);
@@ -602,6 +607,36 @@ export function WatchPage() {
                       >
                         <RadioIcon className="w-4 h-4" /> {l.label || 'Join Live Class'}
                       </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* paper class papers — for theory months */}
+              {papers.length > 0 && (
+                <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.07] px-4 py-4">
+                  <p className="flex items-center gap-2 text-sm font-bold text-amber-300 mb-3">
+                    <FileTextIcon className="w-4 h-4" /> Paper Class Papers
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {papers.map((pp) => (
+                      <div key={pp.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/[0.03] border border-white/[0.05] p-3 rounded-xl">
+                        <span className="text-sm font-semibold text-white/90">{pp.title || 'Paper'}</span>
+                        <div className="flex items-center gap-2">
+                          {pp.paper_url && (
+                            <a href={pp.paper_url} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-semibold hover:bg-amber-500/30 hover:text-amber-200 transition-colors">
+                              <FileTextIcon className="w-3.5 h-3.5" /> Paper
+                            </a>
+                          )}
+                          {pp.scheme_url && (
+                            <a href={pp.scheme_url} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-500/15 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/25 hover:text-emerald-200 transition-colors">
+                              <CheckCircleIcon className="w-3.5 h-3.5" /> Scheme
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
