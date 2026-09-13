@@ -241,9 +241,9 @@ export function CourseDetailsPage() {
         <div className="absolute inset-0 bg-[#7a0010]/30 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#7a0010] via-[#7a0010]/50 to-transparent pointer-events-none" />
 
-        <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-8 p-6 md:p-8 min-h-[260px]">
+        <div className="relative flex flex-col md:flex-row items-center gap-5 md:gap-6 p-5 md:p-6">
           {/* Thumbnail */}
-          <div className="w-full max-w-[280px] md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl shrink-0 ring-1 ring-white/10 group">
+          <div className="w-full max-w-[220px] md:w-[220px] aspect-video rounded-xl overflow-hidden shadow-2xl shrink-0 ring-1 ring-white/10 group">
             {thumbnail ? (
               <img src={thumbnail} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
             ) : (
@@ -255,13 +255,13 @@ export function CourseDetailsPage() {
           
           {/* Info */}
           <div className="flex-1 text-center md:text-left z-10">
-            <button onClick={() => navigate('/dashboard/courses')} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white text-xs font-semibold tracking-wide backdrop-blur-md transition-all mb-4">
+            <button onClick={() => navigate('/dashboard/courses')} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white text-xs font-semibold tracking-wide backdrop-blur-md transition-all mb-3">
               <ArrowLeftIcon className="w-3.5 h-3.5" /> MY CLASSES
             </button>
-            <h1 className="text-2xl md:text-4xl font-black text-white mb-3 leading-tight tracking-tight drop-shadow-md">{title}</h1>
-            {description && <p className="text-white/80 text-sm md:text-sm mb-6 max-w-2xl leading-relaxed font-medium drop-shadow">{description}</p>}
+            <h1 className="text-xl md:text-3xl font-black text-white mb-2 leading-tight tracking-tight drop-shadow-md">{title}</h1>
+            {description && <p className="text-white/80 text-sm mb-4 max-w-2xl leading-relaxed font-medium drop-shadow">{description}</p>}
             
-            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 max-w-md bg-white/5 p-5 rounded-2xl backdrop-blur-sm border border-white/10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 max-w-md bg-white/5 px-4 py-3 rounded-xl backdrop-blur-sm border border-white/10">
               <div className="flex-1 w-full">
                 <div className="flex items-center justify-between text-xs font-bold text-white/80 mb-2 uppercase tracking-wider">
                   <span>Progress</span>
@@ -277,7 +277,7 @@ export function CourseDetailsPage() {
                 </div>
               </div>
               <div className="shrink-0 text-right w-full sm:w-auto">
-                <span className="text-3xl font-black text-white leading-none">{watchedCount}</span>
+                <span className="text-2xl font-black text-white leading-none">{watchedCount}</span>
                 <span className="text-white/40 font-bold ml-1">/ {lessons.length}</span>
                 <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1 font-bold">Completed</div>
               </div>
