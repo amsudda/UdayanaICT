@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { BookOpenIcon, CheckCircleIcon, ClipboardListIcon } from 'lucide-react';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -107,6 +108,33 @@ function Section({ title, count, blurb, index, children }: {
   );
 }
 
+/** A homework sheet as a card: icon, title, then Sheet and Scheme buttons. */
+function HomeworkCard({ title, sheetUrl, schemeUrl }: { title: string; sheetUrl?: string; schemeUrl?: string }) {
+  return (
+    <div className="flex flex-col rounded-2xl bg-slate-50 border border-slate-100 p-5">
+      <span className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+        <ClipboardListIcon className="w-6 h-6" />
+      </span>
+      <p className="mt-4 text-base font-bold text-slate-700 truncate" title={title}>{title}</p>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Weekly Homework</p>
+      <div className="flex flex-wrap items-center gap-2 mt-5">
+        {sheetUrl && (
+          <a href={sheetUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open homework sheet: ${title}`}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2">
+            <BookOpenIcon className="w-4 h-4" /> Sheet
+          </a>
+        )}
+        {schemeUrl && (
+          <a href={schemeUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open marking scheme: ${title}`}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2">
+            <CheckCircleIcon className="w-4 h-4" /> Scheme
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /** One paper or homework sheet: its title, then the question file beside its answers. */
 function PairedItem({ title, fileUrl, schemeUrl, fileLabel }: {
   title: string; fileUrl?: string; schemeUrl?: string; fileLabel: string;
@@ -160,9 +188,9 @@ export function ClassMaterials({ papers, homeworks, notes }: { papers: any[]; ho
       {homeworks.length > 0 && (
         <Section title="Homework Sheets" count={homeworks.length} index={index++}
           blurb="Weekly practice. Mark your own work with the scheme when you're done.">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             {homeworks.map((h, i) => (
-              <PairedItem key={h.id ?? i} title={h.title || 'Homework'} fileUrl={h.homework_url} schemeUrl={h.scheme_url} fileLabel="Homework sheet" />
+              <HomeworkCard key={h.id ?? i} title={h.title || 'Homework'} sheetUrl={h.homework_url} schemeUrl={h.scheme_url} />
             ))}
           </div>
         </Section>
