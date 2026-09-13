@@ -12,14 +12,12 @@ import {
   Loader2Icon,
   LockIcon,
   CheckIcon,
-  ChevronRightIcon,
-  ClipboardListIcon,
-  BookOpenIcon,
-  CheckCircleIcon
+  ChevronRightIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { extractYouTubeId } from '../../lib/youtube';
 import { VIDEO_KINDS, toVideoKind, videoKindLabel, type VideoKind } from '../../data/videoCategories';
+import { ClassMaterials } from '../../components/shared/ClassMaterials';
 
 type Tute = { name: string; url: string };
 type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind: VideoKind };
@@ -427,127 +425,8 @@ export function CourseDetailsPage() {
           </div>
         </div>
 
-        {/* Bottom Section: Study Materials */}
-        <div className="grid grid-cols-1 gap-8">
-          
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-            <h3 className="flex items-center gap-2.5 text-lg font-black text-slate-900 mb-5">
-              <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-                <FileTextIcon className="w-4 h-4" />
-              </div>
-              Study Materials
-            </h3>
-            
-            {allTutes.length === 0 ? (
-              <div className="text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                 <FileTextIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                 <p className="text-sm font-semibold text-slate-500">No materials attached.</p>
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                {allTutes.map((t, idx) => (
-                  <a
-                    key={idx}
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all group"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors shadow-sm">
-                      <FileTextIcon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-700 group-hover:text-slate-900 truncate transition-colors">{t.name || `Study Material ${idx + 1}`}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">PDF Document</p>
-                    </div>
-                    <ChevronRightIcon className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                  </a>
-                ))}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Paper Class Papers Section */}
-          {papers.length > 0 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.35 }} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mt-6">
-              <h3 className="flex items-center gap-2.5 text-lg font-black text-slate-900 mb-5">
-                <div className="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <FileTextIcon className="w-4 h-4" />
-                </div>
-                Paper Class Papers
-              </h3>
-
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                {papers.map((pp, idx) => (
-                  <div key={pp.id || idx} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-all">
-                    <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-sm">
-                      <FileTextIcon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-700 truncate">{pp.title || 'Paper'}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Paper Class</p>
-                    </div>
-                    <div className="flex items-center gap-2 mt-3 sm:mt-0">
-                      {pp.paper_url && (
-                        <a href={pp.paper_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-amber-600 text-white text-xs font-bold hover:bg-amber-500 transition-colors shadow-sm">
-                          <FileTextIcon className="w-3.5 h-3.5" /> Paper
-                        </a>
-                      )}
-                      {pp.scheme_url && (
-                        <a href={pp.scheme_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-400 transition-colors shadow-sm">
-                          <CheckCircleIcon className="w-3.5 h-3.5" /> Scheme
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Homework Sheets Section */}
-          {homeworks.length > 0 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] mt-6">
-              <h3 className="flex items-center gap-2.5 text-lg font-black text-slate-900 mb-5">
-                <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                  <ClipboardListIcon className="w-4 h-4" />
-                </div>
-                Homework Sheets
-              </h3>
-              
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                {homeworks.map((hw, idx) => (
-                  <div key={hw.id || idx} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-all">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
-                      <ClipboardListIcon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-700 truncate">{hw.title || 'Homework'}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Weekly Homework</p>
-                    </div>
-                    <div className="flex items-center gap-2 mt-3 sm:mt-0">
-                      {hw.homework_url && (
-                        <a href={hw.homework_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors shadow-sm">
-                          <BookOpenIcon className="w-3.5 h-3.5" /> Sheet
-                        </a>
-                      )}
-                      {hw.scheme_url && (
-                        <a href={hw.scheme_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-400 transition-colors shadow-sm">
-                          <CheckCircleIcon className="w-3.5 h-3.5" /> Scheme
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-        </div>
+        {/* Class materials — paper class papers, homework sheets and tute notes */}
+        <ClassMaterials papers={papers} homeworks={homeworks} notes={allTutes} />
       </div>
       
       {/* Scrollbar styles to hide/make elegant */}
