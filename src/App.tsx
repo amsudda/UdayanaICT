@@ -19,6 +19,7 @@ import { MyCoursesPage } from './pages/MyCoursesPage';
 import { WatchPage } from './pages/WatchPage';
 import { BuyPackPage } from './pages/BuyPackPage';
 import { VerificationGate } from './components/shared/IdVerification';
+import { LogoLoader } from './components/shared/LogoLoader';
 import { AdminLayout } from './admin/AdminLayout';
 import { AdminOverviewPage } from './admin/pages/AdminOverviewPage';
 import { AdminBatchesPage } from './admin/pages/AdminBatchesPage';
@@ -48,11 +49,7 @@ import { QuizResultPage } from './pages/QuizResultPage';
 import { QuizReviewPage } from './pages/QuizReviewPage';
 
 function FullSpinner() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-apple-light dark:bg-slate-950">
-      <div className="w-8 h-8 rounded-full border-2 border-apple-blue border-t-transparent animate-spin" />
-    </div>
-  );
+  return <LogoLoader />;
 }
 
 function ProtectedRoute({ children }: { children: ReactNode }) {

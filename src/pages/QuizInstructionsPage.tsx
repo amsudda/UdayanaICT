@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ClockIcon, FileTextIcon, BarChart3Icon, ShieldCheckIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { LogoLoader } from '../components/shared/LogoLoader';
 import { useAuth } from '../auth/AuthContext';
 
 export function QuizInstructionsPage() {
@@ -89,9 +90,7 @@ export function QuizInstructionsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-      </div>
+      <LogoLoader variant="inline" label="Loading quiz..." className="min-h-[60vh]" />
     );
   }
 

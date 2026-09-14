@@ -9,7 +9,6 @@ import {
   FilmIcon,
   PlayIcon,
   RadioIcon,
-  Loader2Icon,
   LockIcon,
   CheckIcon,
   ChevronRightIcon
@@ -18,6 +17,7 @@ import { supabase } from '../../lib/supabase';
 import { extractYouTubeId } from '../../lib/youtube';
 import { VIDEO_KINDS, toVideoKind, videoKindLabel, type VideoKind } from '../../data/videoCategories';
 import { ClassMaterials } from '../../components/shared/ClassMaterials';
+import { LogoLoader } from '../../components/shared/LogoLoader';
 
 type Tute = { name: string; url: string };
 type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind: VideoKind };
@@ -118,10 +118,7 @@ export function CourseDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <Loader2Icon className="w-10 h-10 animate-spin text-[#c20f24]/40" />
-        <p className="text-sm font-medium text-slate-400 mt-4 animate-pulse">Loading course details...</p>
-      </div>
+      <LogoLoader variant="inline" label="Loading course..." className="min-h-[60vh]" />
     );
   }
 

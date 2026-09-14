@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClockIcon, CheckCircleIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { LogoLoader } from '../components/shared/LogoLoader';
 import { useAuth } from '../auth/AuthContext';
 
 // Simple seeded random function for shuffling
@@ -223,7 +224,7 @@ export function QuizPlayerPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-slate-50 dark:bg-slate-900"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div></div>;
+    return <LogoLoader label="Loading quiz..." />;
   }
 
   if (!questions.length) return <div className="p-8 text-center text-white">No questions found.</div>;

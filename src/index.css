@@ -111,3 +111,31 @@
     transform: none;
   }
 }
+
+/* ── Branded logo loader (see LogoLoader.tsx; mirrored in index.html) ── */
+.pd-loader-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  background: #f8fafc;
+}
+.pd-loader { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.pd-loader-ring { position: relative; }
+.pd-loader-ring svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  animation: pd-spin 1.1s linear infinite;
+}
+.pd-loader-ring img {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%); object-fit: contain;
+}
+.pd-loader-label {
+  margin: 0; font: 500 13px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #94a3b8; letter-spacing: 0.02em;
+}
+.pd-loader-label--sm { font-size: 12px; }
+@keyframes pd-spin { to { transform: rotate(360deg); } }
+@keyframes pd-pulse { 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) {
+  .pd-loader-ring svg { animation: none; }
+  .pd-loader-ring img { animation: pd-pulse 1.6s ease-in-out infinite; }
+}

@@ -17,6 +17,7 @@ import {
   XIcon
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { LogoLoader } from '../components/shared/LogoLoader';
 import { useAuth } from '../auth/AuthContext';
 import { BANK_DETAILS as FALLBACK_BANK, WHATSAPP_NUMBER as FALLBACK_WA, formatLKR } from '../data/paymentConfig';
 
@@ -149,9 +150,7 @@ export function BuyPackPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-apple-light dark:bg-slate-950 flex items-center justify-center">
-        <Loader2Icon className="w-7 h-7 text-[#c20f24] animate-spin" />
-      </div>
+      <LogoLoader />
     );
   }
 

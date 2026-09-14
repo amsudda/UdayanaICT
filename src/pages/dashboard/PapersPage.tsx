@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { FileTextIcon, Loader2Icon, DownloadIcon, ArrowLeftIcon, MapPinIcon, CalendarIcon, LayoutIcon } from 'lucide-react';
+import { FileTextIcon, DownloadIcon, ArrowLeftIcon, MapPinIcon, CalendarIcon, LayoutIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { LogoLoader } from '../../components/shared/LogoLoader';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function PapersPage() {
@@ -101,7 +102,7 @@ export function PapersPage() {
       </div>
 
       {loading ? (
-        <div className="py-12 flex justify-center"><Loader2Icon className="w-8 h-8 animate-spin text-slate-400" /></div>
+        <LogoLoader variant="inline" label="Loading papers..." />
       ) : (
         <AnimatePresence mode="wait">
           {activeTab === 'main' && (
