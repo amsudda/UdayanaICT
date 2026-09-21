@@ -8,6 +8,10 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      // `short:` = laptop-height screens, used to fit the whole sidebar without scrolling
+      screens: {
+        short: { raw: '(max-height: 800px)' }
+      },
       colors: {
         apple: {
           blue: '#007AFF',

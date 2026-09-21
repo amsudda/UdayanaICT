@@ -1,53 +1,11 @@
 import { ClockIcon, CalendarIcon } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
-import { supabase } from '../../lib/supabase';
 import { DashboardCard, DashboardCardHeader, DashboardCardTitle, DashboardCardContent } from './DashboardCard';
-import { useEffect, useState } from 'react';
+import { useExamCountdown } from '../../data/examCountdown';
 
 export function ExamCountdownCard() {
   const { user } = useAuth();
-  const [daysLeft, setDaysLeft] = useState<number | null>(null);
-  const [examDateStr, setExamDateStr] = useState<string | null>(null);
-  
-  useEffect(() => {
-    const fetchExamDate = async () => {
-      if (!user?.id) return;
-
-      // Fetch the student's batch membership and the exact exam date from the batch
-      const { data, error } = await supabase
-        .from('batch_members')
-        .select('batch:batches ( exam_date, exam_year )')
-        .eq('student_id', user.id)
-        .limit(1);
-        
-      let targetDate: Date | null = null;
-      
-      const batchData = data?.[0]?.batch as any;
-      if (batchData?.exam_date) {
-        targetDate = new Date(batchData.exam_date);
-      } else if (batchData?.exam_year || user.examYear) {
-        // Fallback if no exact date is set by admin
-        const year = batchData?.exam_year || user.examYear;
-        targetDate = new Date(`${year}-08-15T00:00:00`);
-      }
-      
-      if (targetDate) {
-        const now = new Date();
-        const diffTime = targetDate.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        setDaysLeft(diffDays > 0 ? diffDays : 0);
-        
-        setExamDateStr(targetDate.toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric'
-        }));
-      }
-    };
-    
-    fetchExamDate();
-  }, [user]);
+  const { daysLeft, examDateStr } = useExamCountdown();
 
   return (
     <DashboardCard delay={0.1}>

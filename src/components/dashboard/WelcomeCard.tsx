@@ -1,6 +1,11 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { DashboardCard, DashboardCardContent } from './DashboardCard';
-import { BookOpenIcon, TargetIcon, AwardIcon } from 'lucide-react';
+import { BookOpenIcon, TargetIcon, AwardIcon, ChevronRightIcon } from 'lucide-react';
+import { loadMyXp } from '../../data/xp';
+import { rankForXp } from '../../data/ranks';
+import { RankEmblem } from '../achievements/AchievementBadge';
 import type { Mark } from '../shared/MarksChart';
 
 interface WelcomeCardProps {
@@ -9,7 +14,18 @@ interface WelcomeCardProps {
 
 export function WelcomeCard({ marks = [] }: WelcomeCardProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const name = user?.name || 'there';
+  const [xp, setXp] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    loadMyXp().then((v) => { if (active) setXp(v); });
+    return () => { active = false; };
+  }, [user]);
+
+  const rp = rankForXp(xp);
 
   // Calculate accurate stats based on the student's marks
   const completedPapers = marks.length;
@@ -47,8 +63,32 @@ export function WelcomeCard({ marks = [] }: WelcomeCardProps) {
           </div>
         </div>
 
+        {/* Rank & XP: deliberately one quiet line; the details live on the Rank page */}
+        <button
+          type="button"
+          onClick={() => navigate('/dashboard/rank')}
+          className="group mt-7 w-full flex items-center gap-3 rounded-2xl border border-[#E5EAF2] dark:border-slate-700 bg-white/70 dark:bg-slate-800/40 px-4 py-3 text-left hover:border-red-200 dark:hover:border-red-900/50 transition-colors"
+        >
+          <RankEmblem rankKey={rp.current.key} size={36} title={rp.current.name} className="-my-1 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-3 text-xs mb-1.5">
+              <span className="font-bold text-[#172033] dark:text-white truncate">
+                {rp.current.name}
+                <span className="font-medium text-[#64748B] dark:text-slate-400"> · {xp.toLocaleString()} XP</span>
+              </span>
+              <span className="text-[#64748B] dark:text-slate-400 font-medium shrink-0">
+                {rp.next ? `${rp.xpToNext.toLocaleString()} XP to ${rp.next.name}` : 'Top rank reached'}
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div className="h-full rounded-full bg-[#c20f24] transition-[width] duration-700" style={{ width: `${rp.next ? Math.max(rp.progressPct, 2) : 100}%` }} />
+            </div>
+          </div>
+          <ChevronRightIcon className="w-4 h-4 text-slate-300 group-hover:text-[#c20f24] transition-colors shrink-0" />
+        </button>
+
         {/* Quick Stats to fill space beautifully */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 sm:mt-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
           <div className="bg-white/60 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl p-4 border border-red-50 dark:border-red-900/20 flex items-center gap-4 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-colors">
             <div className="w-12 h-12 rounded-[14px] bg-red-50 dark:bg-red-500/10 text-[#c20f24] flex items-center justify-center shrink-0 shadow-sm border border-red-100/50 dark:border-transparent">
               <BookOpenIcon className="w-6 h-6" />

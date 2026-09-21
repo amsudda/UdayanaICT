@@ -73,6 +73,23 @@ export async function loadLeaderboard(
   }));
 }
 
+/** XP earned since the start of this week — the weekly leaderboard metric. */
+export async function loadWeeklyXp(studentId: string): Promise<number> {
+  const monday = new Date();
+  const day = (monday.getDay() + 6) % 7; // Monday = 0
+  monday.setDate(monday.getDate() - day);
+  monday.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from('xp_transactions')
+    .select('amount')
+    .eq('student_id', studentId)
+    .gte('created_at', monday.toISOString());
+
+  if (error || !data) return 0;
+  return (data as any[]).reduce((sum, r) => sum + (r.amount ?? 0), 0);
+}
+
 /**
  * The rows around the student, so someone in 42nd place sees a reachable
  * target instead of a discouraging absolute number. Returns the caller's

@@ -35,7 +35,7 @@ export function LeaderboardCard() {
   const nearMe = user && myIndex > 4 ? sliceAroundMe(rows, user.id, 1) : [];
 
   const tabCls = (active: boolean) =>
-    `flex-1 h-7 px-3 rounded-md text-xs font-semibold transition-colors ${
+    `h-7 px-3 rounded-md text-xs font-semibold whitespace-nowrap transition-colors ${
       active ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
     }`;
@@ -79,7 +79,7 @@ export function LeaderboardCard() {
     <DashboardCard className="h-full" delay={0.2}>
       <DashboardCardHeader>
         <DashboardCardTitle icon={UsersIcon}>Leaderboard</DashboardCardTitle>
-        <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 w-[160px]">
+        <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 shrink-0">
           <button type="button" className={tabCls(scope === 'weekly')} onClick={() => setScope('weekly')}>
             This Week
           </button>

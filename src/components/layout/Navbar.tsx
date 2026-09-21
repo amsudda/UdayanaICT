@@ -98,11 +98,12 @@ export function Navbar() {
               })
             }}
           >
-          <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-10">
-
-
-            {/* Logo */}
-            {!isDashboard && (
+          <div className="flex justify-between items-center h-14 px-4 sm:px-6 lg:px-8 mt-2">
+            {/* Empty space for dashboard to push right cluster */}
+            {isDashboard ? (
+              <div className="flex-1"></div>
+            ) : (
+              /* Logo for Landing */
               <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
                 <motion.img
                   src="/images/pd-logo.png"
@@ -147,32 +148,34 @@ export function Navbar() {
             )}
 
             {/* Right cluster */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-4">
               {isDashboard ? (
                 <>
                   {isAdmin && (
-                    <Link to="/admin" className="text-sm font-semibold text-[#c20f24] hover:underline">
+                    <Link to="/admin" className="text-sm font-semibold text-red-600 hover:underline">
                       Admin
                     </Link>
                   )}
-                  <NotificationBell />
-                  <div className="h-6 w-px bg-gray-200 dark:bg-slate-700" />
-                  <div className="flex items-center gap-2 pl-1.5 pr-1 py-0.5 bg-gray-50 dark:bg-slate-800 rounded-full border border-gray-200/60 dark:border-slate-700 hover:shadow-md transition-all">
-                    <div className="text-right pr-1 hidden sm:block">
-                      <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{displayName}</p>
-                      <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">{user?.studentId || 'Student'}</p>
-                    </div>
-                    {user?.avatar ? (
-                      <img src={user.avatar} alt={displayName} className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-700 object-cover" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-[#c20f24] flex items-center justify-center text-white font-bold text-xs border-2 border-white dark:border-slate-700">
-                        {initials}
-                      </div>
-                    )}
+                  <div className="flex items-center gap-3">
+                     <button className="relative text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors">
+                        <NotificationBell />
+                        <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-black"></span>
+                     </button>
+                     <button className="text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                     </button>
                   </div>
-                  <button onClick={handleLogout} className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors px-2">
-                    Log Out
-                  </button>
+                  
+                  <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
+                  
+                  <div className="flex items-center gap-2">
+                     <button onClick={() => setIsDarkMode((d) => !d)} className="text-amber-500 hover:text-amber-600 transition-colors">
+                        {isDarkMode ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
+                     </button>
+                     <span className="text-[13px] font-semibold text-zinc-600 dark:text-zinc-300">
+                        {new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).replace(/,/g, '')}
+                     </span>
+                  </div>
                 </>
               ) : (
                 <>

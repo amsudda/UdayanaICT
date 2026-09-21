@@ -4,14 +4,11 @@ import { useAuth } from '../auth/AuthContext';
 import { supabase } from '../lib/supabase';
 import { WelcomeCard } from '../components/dashboard/WelcomeCard';
 import { ExamCountdownCard } from '../components/dashboard/ExamCountdownCard';
-import { StudentProgressCard } from '../components/dashboard/StudentProgressCard';
 
 import { NoticesCard } from '../components/dashboard/NoticesCard';
 import { StudyTimeCard } from '../components/shared/StudyTimeCard';
 import { MarksChart, type Mark } from '../components/shared/MarksChart';
 import { QuizPerformanceCard } from '../components/dashboard/QuizPerformanceCard';
-import { RankCard } from '../components/dashboard/RankCard';
-import { LeaderboardCard } from '../components/dashboard/LeaderboardCard';
 import { DashboardCard, DashboardCardHeader, DashboardCardTitle, DashboardCardContent } from '../components/dashboard/DashboardCard';
 import { TrendingUpIcon, WalletIcon, ArrowRightIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -53,20 +50,7 @@ export function DashboardPage() {
         </motion.div>
       </div>
 
-      {/* Row 2: Student Progression */}
-      <div className="grid grid-cols-1">
-        <motion.div variants={item}>
-          <StudentProgressCard />
-        </motion.div>
-      </div>
-
       {/* Row 3: Performance */}
-      {/* gamification — rank progress and the batch leaderboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RankCard />
-        <LeaderboardCard />
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div variants={item} className="h-full">
           <DashboardCard delay={0.2} className="h-full">

@@ -139,3 +139,12 @@
   .pd-loader-ring svg { animation: none; }
   .pd-loader-ring img { animation: pd-pulse 1.6s ease-in-out infinite; }
 }
+
+/* ── Sidebar menu scroll ──
+   No visible scrollbar. The menu still scrolls with the mouse wheel on short
+   screens; overscroll-behavior stops the page scrolling once it reaches the end. */
+.sidebar-scroll {
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.sidebar-scroll::-webkit-scrollbar { display: none; }

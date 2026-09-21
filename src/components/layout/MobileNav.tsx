@@ -29,14 +29,14 @@ export function MobileNav() {
             {({ isActive }) => (
               <>
                 <div className={`w-10 h-7 flex items-center justify-center rounded-xl transition-all duration-200 ${
-                  isActive ? 'bg-[#c20f24]/10 dark:bg-[#c20f24]/20' : ''
+                  isActive ? 'bg-[#dc2626]/10 dark:bg-[#dc2626]/20' : ''
                 }`}>
                   <item.icon className={`w-5 h-5 transition-colors duration-200 ${
-                    isActive ? 'text-[#c20f24]' : 'text-apple-subtext dark:text-slate-400'
+                    isActive ? 'text-[#dc2626]' : 'text-zinc-500 dark:text-zinc-400'
                   }`} />
                 </div>
                 <span className={`text-[10px] font-semibold mt-0.5 transition-colors duration-200 ${
-                  isActive ? 'text-[#c20f24]' : 'text-apple-subtext dark:text-slate-500'
+                  isActive ? 'text-[#dc2626]' : 'text-zinc-500'
                 }`}>{item.name}</span>
               </>
             )}

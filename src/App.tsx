@@ -47,6 +47,10 @@ import { QuizInstructionsPage } from './pages/QuizInstructionsPage';
 import { QuizPlayerPage } from './pages/QuizPlayerPage';
 import { QuizResultPage } from './pages/QuizResultPage';
 import { QuizReviewPage } from './pages/QuizReviewPage';
+import { RankPage } from './pages/RankPage';
+import { LeaderboardPage } from './pages/LeaderboardPage';
+import { AchievementsPage } from './pages/AchievementsPage';
+import { XpHistoryPage } from './pages/XpHistoryPage';
 
 function FullSpinner() {
   return <LogoLoader />;
@@ -125,6 +129,10 @@ function AnimatedRoutes() {
           <Route path="quizzes/:id" element={<QuizInstructionsPage />} />
           <Route path="quizzes/:id/result" element={<QuizResultPage />} />
           <Route path="quizzes/:id/review" element={<QuizReviewPage />} />
+          <Route path="rank" element={<RankPage />} />
+          <Route path="leaderboard" element={<LeaderboardPage />} />
+          <Route path="achievements" element={<AchievementsPage />} />
+          <Route path="xp" element={<XpHistoryPage />} />
         </Route>
 
         {/* Standalone watch page — outside DashboardLayout (no navbar/sidebar) */}
