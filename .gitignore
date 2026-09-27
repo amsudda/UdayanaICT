@@ -30,3 +30,10 @@ dist-ssr
 
 # stray nested repo
 udenaICT/
+
+# headless screenshot probes: mock-backed entry points used to render a
+# single page for a screenshot, never part of the app
+probe*.html
+probe-*.tsx
+probe*.config.ts
+probe-mocks/

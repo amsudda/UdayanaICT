@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeftIcon,
   CheckCircle2Icon,
   ClockIcon,
   FileTextIcon,
@@ -18,6 +17,7 @@ import { extractYouTubeId } from '../../lib/youtube';
 import { VIDEO_KINDS, toVideoKind, videoKindLabel, type VideoKind } from '../../data/videoCategories';
 import { ClassMaterials } from '../../components/shared/ClassMaterials';
 import { LogoLoader } from '../../components/shared/LogoLoader';
+import { CourseHero } from '../../components/dashboard/CourseHero';
 
 type Tute = { name: string; url: string };
 type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind: VideoKind };
@@ -39,13 +39,13 @@ const kindBadge: Record<VideoKind, string> = {
 export function CourseDetailsPage() {
   const { packId } = useParams();
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  
+
   const [lessons, setLessons] = useState<VideoLesson[]>([]);
   const [liveLinks, setLiveLinks] = useState<any[]>([]);
   const [homeworks, setHomeworks] = useState<any[]>([]);
@@ -64,7 +64,7 @@ export function CourseDetailsPage() {
     let live: any[] = [];
 
     const { data: pack } = await supabase.from('packs').select('*').eq('id', packId).maybeSingle();
-    
+
     if (pack) {
       resolvedTitle = pack.title;
       resolvedDesc = pack.description ?? '';
@@ -104,7 +104,7 @@ export function CourseDetailsPage() {
 
     let stored: string[] = [];
     try { stored = JSON.parse(localStorage.getItem(storageKey) ?? '[]'); } catch { stored = []; }
-    
+
     setTitle(resolvedTitle);
     setDescription(resolvedDesc);
     setThumbnail(resolvedThumb);
@@ -138,8 +138,7 @@ export function CourseDetailsPage() {
   }
 
   const watchedCount = watchedIds.size;
-  const progressPct = lessons.length > 0 ? Math.round((watchedCount / lessons.length) * 100) : 0;
-  
+
   // Extract all unique tutes from all lessons
   const allTutes = lessons.flatMap(l => l.tutes).filter((t, i, arr) => arr.findIndex(x => x.url === t.url) === i);
 
@@ -158,139 +157,24 @@ export function CourseDetailsPage() {
 
   return (
     <div className="max-w-6xl mx-auto pb-24 lg:pb-12">
-      
-      {/* Immersive Hero Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-        className="relative rounded-[2rem] overflow-hidden mb-8 shadow-[0_20px_40px_rgba(194,15,36,0.15)] bg-gradient-to-br from-[#7a0010] to-[#c20f24]"
-      >
-        
-        {/* Motion Graphics Animated Background - CONTRAST THEME */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Animated Tech Grid */}
-          <motion.div 
-            animate={{ backgroundPosition: ['0px 0px', '40px 40px'] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 opacity-[0.2]"
-            style={{
-              backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.2) 1px, transparent 1px)`,
-              backgroundSize: '40px 40px'
-            }}
-          />
 
-          {/* SVG Abstract Motion Elements */}
-          <svg className="absolute inset-0 w-full h-full opacity-100" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <linearGradient id="glowContrast1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#fef3c7" stopOpacity="0.1" />
-              </linearGradient>
-              <linearGradient id="glowContrast2" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.1" />
-              </linearGradient>
-            </defs>
-
-            {/* Rotating Rings */}
-            <motion.circle 
-              cx="20%" cy="50%" r="180" 
-              fill="none" stroke="url(#glowContrast1)" strokeWidth="4" strokeDasharray="15 30"
-              animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              style={{ originX: '20%', originY: '50%' }}
-            />
-            <motion.circle 
-              cx="80%" cy="30%" r="220" 
-              fill="none" stroke="url(#glowContrast2)" strokeWidth="3" strokeDasharray="10 25"
-              animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-              style={{ originX: '80%', originY: '30%' }}
-            />
-
-            {/* Floating Geometric Nodes & Lines */}
-            <motion.g animate={{ y: [0, -30, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-              <line x1="30%" y1="20%" x2="50%" y2="60%" stroke="#fbbf24" strokeWidth="2" opacity="0.8" />
-              <circle cx="30%" cy="20%" r="8" fill="#ffffff" />
-              <circle cx="50%" cy="60%" r="6" fill="#fbbf24" />
-            </motion.g>
-
-            <motion.g animate={{ x: [0, 40, 0], y: [0, 25, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
-              <line x1="70%" y1="80%" x2="90%" y2="50%" stroke="#ffffff" strokeWidth="2" opacity="0.6" />
-              <circle cx="70%" cy="80%" r="10" fill="#fbbf24" />
-              <circle cx="90%" cy="50%" r="7" fill="#ffffff" />
-            </motion.g>
-          </svg>
-
-          {/* Scanning Laser Line */}
-          <motion.div 
-            animate={{ top: ['-10%', '110%'] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#fbbf24] to-transparent shadow-[0_0_30px_10px_rgba(251,191,36,0.6)] opacity-90"
-          />
-
-          {/* Slow Moving Gradients for Atmosphere */}
-          <motion.div 
-            animate={{ x: ['-20%', '20%', '-20%'], opacity: [0.1, 0.25, 0.1] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-[20%] w-[50%] h-[100%] bg-gradient-to-br from-[#ffffff] to-[#fbbf24] blur-[120px] rounded-full mix-blend-screen" 
-          />
-        </div>
-        
-        {/* Subtle Darkening Overlays */}
-        <div className="absolute inset-0 bg-[#7a0010]/30 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#7a0010] via-[#7a0010]/50 to-transparent pointer-events-none" />
-
-        <div className="relative flex flex-col md:flex-row items-center gap-5 md:gap-6 p-5 md:p-6">
-          {/* Thumbnail */}
-          <div className="w-full max-w-[220px] md:w-[220px] aspect-video rounded-xl overflow-hidden shadow-2xl shrink-0 ring-1 ring-white/10 group">
-            {thumbnail ? (
-              <img src={thumbnail} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-            ) : (
-              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                <FilmIcon className="w-16 h-16 text-slate-600" />
-              </div>
-            )}
-          </div>
-          
-          {/* Info */}
-          <div className="flex-1 text-center md:text-left z-10">
-            <button onClick={() => navigate('/dashboard/courses')} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white text-xs font-semibold tracking-wide backdrop-blur-md transition-all mb-3">
-              <ArrowLeftIcon className="w-3.5 h-3.5" /> MY CLASSES
-            </button>
-            <h1 className="text-xl md:text-3xl font-black text-white mb-2 leading-tight tracking-tight drop-shadow-md">{title}</h1>
-            {description && <p className="text-white/80 text-sm mb-4 max-w-2xl leading-relaxed font-medium drop-shadow">{description}</p>}
-            
-            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 max-w-md bg-white/5 px-4 py-3 rounded-xl backdrop-blur-sm border border-white/10">
-              <div className="flex-1 w-full">
-                <div className="flex items-center justify-between text-xs font-bold text-white/80 mb-2 uppercase tracking-wider">
-                  <span>Progress</span>
-                  <span className="text-[#ff3b3b]">{progressPct}%</span>
-                </div>
-                <div className="h-2.5 w-full bg-white/20 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPct}%` }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                    className="h-full bg-gradient-to-r from-[#fbbf24] to-[#fef3c7] rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)]" 
-                  />
-                </div>
-              </div>
-              <div className="shrink-0 text-right w-full sm:w-auto">
-                <span className="text-2xl font-black text-white leading-none">{watchedCount}</span>
-                <span className="text-white/40 font-bold ml-1">/ {lessons.length}</span>
-                <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1 font-bold">Completed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+      <CourseHero
+        title={title}
+        description={description}
+        thumbnail={thumbnail}
+        watchedCount={watchedCount}
+        total={lessons.length}
+        onBack={() => navigate('/dashboard/courses')}
+      />
 
       {/* Layout */}
       <div className="space-y-12">
-        
+
         {/* Compact Blue Live Classes */}
         {liveLinks.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 -mr-12 -mt-12 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
-            
+
             <div className="flex items-center gap-3 relative z-10 shrink-0">
               <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                 <RadioIcon className="w-5 h-5 animate-pulse" />
@@ -300,7 +184,7 @@ export function CourseDetailsPage() {
                 <p className="text-xs font-semibold text-blue-600 mt-1 uppercase tracking-widest">Available via Zoom</p>
               </div>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2 relative z-10 w-full md:w-auto md:justify-end">
               {liveLinks.map(l => (
                 <a
@@ -331,7 +215,7 @@ export function CourseDetailsPage() {
                {lessons.length} {lessons.length === 1 ? 'LESSON' : 'LESSONS'}
              </span>
           </div>
-          
+
           <div className="space-y-12">
             {sections.map((section) => (
               <section key={section.key}>
@@ -364,17 +248,17 @@ export function CourseDetailsPage() {
                               <FileTextIcon className="w-8 h-8 opacity-50" />
                             </div>
                           )}
-                    
+
                           {/* Dark Overlay on Hover */}
                           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
-                    
+
                           {/* Play Button Overlay */}
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-xl ring-1 ring-white/40">
                                <PlayIcon className="w-5 h-5 text-white fill-current ml-1" />
                             </div>
                           </div>
-                    
+
                           {/* Duration Badge */}
                           <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold rounded-md">
                             {lesson.duration}
@@ -387,7 +271,7 @@ export function CourseDetailsPage() {
                             </div>
                           )}
                         </div>
-                  
+
                         <div className="flex-1 w-full">
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-[10px] font-black text-[#c20f24] tracking-widest uppercase bg-red-50 px-2 py-0.5 rounded text-xs">
@@ -399,15 +283,15 @@ export function CourseDetailsPage() {
                               </span>
                             )}
                           </div>
-                    
+
                           <h3 className="text-base font-bold text-slate-900 group-hover:text-[#c20f24] transition-colors line-clamp-2 leading-snug mb-3">
                             {lesson.title}
                           </h3>
-                    
+
                           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500 mt-auto">
                             {lesson.tutes.length > 0 && (
                               <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-lg border border-slate-100 text-slate-600">
-                                 <FileTextIcon className="w-3.5 h-3.5 text-blue-500" /> 
+                                 <FileTextIcon className="w-3.5 h-3.5 text-blue-500" />
                                  {lesson.tutes.length} {lesson.tutes.length === 1 ? 'Material' : 'Materials'}
                               </span>
                             )}
@@ -425,7 +309,7 @@ export function CourseDetailsPage() {
         {/* Class materials — paper class papers, homework sheets and tute notes */}
         <ClassMaterials papers={papers} homeworks={homeworks} notes={allTutes} />
       </div>
-      
+
       {/* Scrollbar styles to hide/make elegant */}
       {/* Scrollbar styles to hide/make elegant */}
       <style>{`

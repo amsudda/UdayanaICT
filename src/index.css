@@ -148,3 +148,76 @@
   scrollbar-width: none;
 }
 .sidebar-scroll::-webkit-scrollbar { display: none; }
+
+/* ══ Class hero — the looping motion-graphics composition ══════════════
+   These run forever behind the class title, so every one of them is a
+   CSS animation rather than a JS loop: CSS animations run off the main
+   thread and keep playing at full rate while the page is fetching
+   lessons, where a requestAnimationFrame loop would stutter.
+   Only transform and opacity are animated — nothing here triggers
+   layout or paint. Speeds are deliberately co-prime-ish (13s, 17s, 19s,
+   23s…) so the layers never fall into step and the loop never reads as
+   a loop. */
+
+@keyframes hero-spin { to { transform: rotate(360deg); } }
+@keyframes hero-spin-rev { to { transform: rotate(-360deg); } }
+
+/* dashes crawling along a path — the "signal travelling" read */
+@keyframes hero-dash { to { stroke-dashoffset: -400; } }
+
+/* a node breathing */
+@keyframes hero-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.35); opacity: 0.55; }
+}
+
+/* radar ping expanding out of a node and fading */
+@keyframes hero-ping {
+  0%   { transform: scale(0.4); opacity: 0.55; }
+  70%  { opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* particles drifting up through the panel */
+@keyframes hero-rise {
+  0%   { transform: translate3d(0, 120%, 0); opacity: 0; }
+  12%  { opacity: 0.75; }
+  80%  { opacity: 0.35; }
+  100% { transform: translate3d(14px, -140%, 0); opacity: 0; }
+}
+
+/* the light sweep — a long wait, then one fast pass */
+@keyframes hero-sheen {
+  0%, 62%  { transform: translate3d(-160%, 0, 0) skewX(-12deg); opacity: 0; }
+  66%      { opacity: 0.55; }
+  86%      { opacity: 0; }
+  100%     { transform: translate3d(320%, 0, 0) skewX(-12deg); opacity: 0; }
+}
+
+/* slow atmospheric drift for the big blurred glows */
+@keyframes hero-drift {
+  0%, 100% { transform: translate3d(-6%, 0, 0) scale(1); opacity: 0.16; }
+  50%      { transform: translate3d(8%, -4%, 0) scale(1.12); opacity: 0.26; }
+}
+
+/* the whole grid creeping diagonally, one tile per cycle */
+@keyframes hero-grid {
+  to { transform: translate3d(40px, 40px, 0); }
+}
+
+.hero-spin      { animation: hero-spin 42s linear infinite; }
+.hero-spin-slow { animation: hero-spin-rev 63s linear infinite; }
+.hero-dash      { animation: hero-dash 9s linear infinite; }
+.hero-pulse     { animation: hero-pulse 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.hero-ping      { animation: hero-ping 3.4s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+.hero-rise      { animation: hero-rise 13s linear infinite; }
+.hero-sheen     { animation: hero-sheen 11s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+.hero-drift     { animation: hero-drift 19s ease-in-out infinite; }
+.hero-grid      { animation: hero-grid 17s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-spin, .hero-spin-slow, .hero-dash, .hero-pulse, .hero-ping,
+  .hero-rise, .hero-sheen, .hero-drift, .hero-grid {
+    animation: none;
+  }
+}

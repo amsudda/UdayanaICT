@@ -14,7 +14,7 @@ export function DashboardLayout() {
       <Sidebar />
       
       {/* Main white rounded container */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F4F4F5] dark:bg-[#0A0A0A] rounded-[2rem] sm:rounded-[2.5rem] lg:ml-20 overflow-hidden shadow-2xl relative transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F4F4F5] dark:bg-[#0A0A0A] rounded-[2rem] sm:rounded-[2.5rem] lg:ml-4 overflow-hidden shadow-2xl relative transition-all duration-300">
         
         {/* Navbar inside the container */}
         <Navbar />
