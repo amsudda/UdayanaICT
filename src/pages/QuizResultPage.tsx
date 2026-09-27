@@ -5,15 +5,17 @@ import { CheckCircleIcon, XCircleIcon, ClockIcon, FileMinusIcon } from 'lucide-r
 import { supabase } from '../lib/supabase';
 import { LogoLoader } from '../components/shared/LogoLoader';
 import { useAuth } from '../auth/AuthContext';
+import { loadAttempt, loadQuizShape, passMarkOf } from '../data/quizzes';
 
 export function QuizResultPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [attempt, setAttempt] = useState<any>(null);
   const [quiz, setQuiz] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
+  const [totalMarks, setTotalMarks] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,13 +28,10 @@ export function QuizResultPage() {
         const { data: qData } = await supabase.from('quizzes').select('*').eq('id', id).single();
         if (qData) setQuiz(qData);
 
-        const { data: attData } = await supabase
-          .from('quiz_attempts')
-          .select('*')
-          .eq('quiz_id', id)
-          .eq('student_id', user.id)
-          .eq('status', 'submitted')
-          .maybeSingle();
+        // Newest submitted attempt. maybeSingle() errored for a student
+        // who had sat the quiz twice, which bounced them back to the
+        // instructions page instead of showing their result.
+        const attData = await loadAttempt(id, user.id, 'submitted');
 
         if (!attData) {
           navigate(`/dashboard/quizzes/${id}`);
@@ -48,16 +47,19 @@ export function QuizResultPage() {
             .select('is_correct, selected_option_id')
             .eq('attempt_id', attData.id);
 
-          const { count: totalQuestions } = await supabase
-            .from('quiz_questions')
-            .select('id', { count: 'exact', head: true })
-            .eq('quiz_id', id);
+          // Counted through the safe view, headings excluded — students
+          // cannot read quiz_questions, so the old count was always 0
+          // and every question showed as "unanswered".
+          const shape = await loadQuizShape(id);
+          const totalQuestions = shape.count;
+          setTotalMarks(shape.totalMarks);
 
           const correct = ansData?.filter(a => a.is_correct).length || 0;
           const answered = ansData?.filter(a => a.selected_option_id).length || 0;
           const incorrect = answered - correct;
           const total = totalQuestions || 0;
-          const unanswered = total - answered;
+          // clamped: answers can outlive a question the teacher removed
+          const unanswered = Math.max(0, total - answered);
 
           let timeTaken = 0;
           if (attData.started_at && attData.submitted_at) {
@@ -100,18 +102,18 @@ export function QuizResultPage() {
 
   if (!attempt || !quiz || !stats) return null;
 
-  const passed = attempt.percentage >= (quiz.passing_marks || 0);
+  const passed = attempt.percentage >= passMarkOf(quiz);
   const circleCircumference = 2 * Math.PI * 60;
   const strokeDashoffset = circleCircumference - (attempt.percentage / 100) * circleCircumference;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className="max-w-3xl mx-auto p-6 my-8"
     >
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-        
+
         <div className={`p-8 text-center border-b ${passed ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800'}`}>
           <div className="inline-block px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 bg-white dark:bg-slate-800 shadow-sm">
             {passed ? <span className="text-emerald-600 dark:text-emerald-400">Quiz Passed! 🎉</span> : <span className="text-red-600 dark:text-red-400">Quiz Failed</span>}
@@ -144,7 +146,7 @@ export function QuizResultPage() {
 
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{quiz.title}</h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
-            Score: <span className="font-bold text-slate-900 dark:text-white">{attempt.score}</span> / {quiz.total_marks} marks
+            Score: <span className="font-bold text-slate-900 dark:text-white">{attempt.score}</span> / {quiz.total_marks || totalMarks} marks
           </p>
         </div>
 

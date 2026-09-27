@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ClockIcon, FileTextIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
+import { answerable, pickAttempt } from '../data/quizzes';
 
 interface Quiz {
   id: string;
@@ -32,30 +33,33 @@ export function QuizListPage() {
   useEffect(() => {
     async function loadData() {
       if (!user) return;
-      
+
       try {
         // Fetch published quizzes
         const { data: quizzesData, error: quizzesError } = await supabase
           .from('quizzes')
           .select('*')
           .eq('status', 'published');
-          
+
         if (quizzesError) throw quizzesError;
-        
+
         const quizzesList = quizzesData || [];
         setQuizzes(quizzesList);
 
         if (quizzesList.length > 0) {
           const quizIds = quizzesList.map(q => q.id);
-          
-          // Fetch question counts
+
+          // Question counts come from the safe view — students have no
+          // read on quiz_questions itself, so counting there returned 0
+          // for every quiz. Section headings are not questions.
           const { data: questionsData, error: questionsError } = await supabase
-            .from('quiz_questions')
-            .select('quiz_id');
-            
+            .from('quiz_questions_safe')
+            .select('quiz_id, kind')
+            .in('quiz_id', quizIds);
+
           if (!questionsError && questionsData) {
             const counts: Record<string, number> = {};
-            questionsData.forEach(q => {
+            answerable(questionsData).forEach(q => {
               counts[q.quiz_id] = (counts[q.quiz_id] || 0) + 1;
             });
             setQuestionCounts(counts);
@@ -67,11 +71,18 @@ export function QuizListPage() {
             .select('*')
             .eq('student_id', user.id)
             .in('quiz_id', quizIds);
-            
+
           if (!attemptsError && attemptsData) {
+            // A student can hold several attempts at one quiz. Keeping
+            // whichever row arrived last made a card show "View Result"
+            // while an unfinished attempt was still open.
+            const byQuiz: Record<string, any[]> = {};
+            attemptsData.forEach(a => { (byQuiz[a.quiz_id] ??= []).push(a); });
+
             const attemptsMap: Record<string, Attempt> = {};
-            attemptsData.forEach(a => {
-              attemptsMap[a.quiz_id] = a;
+            Object.entries(byQuiz).forEach(([quizId, rows]) => {
+              const chosen = pickAttempt(rows);
+              if (chosen) attemptsMap[quizId] = chosen;
             });
             setAttempts(attemptsMap);
           }
@@ -82,7 +93,7 @@ export function QuizListPage() {
         setLoading(false);
       }
     }
-    
+
     loadData();
   }, [user]);
 
@@ -162,14 +173,14 @@ export function QuizListPage() {
           <p className="text-slate-500 dark:text-slate-400">Check back later for new quizzes.</p>
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           variants={containerVariants}
           initial="hidden"
           animate="show"
         >
           {quizzes.map(quiz => (
-            <motion.div 
+            <motion.div
               key={quiz.id}
               variants={itemVariants}
               className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm hover:shadow-md transition-shadow border border-slate-200 dark:border-slate-800 flex flex-col h-full"
@@ -178,11 +189,11 @@ export function QuizListPage() {
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white line-clamp-2">{quiz.title}</h3>
                 {getStatusChip(quiz.id)}
               </div>
-              
+
               <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">
                 {quiz.description || 'No description provided.'}
               </p>
-              
+
               <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mb-6">
                 <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
                   <ClockIcon className="h-4 w-4" />
@@ -193,12 +204,12 @@ export function QuizListPage() {
                   <span>{questionCounts[quiz.id] || 0} Qs</span>
                 </div>
               </div>
-              
+
               <button
                 onClick={() => handleAction(quiz.id)}
                 className={`w-full py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${
-                  !attempts[quiz.id] 
-                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                  !attempts[quiz.id]
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
                     : attempts[quiz.id].status === 'in_progress'
                       ? 'bg-amber-500 hover:bg-amber-600 text-white'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white'

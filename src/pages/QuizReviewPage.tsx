@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CheckCircleIcon, XCircleIcon, ArrowLeftIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
+import { answerable, loadAttempt, loadQuizRows } from '../data/quizzes';
 
 export function QuizReviewPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,25 +17,26 @@ export function QuizReviewPage() {
     async function loadReview() {
       if (!user || !id) return;
       try {
-        // Get attempt
-        const { data: attempt } = await supabase
-          .from('quiz_attempts')
-          .select('id')
-          .eq('quiz_id', id)
-          .eq('student_id', user.id)
-          .eq('status', 'submitted')
-          .maybeSingle();
+        // Get attempt (newest submitted; a second attempt used to make
+        // maybeSingle() error and dump the student back on the list)
+        const attempt = await loadAttempt(id, user.id, 'submitted');
 
         if (!attempt) {
           navigate(`/dashboard/quizzes`);
           return;
         }
 
-        // Get questions
-        const { data: qData } = await supabase
+        // Get questions. The base table carries correct_option_id, which
+        // is what marks the right answer here, but students may not be
+        // allowed to read it — so fall back to the safe view and let the
+        // saved answer say whether they were right.
+        const { data: fullRows } = await supabase
           .from('quiz_questions')
           .select('*')
           .eq('quiz_id', id);
+
+        // a review shows answers, so headings have nothing to show
+        const qData = answerable(fullRows?.length ? fullRows : await loadQuizRows(id));
 
         // Get answers
         const { data: aData } = await supabase
@@ -43,11 +45,11 @@ export function QuizReviewPage() {
           .eq('attempt_id', attempt.id);
 
         const answersMap = new Map(aData?.map(a => [a.question_id, a]) || []);
-        
-        const reviewData = qData?.map(q => ({
+
+        const reviewData = qData.map(q => ({
           ...q,
           student_answer: answersMap.get(q.id)
-        })) || [];
+        }));
 
         setQuestions(reviewData);
 
@@ -67,7 +69,7 @@ export function QuizReviewPage() {
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8">
       <div className="flex items-center gap-4 mb-8">
-        <button 
+        <button
           onClick={() => navigate(`/dashboard/quizzes/${id}/result`)}
           className="p-2 bg-white dark:bg-slate-900 rounded-full shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-800"
         >
@@ -75,6 +77,12 @@ export function QuizReviewPage() {
         </button>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Review Answers</h1>
       </div>
+
+      {questions.length === 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-10 text-center">
+          <p className="text-slate-500 dark:text-slate-400">There is nothing to review for this quiz.</p>
+        </div>
+      )}
 
       <div className="space-y-8">
         {questions.map((q, index) => {
@@ -88,6 +96,10 @@ export function QuizReviewPage() {
                 <h3 className="text-lg md:text-xl font-medium text-slate-900 dark:text-white leading-relaxed">
                   <span className="text-slate-400 font-bold mr-2">{index + 1}.</span>
                   {q.question_text}
+                  {q.image_url && (
+                    <img src={q.image_url} alt="" loading="lazy"
+                      className="mt-4 w-full object-contain rounded-xl border border-slate-100 dark:border-slate-800 bg-white" />
+                  )}
                 </h3>
                 <div className={`shrink-0 px-3 py-1 rounded-lg text-sm font-bold ${isCorrect ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
                   {marks} / {q.marks} marks

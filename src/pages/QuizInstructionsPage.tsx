@@ -5,29 +5,28 @@ import { ClockIcon, FileTextIcon, BarChart3Icon, ShieldCheckIcon } from 'lucide-
 import { supabase } from '../lib/supabase';
 import { LogoLoader } from '../components/shared/LogoLoader';
 import { useAuth } from '../auth/AuthContext';
+import { loadAttempt, loadQuizShape, passMarkOf } from '../data/quizzes';
 
 export function QuizInstructionsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [quiz, setQuiz] = useState<any>(null);
   const [questionCount, setQuestionCount] = useState(0);
+  const [totalMarks, setTotalMarks] = useState(0);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
     async function loadQuiz() {
       if (!user || !id) return;
-      
+
       try {
-        // Check for existing attempt
-        const { data: attempt } = await supabase
-          .from('quiz_attempts')
-          .select('status')
-          .eq('quiz_id', id)
-          .eq('student_id', user.id)
-          .maybeSingle();
+        // Check for existing attempt. Not maybeSingle(): a student with
+        // two attempts made that error, and the page then offered the
+        // quiz as if it had never been taken.
+        const attempt = await loadAttempt(id, user.id);
 
         if (attempt?.status === 'submitted') {
           navigate(`/dashboard/quizzes/${id}/result`);
@@ -43,33 +42,38 @@ export function QuizInstructionsPage() {
           .select('*')
           .eq('id', id)
           .single();
-          
+
         if (quizError) throw quizError;
         setQuiz(quizData);
 
-        // Fetch question count
-        const { count } = await supabase
-          .from('quiz_questions')
-          .select('id', { count: 'exact', head: true })
-          .eq('quiz_id', id);
-          
-        setQuestionCount(count || 0);
+        // Counted from the safe view, headings excluded.
+        const shape = await loadQuizShape(id);
+        setQuestionCount(shape.count);
+        setTotalMarks(shape.totalMarks);
       } catch (err) {
         console.error('Error loading quiz instructions:', err);
       } finally {
         setLoading(false);
       }
     }
-    
+
     loadQuiz();
   }, [id, user, navigate]);
 
   const handleStart = async () => {
     if (!user || !quiz) return;
     setStarting(true);
-    
+
     try {
-      const { data, error } = await supabase
+      // If an attempt is already open, resume it rather than starting a
+      // second one — two open attempts split a student's answers.
+      const open = await loadAttempt(quiz.id, user.id, 'in_progress');
+      if (open) {
+        navigate(`/dashboard/quizzes/${quiz.id}/play`);
+        return;
+      }
+
+      const { error } = await supabase
         .from('quiz_attempts')
         .insert({
           quiz_id: quiz.id,
@@ -79,7 +83,7 @@ export function QuizInstructionsPage() {
         })
         .select('id')
         .single();
-        
+
       if (error) throw error;
       navigate(`/dashboard/quizzes/${quiz.id}/play`);
     } catch (err) {
@@ -105,17 +109,28 @@ export function QuizInstructionsPage() {
     );
   }
 
-  const marksPerQuestion = quiz.total_marks && questionCount > 0 
-    ? (quiz.total_marks / questionCount).toFixed(1) 
+  // Added up from the questions themselves; quiz.total_marks is only
+  // filled in once a quiz has been marked, so it read as blank here.
+  const marksPerQuestion = totalMarks && questionCount > 0
+    ? (totalMarks / questionCount).toFixed(1)
     : 1;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto p-6 my-8"
     >
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 md:p-12">
+        {/* The quiz's own banner, as set in the builder */}
+        {quiz.header_image_url && (
+          <img
+            src={quiz.header_image_url}
+            alt=""
+            className="w-full max-h-52 object-cover rounded-2xl mb-8 border border-slate-100 dark:border-slate-800"
+          />
+        )}
+
         <div className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{quiz.title}</h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">{quiz.description}</p>
@@ -140,7 +155,7 @@ export function QuizInstructionsPage() {
           <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center text-center">
             <ShieldCheckIcon className="h-8 w-8 text-red-500 mb-2" />
             <div className="text-sm text-slate-500 dark:text-slate-400">Pass Mark</div>
-            <div className="font-semibold text-slate-900 dark:text-white text-lg">{quiz.passing_marks || 0}</div>
+            <div className="font-semibold text-slate-900 dark:text-white text-lg">{passMarkOf(quiz)}%</div>
           </div>
         </div>
 
