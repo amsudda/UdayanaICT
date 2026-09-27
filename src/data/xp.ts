@@ -101,3 +101,33 @@ export function sliceAroundMe(rows: LeaderRow[], studentId: string, radius = 2):
   const start = Math.max(0, idx - radius);
   return rows.slice(start, start + radius * 2 + 1);
 }
+
+/* ── Paper leaderboard ───────────────────────────────────────────────
+   Ranked on marks rather than XP: average percentage across a student's
+   marked papers, split by type. See migration_paper_leaderboard.sql. */
+
+export type PaperType = 'full' | 'timing' | 'all';
+
+export type PaperLeaderRow = {
+  studentId: string;
+  displayName: string;
+  avatarUrl?: string;
+  avgPct: number;
+  bestPct: number;
+  papers: number;
+  position: number;
+};
+
+export async function loadPaperLeaderboard(type: PaperType = 'full', limit = 50): Promise<PaperLeaderRow[]> {
+  const { data, error } = await supabase.rpc('paper_leaderboard', { p_type: type, p_limit: limit });
+  if (error || !data) return [];
+  return (data as any[]).map((r) => ({
+    studentId: r.student_id,
+    displayName: r.display_name ?? 'Student',
+    avatarUrl: r.avatar_url ?? undefined,
+    avgPct: Number(r.avg_pct) || 0,
+    bestPct: Number(r.best_pct) || 0,
+    papers: r.papers_count ?? 0,
+    position: r.rank_position ?? 0
+  }));
+}

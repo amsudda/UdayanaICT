@@ -223,6 +223,16 @@ export function RankPage() {
                       </div>
                     ))}
                   </div>
+                  {cat === 'Classes' && (
+                    <p className="text-[11px] text-zinc-500 mt-2 leading-snug">
+                      Capped at 40 XP a day for lessons and 20 for sheets, so papers stay the biggest way to climb.
+                    </p>
+                  )}
+                  {cat === 'Papers' && (
+                    <p className="text-[11px] text-zinc-500 mt-2 leading-snug">
+                      Timing papers earn 60% of these amounts. If your teacher corrects a mark, your XP is recalculated to match.
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

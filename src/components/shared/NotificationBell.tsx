@@ -3,7 +3,9 @@ import {
   BellIcon,
   VideoIcon,
   RadioIcon,
-  MegaphoneIcon } from
+  MegaphoneIcon,
+  TrophyIcon,
+  AwardIcon } from
 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
@@ -38,6 +40,10 @@ export function NotificationBell() {
         return <VideoIcon className="w-4 h-4 text-red-500" />;
       case 'live':
         return <RadioIcon className="w-4 h-4 text-red-500" />;
+      case 'rank':
+        return <TrophyIcon className="w-4 h-4 text-amber-500" />;
+      case 'achievement':
+        return <AwardIcon className="w-4 h-4 text-emerald-500" />;
       default:
         return <MegaphoneIcon className="w-4 h-4 text-amber-500" />;
     }
@@ -95,7 +101,7 @@ export function NotificationBell() {
               }
               </div>
 
-              <div className="max-h-[400px] overflow-y-auto hide-scrollbar">
+              <div data-lenis-prevent className="max-h-[400px] overflow-y-auto hide-scrollbar">
                 {notifications.length > 0 ?
               <div className="flex flex-col">
                     {notifications.map((notification) =>

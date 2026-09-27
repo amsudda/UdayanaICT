@@ -30,6 +30,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { extractYouTubeId } from '../lib/youtube';
 import { toVideoKind, videoKindLabel, type VideoKind } from '../data/videoCategories';
+import { markLessonWatched, recordDownload } from '../data/activity';
 
 type Tute = { name: string; url: string };
 type VideoLesson = { id: string; title: string; youtubeId: string; duration: string; description?: string; tutes: Tute[]; kind: VideoKind };
@@ -459,7 +460,7 @@ export function WatchPage() {
       setHomeworks(hws);
       setPapers(pps);
       setWatchedIds(watched);
-      
+
       let initialIndex = Math.max(mapped.findIndex((l) => !watched.has(l.id)), 0);
       if (targetVideoId) {
         const found = mapped.findIndex(l => l.id === targetVideoId);
@@ -489,6 +490,13 @@ export function WatchPage() {
   }), []);
   const goTo = useCallback((i: number) => { if (i >= 0 && i < lessons.length) setActiveIndex(i); }, [lessons.length]);
   const handleNext = useCallback(() => { if (active) markWatched(active.id); goTo(activeIndex + 1); }, [active, activeIndex, goTo, markWatched]);
+
+  // XP only for a video the player actually played to the end. Ticking the
+  // box by hand still marks it read locally, but pays nothing.
+  const handleEnded = useCallback(() => {
+    if (active) void markLessonWatched(active.id);
+    handleNext();
+  }, [active, handleNext]);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -556,7 +564,7 @@ export function WatchPage() {
           <div className="relative w-full bg-black shrink-0 lg:p-4 xl:p-5">
             {active.youtubeId ? (
               <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-black" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
-                <CustomPlayer videoId={active.youtubeId} onEnded={handleNext} />
+                <CustomPlayer videoId={active.youtubeId} onEnded={handleEnded} />
               </div>
             ) : (
               <div className="relative mx-auto overflow-hidden lg:rounded-2xl lg:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-gradient-to-br from-red-500/15 to-black flex flex-col items-center justify-center text-center px-6" style={{ aspectRatio: '16/9', width: 'min(100%, calc(62vh * 16 / 9))' }}>
@@ -569,7 +577,7 @@ export function WatchPage() {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.12) transparent' }}>
+          <div data-lenis-prevent className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.12) transparent' }}>
             <div className="px-4 sm:px-6 lg:px-5 pb-6 max-w-3xl space-y-5">
               <div className="pt-1">
                 <div className="flex items-start gap-3 justify-between">
@@ -655,6 +663,7 @@ export function WatchPage() {
                         <div className="flex items-center gap-2">
                           {hw.homework_url && (
                             <a href={hw.homework_url} target="_blank" rel="noopener noreferrer"
+                              onClick={() => void recordDownload('homework', hw.id, hw.title || 'Homework sheet')}
                               className="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-semibold hover:bg-indigo-500/30 hover:text-indigo-200 transition-colors">
                               <BookOpenIcon className="w-3.5 h-3.5" /> Sheet
                             </a>
@@ -728,7 +737,7 @@ export function WatchPage() {
                 <AnimatePresence>
                   {mobilePlaylistOpen && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-                      <div className="p-2 border-t border-white/[0.07] max-h-[50vh] overflow-y-auto space-y-1">
+                      <div data-lenis-prevent className="p-2 border-t border-white/[0.07] max-h-[50vh] overflow-y-auto space-y-1">
                         {lessons.map((l, idx) => (
                           <PlaylistItem key={l.id} lesson={l} index={idx} isActive={idx === activeIndex} isWatched={watchedIds.has(l.id)} onClick={() => { goTo(idx); setMobilePlaylistOpen(false); }} />
                         ))}
@@ -759,7 +768,7 @@ export function WatchPage() {
               </AnimatePresence>
             </div>
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto py-2 px-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.14) transparent' }}>
+          <div data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto py-2 px-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.14) transparent' }}>
             <div className="space-y-1">
               {lessons.map((l, idx) => (
                 <PlaylistItem key={l.id} lesson={l} index={idx} isActive={idx === activeIndex} isWatched={watchedIds.has(l.id)} onClick={() => goTo(idx)} />

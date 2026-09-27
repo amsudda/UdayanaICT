@@ -94,6 +94,7 @@ export function BuyPackModal({ pack, onClose, onSubmitted }: { pack: Pack; onClo
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/50" onClick={onClose} />
       <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        data-lenis-prevent
         className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl">
         <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-5 py-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-gray-100 dark:border-slate-800">
           <h2 className="text-base font-bold text-apple-text dark:text-apple-light">{done ? 'Request submitted' : 'Buy this pack'}</h2>
