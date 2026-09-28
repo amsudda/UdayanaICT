@@ -54,16 +54,20 @@ const menuGroups = [
   }
 ];
 
-const PIN_KEY = 'sidebar:pinned';
+// v2: the first version defaulted to folded, so the panel opened as a bare
+// icon rail and the full panel only appeared on hover — it read as the old
+// sidebar. Open is the default now, and the new key ignores any folded
+// preference stored while that was the behaviour.
+const PIN_KEY = 'sidebar:pinned:v2';
 
 export function Sidebar() {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [xp, setXp] = useState(0);
-  // The panel folds itself and opens on hover. Pinning holds it open, and that
-  // choice sticks between visits.
+  // Open unless the student has folded it themselves. Once folded, it stays
+  // folded and opens on hover, and that choice sticks between visits.
   const [pinned, setPinned] = useState(() => {
-    try { return localStorage.getItem(PIN_KEY) === '1'; } catch { return false; }
+    try { return localStorage.getItem(PIN_KEY) !== '0'; } catch { return true; }
   });
   const [hovered, setHovered] = useState(false);
   const folded = !pinned && !hovered;
