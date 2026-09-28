@@ -27,7 +27,9 @@ const MEDAL: Record<number, string> = {
 export function PaperRankBoard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [type, setType] = useState<PaperType>('full');
+  // 'all' first: most students have sat a mix, and a board that opens on
+  // full papers only looks empty to anyone whose batch has done timing ones.
+  const [type, setType] = useState<PaperType>('all');
   const [rows, setRows] = useState<PaperLeaderRow[]>([]);
   const [loading, setLoading] = useState(true);
 

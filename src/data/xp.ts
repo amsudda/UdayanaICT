@@ -118,7 +118,7 @@ export type PaperLeaderRow = {
   position: number;
 };
 
-export async function loadPaperLeaderboard(type: PaperType = 'full', limit = 50): Promise<PaperLeaderRow[]> {
+export async function loadPaperLeaderboard(type: PaperType = 'all', limit = 50): Promise<PaperLeaderRow[]> {
   const { data, error } = await supabase.rpc('paper_leaderboard', { p_type: type, p_limit: limit });
   if (error || !data) return [];
   return (data as any[]).map((r) => ({
