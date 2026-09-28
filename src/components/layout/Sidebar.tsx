@@ -70,7 +70,23 @@ export function Sidebar() {
     try { return localStorage.getItem(PIN_KEY) !== '0'; } catch { return true; }
   });
   const [hovered, setHovered] = useState(false);
-  const folded = !pinned && !hovered;
+  // You have to be hovering the panel to reach the fold button, so hover
+  // alone would hold it open and the click would look like it did nothing.
+  // Unpinning disarms hover until the pointer leaves and comes back.
+  const [hoverArmed, setHoverArmed] = useState(true);
+  const folded = !pinned && !(hovered && hoverArmed);
+
+  const togglePinned = () => {
+    // computed outside the updater: React may run an updater more than once,
+    // and state set inside one is not guaranteed to stick
+    const next = !pinned;
+    setPinned(next);
+    if (!next) {
+      // fold now, even though the pointer is still resting on the panel
+      setHovered(false);
+      setHoverArmed(false);
+    }
+  };
 
   useEffect(() => {
     try { localStorage.setItem(PIN_KEY, pinned ? '1' : '0'); } catch { /* private mode */ }
@@ -126,7 +142,7 @@ export function Sidebar() {
     // with it rather than covering the content.
     <div
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => { setHovered(false); setHoverArmed(true); }}
       className={`hidden lg:block shrink-0 relative h-[calc(100vh-2rem)] short:h-[calc(100vh-1.5rem)] sticky top-0 z-40 transition-[width] duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${folded ? 'w-[84px]' : 'w-[260px]'}`}
     >
     <aside
@@ -156,7 +172,7 @@ export function Sidebar() {
         </div>
         <button
           type="button"
-          onClick={() => setPinned((p) => !p)}
+          onClick={togglePinned}
           title={pinned ? 'Unpin menu (folds by itself)' : 'Keep menu open'}
           aria-label={pinned ? 'Unpin menu' : 'Keep menu open'}
           aria-pressed={pinned}
