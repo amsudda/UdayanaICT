@@ -274,9 +274,6 @@ export function Sidebar() {
       ) : (
       <div className="mt-4 short:mt-3 shrink-0 relative rounded-2xl overflow-hidden h-24 short:h-[72px] flex flex-col justify-end p-4 bg-gradient-to-br from-[#c20f24] to-[#7a0c17] shadow-md shadow-red-900/20">
          <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-white/10 blur-xl z-0" />
-         <div className="relative z-10 pr-8">
-            <p className="text-white text-xs font-semibold leading-tight italic">Small steps<br/>every day<br/>create big results.</p>
-         </div>
          <button onClick={handleLogout} className="absolute bottom-3 right-3 w-6 h-6 bg-white/20 hover:bg-white/35 rounded-full flex items-center justify-center text-white transition-colors z-20">
             <LogOutIcon className="w-3 h-3 ml-0.5" />
          </button>
