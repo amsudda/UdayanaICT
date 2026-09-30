@@ -129,7 +129,7 @@ export function Sidebar() {
           {({ isActive }) => (
             <div className="flex items-center gap-3">
               <item.icon className={`w-5 h-5 short:w-4 short:h-4 shrink-0 ${isActive ? 'text-white' : 'text-zinc-400'}`} />
-              {!folded && <span className="text-[14px] short:text-[12px] font-medium whitespace-nowrap">{item.name}</span>}
+              {!folded && <span className="text-[15px] short:text-[13px] font-medium whitespace-nowrap">{item.name}</span>}
             </div>
           )}
         </NavLink>
@@ -261,24 +261,19 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* Bottom Graphic & Logout */}
-      {folded ? (
-        <button
-          onClick={handleLogout}
-          title="Log Out"
-          aria-label="Log Out"
-          className="mt-4 short:mt-3 shrink-0 h-11 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#c20f24] to-[#7a0c17] text-white shadow-md shadow-red-900/20 hover:brightness-110 transition-all"
-        >
-          <LogOutIcon className="w-4 h-4 ml-0.5" />
-        </button>
-      ) : (
-      <div className="mt-4 short:mt-3 shrink-0 relative rounded-2xl overflow-hidden h-24 short:h-[72px] flex flex-col justify-end p-4 bg-gradient-to-br from-[#c20f24] to-[#7a0c17] shadow-md shadow-red-900/20">
-         <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-white/10 blur-xl z-0" />
-         <button onClick={handleLogout} className="absolute bottom-3 right-3 w-6 h-6 bg-white/20 hover:bg-white/35 rounded-full flex items-center justify-center text-white transition-colors z-20">
-            <LogOutIcon className="w-3 h-3 ml-0.5" />
-         </button>
-      </div>
-      )}
+      {/* Log out. Reads as one more row of the menu rather than a panel of
+          its own, now that the red card it used to sit on is gone. */}
+      <button
+        onClick={handleLogout}
+        title={folded ? 'Log Out' : undefined}
+        aria-label="Log Out"
+        className={`mt-3 short:mt-2 shrink-0 flex items-center rounded-xl text-zinc-500 hover:text-[#c20f24] hover:bg-red-50 transition-colors ${
+          folded ? 'justify-center py-2.5 short:py-2' : 'px-4 py-2.5 short:py-2 gap-3'
+        }`}
+      >
+        <LogOutIcon className="w-5 h-5 short:w-4 short:h-4 shrink-0" />
+        {!folded && <span className="text-[15px] short:text-[13px] font-medium whitespace-nowrap">Log Out</span>}
+      </button>
     </aside>
     </div>
   );
