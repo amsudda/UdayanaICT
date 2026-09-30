@@ -4,6 +4,7 @@ import { CheckCircleIcon, XCircleIcon, ArrowLeftIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 import { answerable, loadAttempt, loadQuizRows } from '../data/quizzes';
+import { QuestionImage } from '../components/shared/QuestionImage';
 
 export function QuizReviewPage() {
   const { id } = useParams<{ id: string }>();
@@ -96,10 +97,7 @@ export function QuizReviewPage() {
                 <h3 className="text-lg md:text-xl font-medium text-slate-900 dark:text-white leading-relaxed">
                   <span className="text-slate-400 font-bold mr-2">{index + 1}.</span>
                   {q.question_text}
-                  {q.image_url && (
-                    <img src={q.image_url} alt="" loading="lazy"
-                      className="mt-4 w-full object-contain rounded-xl border border-slate-100 dark:border-slate-800 bg-white" />
-                  )}
+                  {q.image_url && <QuestionImage src={q.image_url} className="mt-4" />}
                 </h3>
                 <div className={`shrink-0 px-3 py-1 rounded-lg text-sm font-bold ${isCorrect ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
                   {marks} / {q.marks} marks

@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { LogoLoader } from '../components/shared/LogoLoader';
 import { useAuth } from '../auth/AuthContext';
 import { answerable, isSection, loadAttempt, loadQuizRows } from '../data/quizzes';
+import { QuestionImage, usePreloadImages } from '../components/shared/QuestionImage';
 
 // Simple seeded random function for shuffling
 function seededRandom(seed: number) {
@@ -222,6 +223,15 @@ export function QuizPlayerPage() {
     return 'text-slate-600 dark:text-slate-300';
   };
 
+  // Warm the neighbouring questions' images while this one is on screen, so
+  // Next doesn't sit on a blank card waiting for the network. Called before
+  // the early returns below, because hooks cannot be conditional.
+  usePreloadImages([
+    questions[currentIdx + 1]?.image_url,
+    questions[currentIdx + 2]?.image_url,
+    questions[currentIdx - 1]?.image_url
+  ]);
+
   if (loading) {
     return <LogoLoader label="Loading quiz..." />;
   }
@@ -300,19 +310,14 @@ export function QuizPlayerPage() {
                       {currentQ.section_note}
                     </p>
                   )}
-                  {currentQ.image_url && (
-                    <img src={currentQ.image_url} alt="" loading="lazy"
-                      className="mt-5 w-full object-contain rounded-xl border border-slate-100 dark:border-slate-800" />
-                  )}
+                  {currentQ.image_url && <QuestionImage src={currentQ.image_url} className="mt-5" />}
                 </div>
               ) : (
               <>
               {/* Most questions are a photo of the printed paper, so the
-                  image carries the wording and the text box is optional. */}
-              {currentQ.image_url && (
-                <img src={currentQ.image_url} alt="" loading="lazy"
-                  className="w-full object-contain rounded-xl border border-slate-100 dark:border-slate-800 mb-6 bg-white" />
-              )}
+                  image carries the wording and the text box is optional —
+                  which is why it loads eagerly and says so while it loads. */}
+              {currentQ.image_url && <QuestionImage src={currentQ.image_url} className="mb-6" />}
 
               {currentQ.question_text && (
                 <h2 className="text-xl md:text-2xl font-medium text-slate-900 dark:text-white mb-8 leading-relaxed whitespace-pre-wrap">
