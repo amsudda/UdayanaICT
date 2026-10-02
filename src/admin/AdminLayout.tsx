@@ -37,6 +37,7 @@ const nav = [
   { name: 'Papers', path: '/admin/papers', icon: FileTextIcon },
   { name: 'Paper Marks', path: '/admin/marks', icon: TrendingUpIcon },
   { name: 'AQuiz', path: '/admin/quizzes', icon: ClipboardListIcon },
+  { name: 'Notices', path: '/admin/notices', icon: BellRingIcon },
   { name: 'Promotions', path: '/admin/promotions', icon: MegaphoneIcon },
   { name: 'Reviews', path: '/admin/reviews', icon: MessageSquareQuoteIcon },
   { name: 'Books', path: '/admin/books', icon: BookMarkedIcon },

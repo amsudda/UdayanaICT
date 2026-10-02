@@ -31,6 +31,7 @@ import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
 import { AdminStudentDetailPage } from './admin/pages/AdminStudentDetailPage';
 import { AdminStudentEditPage } from './admin/pages/AdminStudentEditPage';
 import { AdminPromotionsPage } from './admin/pages/AdminPromotionsPage';
+import { AdminNoticesPage } from './admin/pages/AdminNoticesPage';
 import { AdminSettingsPage } from './admin/pages/AdminSettingsPage';
 import { AdminFeaturedPage } from './admin/pages/AdminFeaturedPage';
 import { AdminMarksPage } from './admin/pages/AdminMarksPage';
@@ -188,6 +189,7 @@ function AnimatedRoutes() {
           <Route path="students" element={<AdminStudentsPage />} />
           <Route path="students/:id" element={<AdminStudentDetailPage />} />
           <Route path="students/:id/edit" element={<AdminStudentEditPage />} />
+          <Route path="notices" element={<AdminNoticesPage />} />
           <Route path="promotions" element={<AdminPromotionsPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="books" element={<AdminBooksPage />} />

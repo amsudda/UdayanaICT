@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { BellIcon, ArrowRightIcon } from 'lucide-react';
+import { BellIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
 import { DashboardCard, DashboardCardHeader, DashboardCardTitle, DashboardCardContent } from './DashboardCard';
-import { useNavigate } from 'react-router-dom';
 
 interface Notice {
   id: string;
@@ -16,7 +15,6 @@ interface Notice {
 
 export function NoticesCard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,14 +23,21 @@ export function NoticesCard() {
     
     const fetchNotices = async () => {
       setLoading(true);
+      // No student_id filter: RLS already limits this to the student's own
+      // rows, their batch's, and the ones posted to everyone. Filtering here
+      // threw away every announcement that was not addressed individually.
       const { data } = await supabase
         .from('notifications')
         .select('*')
-        .eq('student_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(3);
-        
-      if (data) setNotices(data as Notice[]);
+        .limit(20);
+
+      // The teacher's announcements come first: XP messages are frequent
+      // enough to bury a real notice otherwise, and they have the bell.
+      const rows = (data ?? []) as Notice[];
+      const announcements = rows.filter((n) => n.type === 'announcement');
+      const rest = rows.filter((n) => n.type !== 'announcement');
+      setNotices([...announcements, ...rest].slice(0, 3));
       setLoading(false);
     };
     
@@ -87,14 +92,6 @@ export function NoticesCard() {
           </div>
         )}
         
-        <div className="mt-6 pt-4 border-t border-gray-50 dark:border-slate-800/60 text-center">
-          <button 
-            onClick={() => {/* Not globally implemented yet, but keeping structure */}}
-            className="text-[12px] font-semibold text-[#64748B] hover:text-[#c20f24] transition-colors flex items-center justify-center gap-1 w-full"
-          >
-            View all notices <ArrowRightIcon className="w-3 h-3" />
-          </button>
-        </div>
       </DashboardCardContent>
     </DashboardCard>
   );
