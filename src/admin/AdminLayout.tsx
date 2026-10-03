@@ -186,15 +186,15 @@ export function AdminLayout() {
     <div className="flex flex-col h-full text-slate-300">
       {/* Brand */}
       <div className={`flex items-center gap-3 border-b border-white/[0.06] ${mini ? 'px-3 py-5 justify-center' : 'px-5 py-5'}`}>
-        <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c20f24] to-[#7a0c17] flex items-center justify-center shrink-0 shadow-lg shadow-red-900/30">
-          <img src="/images/pd-logo.png" alt="" className="w-6 h-6 object-contain" />
+        {/* white tile: the logo is drawn in the brand red, so it needs a
+            light ground to read against the dark rail */}
+        <span className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-lg shadow-black/30">
+          <img src="/images/pd-logo.png" alt="" className="w-7 h-7 object-contain" />
         </span>
         {!mini && (
           <div className="leading-tight min-w-0">
-            <p className="font-bold text-white text-[15px] truncate">Udayana ICT</p>
-            <p className="text-[11px] text-slate-400 truncate">
-              Admin{user?.name ? ` · ${user.name.split(' ')[0]}` : ''}
-            </p>
+            <p className="font-bold text-white text-[15px] truncate">Pasindu Dissanayake</p>
+            <p className="text-[11px] text-slate-400 truncate">ICT · Admin</p>
           </div>
         )}
       </div>
@@ -317,10 +317,10 @@ export function AdminLayout() {
       {/* Mobile top bar */}
       <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-14 bg-[#0C0C0E] text-white">
         <div className="flex items-center gap-2.5">
-          <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c20f24] to-[#7a0c17] flex items-center justify-center">
-            <img src="/images/pd-logo.png" alt="" className="w-5 h-5 object-contain" />
+          <span className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+            <img src="/images/pd-logo.png" alt="" className="w-6 h-6 object-contain" />
           </span>
-          <span className="font-bold">Udayana ICT</span>
+          <span className="font-bold truncate">Pasindu Dissanayake <span className="text-slate-400 font-semibold">ICT</span></span>
         </div>
         <button onClick={() => setOpen(true)} className="p-2 rounded-lg text-slate-300 hover:bg-white/10" aria-label="Menu">
           <MenuIcon className="w-6 h-6" />
