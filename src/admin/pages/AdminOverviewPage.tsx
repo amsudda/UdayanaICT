@@ -182,7 +182,6 @@ export function AdminOverviewPage() {
     });
     return out;
   }, [approved, revRange]);
-  const revRangeTotal = revenueSeries.reduce((s, b) => s + b.total, 0);
   const revRangeDesc = { '30d': 'last 30 days', '3m': 'last 3 months', '6m': 'last 6 months', '12m': 'last 12 months', all: 'lifetime' }[revRange];
 
   // student growth: new registrations per month, last 7 months
@@ -457,7 +456,7 @@ export function AdminOverviewPage() {
         <Panel
           className="rise-in"
           title="Revenue"
-          description={`Approved payments · ${revRangeDesc}${revTrend ? ` · ${revTrend}` : ''}`}
+          description={`${fmtLKR(revenueSeries.reduce((a, b) => a + b.total, 0))} · ${revRangeDesc}${revTrend ? ` · ${revTrend}` : ''}`}
           actions={
             <div className="inline-flex rounded-xl bg-slate-100 p-1">
               {rangeTabs.map((r) => (
@@ -475,7 +474,14 @@ export function AdminOverviewPage() {
           }
         >
           {/* keyed on range: a new series draws itself rather than morphing */}
-          <AreaChart key={revRange} points={revenueSeries} height={260} color="#c20f24" valueFormat={(n) => `Rs ${shortNum(n)}`} />
+          <AreaChart
+            key={revRange}
+            points={revenueSeries}
+            height={260}
+            color="#c20f24"
+            valueFormat={(n) => `Rs ${shortNum(n)}`}
+            tooltipFormat={(n) => fmtLKR(n)}
+          />
         </Panel>
 
         <Panel className="rise-in" title="ID verification" description="Where your students stand">
@@ -503,14 +509,26 @@ export function AdminOverviewPage() {
       {/* ── Growth + batch marks ──────────────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
         <Panel className="rise-in" title="Student growth" description="New registrations per month">
-          <AreaChart points={growthBuckets} height={220} color="#2563eb" valueFormat={(n) => String(Math.round(n))} showAverage={false} />
+          <AreaChart
+            points={growthBuckets}
+            height={220}
+            color="#2563eb"
+            valueFormat={(n) => String(Math.round(n))}
+            tooltipFormat={(n) => `${Math.round(n)} student${Math.round(n) === 1 ? '' : 's'}`}
+            showAverage={false}
+          />
         </Panel>
 
         <Panel className="rise-in" title="Batch performance" description="Average paper marks by batch">
           {batchPerf.length === 0 ? (
             <EmptyState icon={TrendingUpIcon} title="No marks yet" description="This fills in as you enter paper marks." />
           ) : (
-            <BarChart points={batchPerf.map((b) => ({ label: b.name, total: b.avg ?? 0 }))} suffix="%" color="#c20f24" />
+            <BarChart
+              points={batchPerf.map((b) => ({ label: b.name, total: b.avg ?? 0 }))}
+              suffix="%"
+              color="#c20f24"
+              caption={(_p, i) => `${batchPerf[i]?.n ?? 0} mark${batchPerf[i]?.n === 1 ? '' : 's'} recorded`}
+            />
           )}
         </Panel>
       </div>
