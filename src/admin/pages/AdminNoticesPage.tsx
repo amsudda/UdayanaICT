@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   BellRingIcon,
   GlobeIcon,
+  ImageIcon,
   LayersIcon,
   Loader2Icon,
   SendIcon,
   Trash2Icon,
-  UserIcon
+  UserIcon,
+  XIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -48,6 +50,10 @@ export function AdminNoticesPage() {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
+  // the picture, if there is one: held as a file until the notice is posted
+  const [imgFile, setImgFile] = useState<File | null>(null);
+  const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
 
@@ -100,8 +106,21 @@ export function AdminNoticesPage() {
       : audience === 'batch' ? (studentsByBatch[batchId]?.length ?? 0)
         : chosenStudent ? 1 : 0;
 
+  const pickImage = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('That file is not an image.'); return; }
+    if (file.size > 8 * 1024 * 1024) { alert('Images must be under 8MB.'); return; }
+    setImgFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setImgPreview(String(reader.result));
+    reader.readAsDataURL(file);
+  };
+
+  const clearImage = () => { setImgFile(null); setImgPreview(null); };
+
+  // A notice may be only a picture — a timetable or a hall list often is.
   const canSend =
-    message.trim().length > 0 &&
+    (message.trim().length > 0 || !!imgFile) &&
     !sending &&
     (audience === 'everyone' || (audience === 'batch' && batchId) || (audience === 'student' && studentId));
 
@@ -110,7 +129,25 @@ export function AdminNoticesPage() {
     setSending(true);
     setSent(null);
 
+    let imageUrl: string | null = null;
+    if (imgFile) {
+      setUploading(true);
+      const ext = (imgFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const path = `notices/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('thumbnails')
+        .upload(path, imgFile, { upsert: true, contentType: imgFile.type });
+      setUploading(false);
+      if (upErr) {
+        setSending(false);
+        alert(`Could not upload the image: ${upErr.message}`);
+        return;
+      }
+      imageUrl = supabase.storage.from('thumbnails').getPublicUrl(path).data.publicUrl;
+    }
+
     const row: any = {
+      image_url: imageUrl,
       title: title.trim() || null,
       message: message.trim(),
       type: 'announcement',
@@ -133,6 +170,7 @@ export function AdminNoticesPage() {
     );
     setTitle('');
     setMessage('');
+    clearImage();
     load();
   };
 
@@ -261,6 +299,29 @@ export function AdminNoticesPage() {
             />
           </div>
 
+          <div className="mb-5">
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5">Picture (optional)</label>
+            {imgPreview ? (
+              <div className="relative rounded-xl overflow-hidden border border-slate-200">
+                <img src={imgPreview} alt="" className="w-full max-h-64 object-contain bg-slate-50" />
+                <button
+                  onClick={clearImage}
+                  title="Remove picture"
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
+                >
+                  <XIcon className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-blue-300 hover:bg-blue-50/40 transition-colors">
+                <ImageIcon className="w-5 h-5 text-slate-300" />
+                <span className="text-sm text-slate-500">Add a timetable, a notice sheet, a photo…</span>
+                <input type="file" accept="image/*" className="hidden"
+                  onChange={(e) => pickImage(e.target.files?.[0])} />
+              </label>
+            )}
+          </div>
+
           <div className="flex items-center justify-between gap-4">
             <p className="text-xs text-slate-500">
               {loading ? 'Loading students…' : `Goes to ${reach} student${reach === 1 ? '' : 's'}.`}
@@ -272,7 +333,7 @@ export function AdminNoticesPage() {
               className="h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2 shrink-0"
             >
               {sending ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <SendIcon className="w-4 h-4" />}
-              Post notice
+              {uploading ? 'Uploading…' : 'Post notice'}
             </button>
           </div>
         </div>
@@ -310,7 +371,11 @@ export function AdminNoticesPage() {
                       </button>
                     </div>
                     {n.title && <p className="text-sm font-bold text-slate-900 mt-2">{n.title}</p>}
-                    <p className="text-sm text-slate-600 mt-0.5 whitespace-pre-wrap">{n.message}</p>
+                    {n.message && <p className="text-sm text-slate-600 mt-0.5 whitespace-pre-wrap">{n.message}</p>}
+                    {n.image_url && (
+                      <img src={n.image_url} alt="" loading="lazy"
+                        className="mt-2 w-full max-h-40 object-contain rounded-lg border border-slate-100 bg-slate-50" />
+                    )}
                     <p className="text-[11px] text-slate-400 mt-2">
                       {new Date(n.created_at).toLocaleString('en-LK', {
                         month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
