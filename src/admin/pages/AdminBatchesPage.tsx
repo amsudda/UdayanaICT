@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
   PlusIcon,
   UsersIcon,
@@ -10,7 +10,9 @@ import {
   CalendarClockIcon,
   ArchiveIcon,
   UserMinusIcon,
-  XIcon
+  XIcon,
+  ChevronDownIcon,
+  ChevronUpIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -88,6 +90,7 @@ export function AdminBatchesPage() {
   const [results, setResults] = useState<any[]>([]);
   /** filters the list already in the batch — a cohort of 100 is a long scroll */
   const [memberFilter, setMemberFilter] = useState('');
+  const expandedRef = useRef<HTMLElement | null>(null);
 
   // delete
   const [deleteTarget, setDeleteTarget] = useState<Batch | null>(null);
@@ -198,6 +201,10 @@ export function AdminBatchesPage() {
       .eq('batch_id', b.id);
     setMembers(data ?? []);
     setMemberFilter('');
+    // an expanded card can open below the fold, so bring it to the eye
+    requestAnimationFrame(() => {
+      expandedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   };
   const runSearch = async (q: string) => {
     setSearch(q);
@@ -353,10 +360,16 @@ export function AdminBatchesPage() {
           {visible.map((b, i) => {
             const left = daysTo(b.exam_date);
             const avg = b.avg_mark;
+            const expanded = membersBatch?.id === b.id;
             return (
               <article
                 key={b.id}
-                className="rise-in group relative rounded-2xl border border-slate-200 bg-white p-5 flex flex-col hover:border-slate-300 transition-colors"
+                ref={expanded ? expandedRef : undefined}
+                className={`rise-in group relative rounded-2xl bg-white p-5 flex flex-col transition-colors ${
+                  expanded
+                    ? 'md:col-span-2 xl:col-span-3 border-2 border-[#c20f24]/30 shadow-sm'
+                    : 'border border-slate-200 hover:border-slate-300'
+                }`}
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 {/* head */}
@@ -387,7 +400,7 @@ export function AdminBatchesPage() {
                 )}
 
                 {/* students + average */}
-                <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100">
+                <div className={`grid gap-3 mt-4 pt-4 border-t border-slate-100 ${expanded ? 'grid-cols-2 sm:grid-cols-4 max-w-xl' : 'grid-cols-2'}`}>
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Students</p>
                     <p className="text-[22px] font-bold text-slate-900 tabular-nums leading-none mt-1">{b.member_count}</p>
@@ -401,7 +414,7 @@ export function AdminBatchesPage() {
                 </div>
 
                 {avg !== null && avg !== undefined && (
-                  <div className="mt-2.5">
+                  <div className={`mt-2.5 ${expanded ? 'max-w-xl' : ''}`}>
                     <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-[#c20f24] transition-[width] duration-700 ease-out"
@@ -413,7 +426,7 @@ export function AdminBatchesPage() {
                 )}
 
                 {/* who is in it */}
-                {b.preview && b.preview.length > 0 && (
+                {!expanded && b.preview && b.preview.length > 0 && (
                   <button
                     onClick={() => openMembers(b)}
                     className="flex items-center gap-2 mt-4 mb-5"
@@ -435,12 +448,17 @@ export function AdminBatchesPage() {
                 )}
 
                 {/* actions */}
-                <div className="flex items-center gap-1 mt-auto pt-4 border-t border-slate-100">
+                <div className={`flex items-center gap-1 mt-auto pt-4 border-t border-slate-100 ${expanded ? 'max-w-xl' : ''}`}>
                   <button
-                    onClick={() => openMembers(b)}
-                    className="flex-1 h-9 rounded-lg text-[13px] font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 inline-flex items-center justify-center gap-1.5 transition-colors active:scale-[0.98] duration-150"
+                    onClick={() => (expanded ? setMembersBatch(null) : openMembers(b))}
+                    className={`flex-1 h-9 rounded-lg text-[13px] font-semibold inline-flex items-center justify-center gap-1.5 transition-colors active:scale-[0.98] duration-150 ${
+                      expanded ? 'bg-[#c20f24] text-white hover:bg-[#a60d1f]' : 'text-slate-700 bg-slate-50 hover:bg-slate-100'
+                    }`}
                   >
-                    <UsersIcon className="w-4 h-4" /> Members
+                    <UsersIcon className="w-4 h-4" /> {expanded ? 'Hide members' : 'Members'}
+                    {expanded
+                      ? <ChevronUpIcon className="w-3.5 h-3.5" />
+                      : <ChevronDownIcon className="w-3.5 h-3.5 text-slate-400" />}
                   </button>
                   <button
                     onClick={() => exportBatch(b)}
@@ -464,6 +482,94 @@ export function AdminBatchesPage() {
                     <Trash2Icon className="w-4 h-4" />
                   </button>
                 </div>
+
+                {/* ── Roster, in place. No overlay: the batch it belongs to
+                       stays visible above it the whole time. ── */}
+                {expanded && (
+                  <div className="rise-in mt-5 pt-5 border-t border-slate-100 grid grid-cols-1 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] gap-6">
+                    {/* add */}
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Add a student</p>
+                      <SearchInput value={search} onChange={runSearch} placeholder="Name, email or student ID…" />
+                      {search.trim().length === 1 && (
+                        <p className="text-[11px] text-slate-400 mt-1.5">Keep typing — two letters or more.</p>
+                      )}
+                      {search.trim().length >= 2 && results.length === 0 && (
+                        <p className="text-[12px] text-slate-400 mt-2">No match, or they are already in this batch.</p>
+                      )}
+                      {results.length > 0 && (
+                        <div className="mt-2 border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden max-h-64 overflow-y-auto">
+                          {results.map((st) => (
+                            <button
+                              key={st.id}
+                              onClick={() => addMember(st.id)}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-slate-50 transition-colors"
+                            >
+                              <Initials name={st.full_name} size={30} />
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-medium text-slate-900 truncate">{st.full_name || '(no name)'}</span>
+                                <span className="block text-xs text-slate-400 truncate">{[st.student_code, st.email].filter(Boolean).join(' · ')}</span>
+                              </span>
+                              <UserPlusIcon className="w-4 h-4 text-[#c20f24] shrink-0" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => exportBatch(b)}
+                        className="mt-4 w-full h-10 rounded-xl border border-slate-200 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center justify-center gap-2 transition-colors active:scale-[0.98] duration-150"
+                      >
+                        <DownloadIcon className="w-4 h-4" /> Download student data (CSV)
+                      </button>
+                    </div>
+
+                    {/* roster */}
+                    <div className="min-w-0">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          {shownMembers.length === members.length
+                            ? `${members.length} student${members.length === 1 ? '' : 's'}`
+                            : `${shownMembers.length} of ${members.length}`}
+                        </p>
+                        {members.length > 8 && (
+                          <input
+                            value={memberFilter}
+                            onChange={(e) => setMemberFilter(e.target.value)}
+                            placeholder="Filter this list…"
+                            className="h-9 w-48 rounded-lg border border-slate-200 px-3 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#c20f24]/20 focus:border-[#c20f24]/40"
+                          />
+                        )}
+                      </div>
+
+                      {members.length === 0 ? (
+                        <EmptyState icon={UsersIcon} title="Nobody here yet" description="Search on the left to add your first student." />
+                      ) : shownMembers.length === 0 ? (
+                        <p className="text-sm text-slate-400 py-8 text-center">Nobody in this batch matches that.</p>
+                      ) : (
+                        <div data-lenis-prevent className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[22rem] overflow-y-auto pr-1">
+                          {shownMembers.map((m) => (
+                            <div key={m.id} className="flex items-center gap-3 border border-slate-200 rounded-xl px-3 py-2.5 hover:border-slate-300 transition-colors">
+                              <Initials name={m.student?.full_name} size={34} />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-slate-900 truncate">{m.student?.full_name || '(no name)'}</p>
+                                <p className="text-xs text-slate-400 truncate">{[m.student?.student_code, m.student?.email].filter(Boolean).join(' · ')}</p>
+                              </div>
+                              <button
+                                onClick={() => removeMember(m.id)}
+                                className="p-1.5 rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-600 transition-colors active:scale-95 duration-150"
+                                aria-label={`Remove ${m.student?.full_name ?? 'student'} from this batch`}
+                                title="Remove from batch"
+                              >
+                                <XIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </article>
             );
           })}
@@ -520,99 +626,6 @@ export function AdminBatchesPage() {
             </span>
           </label>
         </div>
-      </Modal>
-
-      {/* members drawer */}
-      <Modal
-        open={!!membersBatch}
-        onClose={() => setMembersBatch(null)}
-        size="lg"
-        title={membersBatch ? membersBatch.name : ''}
-        description={membersBatch ? `${members.length} student${members.length === 1 ? '' : 's'} in this batch` : undefined}
-        footer={
-          membersBatch ? (
-            <div className="flex gap-3">
-              <button
-                onClick={() => exportBatch(membersBatch)}
-                className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50 transition-colors active:scale-[0.98] duration-150"
-              >
-                <DownloadIcon className="w-4 h-4" /> Download student data (CSV)
-              </button>
-              <button
-                onClick={() => setMembersBatch(null)}
-                className="h-11 px-6 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors active:scale-[0.98] duration-150"
-              >
-                Done
-              </button>
-            </div>
-          ) : null
-        }
-      >
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">Add a student</label>
-          <SearchInput value={search} onChange={runSearch} placeholder="Search by name, email or student ID…" />
-          {search.trim().length === 1 && <p className="text-[11px] text-slate-400 mt-1.5">Keep typing — two letters or more.</p>}
-          {search.trim().length >= 2 && results.length === 0 && (
-            <p className="text-[12px] text-slate-400 mt-2">No student matches, or they are already in this batch.</p>
-          )}
-          {results.length > 0 && (
-            <div className="mt-2 border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden">
-              {results.map((s) => (
-                <button key={s.id} onClick={() => addMember(s.id)} className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-slate-50 transition-colors">
-                  <Initials name={s.full_name} size={32} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium text-slate-900 truncate">{s.full_name || '(no name)'}</span>
-                    <span className="block text-xs text-slate-400 truncate">{[s.student_code, s.email].filter(Boolean).join(' · ')}</span>
-                  </span>
-                  <UserPlusIcon className="w-4 h-4 text-[#c20f24] shrink-0" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            {shownMembers.length === members.length
-              ? `${members.length} student${members.length === 1 ? '' : 's'}`
-              : `${shownMembers.length} of ${members.length}`}
-          </p>
-        </div>
-
-        {members.length > 8 && (
-          <input
-            value={memberFilter}
-            onChange={(e) => setMemberFilter(e.target.value)}
-            placeholder="Filter this list…"
-            className="w-full h-10 rounded-xl border border-slate-200 px-3.5 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#c20f24]/20 focus:border-[#c20f24]/40"
-          />
-        )}
-
-        {members.length === 0 ? (
-          <EmptyState icon={UsersIcon} title="Nobody here yet" description="Search above to add your first student to this batch." />
-        ) : shownMembers.length === 0 ? (
-          <p className="text-sm text-slate-400 py-6 text-center">Nobody in this batch matches that.</p>
-        ) : (
-          <div className="space-y-2">
-            {shownMembers.map((m) => (
-              <div key={m.id} className="group flex items-center gap-3 border border-slate-200 rounded-xl px-3 py-2.5 hover:border-slate-300 transition-colors">
-                <Initials name={m.student?.full_name} size={34} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{m.student?.full_name || '(no name)'}</p>
-                  <p className="text-xs text-slate-400 truncate">{[m.student?.student_code, m.student?.email].filter(Boolean).join(' · ')}</p>
-                </div>
-                <button
-                  onClick={() => removeMember(m.id)}
-                  className="p-1.5 rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-600 transition-colors active:scale-95 duration-150"
-                  aria-label={`Remove ${m.student?.full_name ?? 'student'} from this batch`}
-                  title="Remove from batch"
-                >
-                  <XIcon className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
       </Modal>
 
       {/* delete confirm with export */}
