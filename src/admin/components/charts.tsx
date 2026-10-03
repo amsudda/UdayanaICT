@@ -86,8 +86,8 @@ export function AreaChart({
       </defs>
 
       {/* gridlines + y labels */}
-      {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-        <g key={t}>
+      {[0, 0.25, 0.5, 0.75, 1].map((t, gi) => (
+        <g key={t} style={reduce ? undefined : { animation: `chart-fade 260ms ${EASE} both`, animationDelay: `${gi * 35}ms` }}>
           <line
             x1={PAD_L} x2={W - PAD_R} y1={y(max * t)} y2={y(max * t)}
             stroke="#e2e8f0" strokeWidth="1" strokeDasharray={t === 0 ? undefined : '3 5'}
@@ -125,7 +125,12 @@ export function AreaChart({
             />
           )}
           {(i % step === 0 || i === points.length - 1) && (
-            <text x={x(i)} y={H - 8} textAnchor="middle" fontSize="11" fill="#94a3b8">{p.label}</text>
+            <text
+              x={x(i)} y={H - 8} textAnchor="middle" fontSize="11" fill="#94a3b8"
+              style={reduce ? undefined : { animation: `chart-fade 260ms ${EASE} both`, animationDelay: `${120 + i * 15}ms` }}
+            >
+              {p.label}
+            </text>
           )}
         </g>
       ))}
@@ -155,7 +160,12 @@ export function BarChart({
     <div className="flex items-end gap-3" style={{ height }}>
       {points.map((p, i) => (
         <div key={`${p.label}-${i}`} className="flex-1 min-w-0 flex flex-col items-center gap-2 h-full justify-end">
-          <span className="text-[12px] font-bold text-slate-900 tabular-nums">{Math.round(p.total)}{suffix}</span>
+          <span
+            className="text-[12px] font-bold text-slate-900 tabular-nums"
+            style={reduce ? undefined : { animation: `chart-fade 260ms ${EASE} both`, animationDelay: `${160 + i * 40}ms` }}
+          >
+            {Math.round(p.total)}{suffix}
+          </span>
           <div
             // capped: four batches should not become slabs the width of a hand
             className="w-full max-w-[64px] rounded-t-lg"
@@ -199,15 +209,23 @@ export function Donut({
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f1f5f9" strokeWidth="16" />
           {segments.map((s, i) => {
             const len = (s.value / total) * c;
-            const dash = `${len} ${c - len}`;
             const el = (
               <circle
                 key={s.label}
                 cx={size / 2} cy={size / 2} r={r}
                 fill="none" stroke={s.color} strokeWidth="16" strokeLinecap="butt"
-                strokeDasharray={dash}
+                strokeDasharray={`${len} ${c - len}`}
                 strokeDashoffset={-offset}
-                style={reduce ? undefined : { animation: `chart-fade 360ms ${EASE} both`, animationDelay: `${i * 90}ms` }}
+                // the ring draws itself, segment after segment, rather than
+                // appearing whole — stroke-dasharray is animatable, so this
+                // stays a CSS animation off the main thread
+                style={reduce ? undefined : {
+                  ['--len' as any]: `${len}`,
+                  ['--rest' as any]: `${c - len}`,
+                  ['--c' as any]: `${c}`,
+                  animation: `donut-sweep 520ms ${EASE} both`,
+                  animationDelay: `${120 + i * 140}ms`
+                }}
               />
             );
             offset += len;

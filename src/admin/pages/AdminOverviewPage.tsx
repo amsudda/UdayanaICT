@@ -457,7 +457,7 @@ export function AdminOverviewPage() {
         <Panel
           className="rise-in"
           title="Revenue"
-          description={`Approved payments · ${revRangeDesc}`}
+          description={`Approved payments · ${revRangeDesc}${revTrend ? ` · ${revTrend}` : ''}`}
           actions={
             <div className="inline-flex rounded-xl bg-slate-100 p-1">
               {rangeTabs.map((r) => (
@@ -474,11 +474,6 @@ export function AdminOverviewPage() {
             </div>
           }
         >
-          <p className="text-[30px] font-bold text-slate-900 tabular-nums leading-none mb-1">{fmtLKR(revRangeTotal)}</p>
-          <p className="text-[12px] text-slate-400 mb-4">
-            collected {revRangeDesc}
-            {revTrend ? ` · ${revTrend}` : ''}
-          </p>
           {/* keyed on range: a new series draws itself rather than morphing */}
           <AreaChart key={revRange} points={revenueSeries} height={260} color="#c20f24" valueFormat={(n) => `Rs ${shortNum(n)}`} />
         </Panel>

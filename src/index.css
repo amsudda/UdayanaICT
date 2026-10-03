@@ -241,3 +241,12 @@
 @media (prefers-reduced-motion: reduce) {
   .rise-in { animation: chart-fade 200ms ease both; }
 }
+
+/* Donut segments sweeping around the ring, one after another. */
+@keyframes donut-sweep {
+  from { stroke-dasharray: 0 var(--c); }
+  to   { stroke-dasharray: var(--len) var(--rest); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="donut-sweep"] { animation: none !important; }
+}
