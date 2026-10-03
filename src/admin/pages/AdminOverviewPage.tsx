@@ -6,7 +6,6 @@ import {
   LayersIcon,
   PackageIcon,
   ArrowRightIcon,
-  PlusIcon,
   VideoIcon,
   CalendarClockIcon,
   CheckIcon,
@@ -17,16 +16,23 @@ import {
   BanknoteIcon,
   TrendingUpIcon,
   IdCardIcon,
-  ShieldCheckIcon,
-  BellRingIcon
+  ShieldCheckIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { Panel, EmptyState, Initials } from '../components/ui';
+import { AreaChart, AreaSpark, BarChart, Donut } from '../components/charts';
 import { useAuth } from '../../auth/AuthContext';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const fmtLKR = (n: number) => `Rs. ${Math.round(n).toLocaleString()}`;
+
+/** Axis labels: 1200000 -> 1.2M, 45000 -> 45k. */
+const shortNum = (n: number) =>
+  n >= 1_000_000 ? `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`
+    : n >= 1_000 ? `${Math.round(n / 1000)}k`
+      : String(Math.round(n));
 
 function timeAgo(iso: string) {
   const s = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
@@ -36,53 +42,6 @@ function timeAgo(iso: string) {
   const h = Math.floor(m / 60);
   if (h < 24) return `${h}h ago`;
   return `${Math.floor(h / 24)}d ago`;
-}
-
-/* tiny sparkline from a numeric series */
-function Sparkline({ data, stroke = '#2563eb' }: { data: number[]; stroke?: string }) {
-  if (!data.length) return null;
-  const max = Math.max(...data, 1);
-  const pts = data.map((v, i) => `${(i / (data.length - 1)) * 100},${28 - (v / max) * 24 - 2}`).join(' ');
-  return (
-    <svg viewBox="0 0 100 28" className="w-full h-7" preserveAspectRatio="none" aria-hidden>
-      <polyline points={pts} fill="none" stroke={stroke} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" opacity="0.85" />
-    </svg>
-  );
-}
-
-/* monthly revenue area chart */
-function TrendAreaChart({ buckets, color, id, label }: { buckets: { label: string; total: number }[]; color: string; id: string; label: string }) {
-  const W = 620, H = 200, PAD = 34;
-  const max = Math.max(...buckets.map((b) => b.total), 1);
-  const x = (i: number) => PAD + (i / Math.max(buckets.length - 1, 1)) * (W - PAD * 2);
-  const y = (v: number) => H - 30 - (v / max) * (H - 60);
-  const line = buckets.map((b, i) => `${x(i)},${y(b.total)}`).join(' ');
-  const area = `${PAD},${H - 30} ${line} ${x(buckets.length - 1)},${H - 30}`;
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={label}>
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.22" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      {[0.25, 0.5, 0.75, 1].map((t) => (
-        <line key={t} x1={PAD} x2={W - PAD} y1={y(max * t)} y2={y(max * t)} stroke="#e2e8f0" strokeDasharray="3 4" strokeWidth="1" />
-      ))}
-      <polygon points={area} fill={`url(#${id})`} />
-      <polyline points={line} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-      {buckets.map((b, i) => {
-        const step = Math.max(1, Math.ceil(buckets.length / 7));
-        const showLabel = i % step === 0 || i === buckets.length - 1;
-        return (
-          <g key={`${b.label}-${i}`}>
-            <circle cx={x(i)} cy={y(b.total)} r={buckets.length > 14 ? 2 : 3.5} fill={color} />
-            {showLabel && <text x={x(i)} y={H - 10} textAnchor="middle" fontSize="11" fill="#94a3b8">{b.label}</text>}
-          </g>
-        );
-      })}
-    </svg>
-  );
 }
 
 export function AdminOverviewPage() {
@@ -146,7 +105,6 @@ export function AdminOverviewPage() {
   const pendingIds = profiles.filter((p) => p.verification_status === 'pending');
 
   const monthKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}`;
-  const thisMonth = monthKey(new Date());
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86_400_000);
   const revenueLast30Days = approved
     .filter((p) => new Date(p.created_at) >= thirtyDaysAgo)
@@ -245,9 +203,20 @@ export function AdminOverviewPage() {
 
   // trend chips (real month-over-month / day-over-day deltas)
   const regsThisMonth = growthBuckets[growthBuckets.length - 1]?.total ?? 0;
-  const revNow = revenueBuckets[revenueBuckets.length - 1]?.total ?? 0;
-  const revPrev = revenueBuckets[revenueBuckets.length - 2]?.total ?? 0;
-  const revTrend = revPrev > 0 ? `${revNow >= revPrev ? '+' : ''}${Math.round(((revNow - revPrev) / revPrev) * 100)}% vs last month` : null;
+  // Rolling 30 days against the 30 before it. Comparing calendar months
+  // means that on the 2nd of a month you are holding two days up against
+  // thirty and calling it a collapse.
+  const sixtyDaysAgo = new Date(Date.now() - 60 * 86_400_000);
+  const revenuePrev30 = approved
+    .filter((p) => {
+      const d = new Date(p.created_at);
+      return d >= sixtyDaysAgo && d < thirtyDaysAgo;
+    })
+    .reduce((s, p) => s + Number(p.amount ?? 0), 0);
+  const revTrendPct = revenuePrev30 > 0
+    ? Math.round(((revenueLast30Days - revenuePrev30) / revenuePrev30) * 100)
+    : null;
+  const revTrend = revTrendPct === null ? null : `${revTrendPct >= 0 ? '+' : ''}${revTrendPct}% vs previous 30 days`;
   const yesterdayStr = new Date(Date.now() - 86_400_000).toDateString();
   const regsYesterday = profiles.filter((p) => new Date(p.created_at).toDateString() === yesterdayStr).length;
   const regsTodayTrend = `${regsToday - regsYesterday >= 0 ? '+' : ''}${regsToday - regsYesterday} vs yesterday`;
@@ -356,312 +325,392 @@ export function AdminOverviewPage() {
     load();
   };
 
-  const quickActions = [
-    { title: 'Create Batch', desc: 'Start a new batch', to: '/admin/batches', icon: LayersIcon, tone: 'bg-violet-50 text-violet-600 border-violet-100' },
-    { title: 'Upload Pack', desc: 'Add learning content', to: '/admin/packs', icon: PackageIcon, tone: 'bg-blue-50 text-blue-600 border-blue-100' },
-    { title: 'Monthly Recordings', desc: 'Sessions + live links', to: '/admin/theory', icon: VideoIcon, tone: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-    { title: 'Approve Payments', desc: 'Review pending slips', to: '/admin/payments', icon: ReceiptTextIcon, tone: 'bg-amber-50 text-amber-600 border-amber-100' }
+  const dateLabel = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+  const firstName = adminName ? adminName.split(' ')[0] : null;
+
+  /* ── Headline sentence: only what is actually true today ── */
+  const headline = [
+    pendingIds.length ? `${pendingIds.length} ID${pendingIds.length === 1 ? '' : 's'} need verifying` : null,
+    pending.length ? `${pending.length} payment${pending.length === 1 ? '' : 's'} await your approval` : null,
+    regsToday ? `${regsToday} student${regsToday === 1 ? '' : 's'} registered today` : null
+  ].filter(Boolean);
+
+  const quickChips = [
+    { label: 'Create Batch', to: '/admin/batches', icon: LayersIcon },
+    { label: 'Upload Pack', to: '/admin/packs', icon: PackageIcon },
+    { label: 'Monthly Recordings', to: '/admin/theory', icon: VideoIcon },
+    { label: 'Approve Payments', to: '/admin/payments', icon: ReceiptTextIcon }
   ];
 
-  const stats = [
-    { label: 'Pending ID Verifications', value: pendingIds.length, icon: IdCardIcon, to: '/admin/students', tone: pendingIds.length > 0 ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500', spark: null as number[] | null, sparkColor: '', trend: pendingIds.length > 0 ? 'awaiting approval' : 'all caught up' },
-    { label: 'Pending Payments', value: pending.length, icon: ReceiptTextIcon, to: '/admin/payments', tone: pending.length > 0 ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500', spark: null as number[] | null, sparkColor: '', trend: pending.length > 0 ? 'awaiting approval' : 'all caught up' },
-    { label: 'Students', value: profiles.length, icon: UsersIcon, to: '/admin/students', tone: 'bg-blue-50 text-blue-600', spark: signupSpark, sparkColor: '#2563eb', trend: `+${regsThisMonth} this month` },
-    { label: 'Active Batches', value: batches.length, icon: LayersIcon, to: '/admin/batches', tone: 'bg-violet-50 text-violet-600', spark: null, sparkColor: '', trend: null as string | null },
-    { label: 'Video Packs', value: packCount, icon: PackageIcon, to: '/admin/packs', tone: 'bg-emerald-50 text-emerald-600', spark: null, sparkColor: '', trend: null },
-    { label: 'Revenue (Last 30 Days)', value: fmtLKR(revenueLast30Days), icon: BanknoteIcon, to: '/admin/payments', tone: 'bg-rose-50 text-rose-600', spark: revenueSpark, sparkColor: '#e11d48', trend: revTrend },
-    { label: "Today's Registrations", value: regsToday, icon: UserPlusIcon, to: '/admin/students', tone: 'bg-cyan-50 text-cyan-600', spark: signupSpark, sparkColor: '#0891b2', trend: regsTodayTrend }
+  /* ── Stat tiles. Every number here is read off real rows. ── */
+  const tiles = [
+    { label: 'Pending ID verifications', value: pendingIds.length, sub: pendingIds.length ? 'Awaiting review' : 'All caught up', delta: null as string | null, icon: IdCardIcon, tint: 'bg-rose-50 text-rose-600', color: '#e11d48', spark: null as number[] | null, to: '/admin/students' },
+    { label: 'Pending payments', value: pending.length, sub: pending.length ? 'Waiting approval' : 'All caught up', delta: null, icon: ReceiptTextIcon, tint: 'bg-amber-50 text-amber-600', color: '#d97706', spark: null, to: '/admin/payments' },
+    { label: 'Total students', value: profiles.length.toLocaleString(), sub: `+${regsThisMonth} this month`, delta: regsThisMonth ? `+${regsThisMonth}` : null, icon: UsersIcon, tint: 'bg-blue-50 text-blue-600', color: '#2563eb', spark: signupSpark, to: '/admin/students' },
+    { label: 'Active batches', value: batches.length, sub: batches.length ? 'Across all programs' : 'None yet', delta: null, icon: LayersIcon, tint: 'bg-violet-50 text-violet-600', color: '#7c3aed', spark: null, to: '/admin/batches' },
+    { label: 'Video packs', value: packCount, sub: 'Published', delta: null, icon: PackageIcon, tint: 'bg-emerald-50 text-emerald-600', color: '#059669', spark: null, to: '/admin/packs' },
+    { label: 'Revenue · 30 days', value: fmtLKR(revenueLast30Days), sub: 'Approved payments', delta: revTrendPct === null ? null : `${revTrendPct >= 0 ? '+' : ''}${revTrendPct}%`, icon: BanknoteIcon, tint: 'bg-[#c20f24]/10 text-[#c20f24]', color: '#c20f24', spark: revenueSpark, to: '/admin/payments' },
+    { label: 'Lifetime revenue', value: fmtLKR(approved.reduce((s, p) => s + Number(p.amount ?? 0), 0)), sub: `${approved.length} approved payment${approved.length === 1 ? '' : 's'}`, delta: null, icon: TrendingUpIcon, tint: 'bg-cyan-50 text-cyan-600', color: '#0891b2', spark: revenueSpark, to: '/admin/payments' },
+    { label: "Today's registrations", value: regsToday, sub: regsTodayTrend, delta: regsToday - regsYesterday > 0 ? `+${regsToday - regsYesterday}` : null, icon: UserPlusIcon, tint: 'bg-indigo-50 text-indigo-600', color: '#4f46e5', spark: signupSpark, to: '/admin/students' }
   ];
 
-  const dateLabel = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const verifiedCount = profiles.filter((p) => p.verification_status === 'approved').length;
+  const rejectedCount = profiles.filter((p) => p.verification_status === 'rejected').length;
+  const unsubmitted = Math.max(0, profiles.length - verifiedCount - rejectedCount - pendingIds.length);
+
+  const rangeTabs = [
+    { v: '30d', label: '30D' },
+    { v: '3m', label: '3M' },
+    { v: '6m', label: '6M' },
+    { v: '12m', label: '12M' },
+    { v: 'all', label: 'All' }
+  ] as const;
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-40 rounded-3xl bg-slate-100 animate-pulse" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => <div key={i} className="h-40 rounded-2xl bg-slate-100 animate-pulse" />)}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {/* prominent ID-verification alert (most important, above everything) */}
-      {!loading && pendingIds.length > 0 && (
-        <Link
-          to="/admin/students"
-          className="mb-6 flex items-center gap-3 rounded-2xl bg-rose-600 text-white px-4 sm:px-5 py-4 shadow-sm hover:bg-rose-700 transition-colors animate-pulse"
-        >
-          <span className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-            <BellRingIcon className="w-5 h-5" />
-          </span>
-          <p className="text-sm font-semibold flex-1 min-w-0">
-            <span className="font-black">{pendingIds.length}</span> student{pendingIds.length === 1 ? '' : 's'} {pendingIds.length === 1 ? 'has' : 'have'} uploaded an ID awaiting verification — review to unlock their lessons.
-          </p>
-          <span className="hidden sm:flex text-sm font-bold items-center gap-1 shrink-0">
-            Verify now <ArrowRightIcon className="w-4 h-4" />
-          </span>
-        </Link>
-      )}
+    <div className="space-y-6">
+      {/* ── Welcome ───────────────────────────────────────────────── */}
+      <section
+        className="rise-in relative overflow-hidden rounded-3xl px-6 py-7 sm:px-8 text-white"
+        style={{ background: 'linear-gradient(110deg, #7a0c17 0%, #c20f24 55%, #e11d48 100%)' }}
+      >
+        <div className="pointer-events-none absolute -top-24 -right-10 w-80 h-80 rounded-full bg-white/10 blur-3xl" />
+        <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold tracking-[0.18em] text-white/60">{dateLabel}</p>
+            <h1 className="text-[32px] sm:text-[38px] leading-tight font-bold tracking-tight mt-1">
+              Welcome back{firstName ? `, ${firstName}` : ''} <span className="inline-block">👋</span>
+            </h1>
+            <p className="text-sm text-white/75 mt-2 max-w-xl">
+              {headline.length
+                ? `${headline.join(', ')}.`
+                : 'Nothing is waiting on you — every payment and ID is reviewed.'}
+            </p>
+          </div>
 
-      {/* header */}
-      <div className="flex flex-wrap items-end justify-between gap-2 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Welcome back{adminName ? `, ${adminName.split(' ')[0]}` : ''} 👋
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">Keep inspiring, keep teaching. Here's today at a glance.</p>
-        </div>
-        <p className="text-sm text-slate-400">{dateLabel}</p>
-      </div>
-
-      {/* quick actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        {quickActions.map((a) => (
-          <Link key={a.title} to={a.to}
-            className={`group flex items-center justify-between rounded-2xl border bg-white p-4 hover:shadow-md transition-all ${a.tone.split(' ')[2] ?? 'border-slate-200'}`}>
-            <span className="flex items-center gap-3 min-w-0">
-              <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${a.tone.split(' ').slice(0, 2).join(' ')}`}>
-                <a.icon className="w-5 h-5" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-bold text-slate-900 truncate">{a.title}</span>
-                <span className="block text-xs text-slate-400 truncate">{a.desc}</span>
-              </span>
-            </span>
-            <PlusIcon className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors shrink-0" />
-          </Link>
-        ))}
-      </div>
-
-      {/* stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
-        {stats.map((s) => (
-          <Link key={s.label} to={s.to} className="group rounded-2xl bg-white border border-slate-200 p-4 hover:shadow-md transition-all">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${s.tone}`}>
-              <s.icon className="w-4 h-4" />
-            </div>
-            <p className="text-xl font-black text-slate-900 leading-none truncate">{loading ? '—' : s.value}</p>
-            <p className="text-[11px] text-slate-500 mt-1.5 leading-tight">{s.label}</p>
-            {!loading && s.trend ? (
-              <p className={`text-[10px] font-semibold mt-1 truncate ${s.trend.startsWith('+') || s.trend === 'all caught up' ? 'text-emerald-600' : s.trend.startsWith('-') ? 'text-red-500' : 'text-slate-400'}`}>
-                {s.trend}
-              </p>
-            ) : null}
-            {s.spark && s.spark.some((v) => v > 0) ? (
-              <div className="mt-2"><Sparkline data={s.spark} stroke={s.sparkColor} /></div>
-            ) : null}
-          </Link>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-6 items-start">
-        {/* ── LEFT column ── */}
-        <div className="space-y-6 min-w-0">
-          {/* ID verifications queue */}
-          <div className="rounded-2xl bg-white border border-rose-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="flex items-center gap-2 font-bold text-slate-900">
-                <ShieldCheckIcon className="w-4 h-4 text-rose-600" />
-                ID Verifications
-              </h2>
-              <Link to="/admin/students" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
-                View all <ArrowRightIcon className="w-3 h-3" />
+          <div className="flex flex-wrap gap-2 shrink-0">
+            {quickChips.map((c) => (
+              <Link
+                key={c.label}
+                to={c.to}
+                className="inline-flex items-center gap-2 h-10 px-4 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm text-[13px] font-semibold transition-colors active:scale-[0.97] duration-150"
+              >
+                <c.icon className="w-4 h-4" /> {c.label}
               </Link>
-            </div>
-            {pendingIds.length === 0 ? (
-              <p className="text-sm text-slate-400 py-6 text-center">No IDs waiting — all verified ✅</p>
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {pendingIds.slice(0, 5).map((s) => (
-                  <div key={s.id} className="py-3 flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-full bg-rose-50 text-rose-600 text-xs font-bold flex items-center justify-center shrink-0">
-                      {(s.full_name ?? '?').split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{s.full_name || '(no name)'}</p>
-                      <p className="text-xs text-slate-400 truncate">
-                        {s.student_code}
-                        {s.verification_submitted_at ? ` · submitted ${timeAgo(s.verification_submitted_at)}` : ''}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={() => viewIdImages(s)} disabled={!s.id_front_path && !s.id_back_path} title="View ID"
-                        className="w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-30 flex items-center justify-center">
-                        <ImageIcon className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => approveId(s)} disabled={vBusyId === s.id} title="Approve"
-                        className="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center">
-                        {vBusyId === s.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <CheckIcon className="w-4 h-4" />}
-                      </button>
-                      <button onClick={() => setIdRejectTarget(s)} disabled={vBusyId === s.id} title="Reject"
-                        className="w-8 h-8 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center">
-                        <XIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {pendingIds.length > 5 && (
-                  <p className="pt-3 text-xs text-slate-400 text-center">
-                    Showing 5 of {pendingIds.length} — <Link to="/admin/students" className="font-semibold text-blue-600 hover:underline">view the rest</Link>
-                  </p>
-                )}
-              </div>
-            )}
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* revenue */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-              <h2 className="font-bold text-slate-900">Revenue Overview</h2>
-              <div className="flex rounded-lg bg-slate-100 p-0.5">
-                {([['30d', '30D'], ['3m', '3M'], ['6m', '6M'], ['12m', '12M'], ['all', 'All']] as const).map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setRevRange(key)}
-                    className={`h-7 px-2.5 rounded-md text-xs font-semibold transition-colors ${revRange === key ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+      {/* ── Stat tiles ────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {tiles.map((t, i) => (
+          <Link
+            key={t.label}
+            to={t.to}
+            className="rise-in group relative overflow-hidden rounded-2xl border border-slate-200 bg-white pt-5 hover:border-slate-300 transition-colors"
+            style={{ animationDelay: `${60 + i * 40}ms` }}
+          >
+            <div className="px-5">
+              <div className="flex items-start justify-between gap-3">
+                <span className={`w-10 h-10 rounded-xl flex items-center justify-center ${t.tint}`}>
+                  <t.icon className="w-5 h-5" />
+                </span>
+                {t.delta && (
+                  <span
+                    className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${
+                      t.delta.startsWith('-') ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50'
+                    }`}
                   >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <p className="text-2xl font-black text-slate-900 mb-3">
-              {fmtLKR(revRangeTotal)} <span className="text-sm font-medium text-slate-400">{revRangeDesc} · approved payments</span>
-            </p>
-            <TrendAreaChart buckets={revenueSeries} color="#2563eb" id="revfill" label="Revenue" />
-          </div>
-
-          {/* student growth */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="font-bold text-slate-900">Student Growth</h2>
-              <span className="text-xs text-slate-400">new registrations · last 7 months</span>
-            </div>
-            <p className="text-2xl font-black text-slate-900 mb-3">{regsThisMonth} <span className="text-sm font-medium text-slate-400">joined this month</span></p>
-            <TrendAreaChart buckets={growthBuckets} color="#059669" id="growfill" label="Student growth" />
-          </div>
-
-          {/* pending payments */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-slate-900">Pending Payments</h2>
-              <Link to="/admin/payments" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">View all <ArrowRightIcon className="w-3 h-3" /></Link>
-            </div>
-            {pending.length === 0 ? (
-              <p className="text-sm text-slate-400 py-6 text-center">Nothing to approve — all caught up 🎉</p>
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {pending.slice(0, 5).map((p) => (
-                  <div key={p.id} className="py-3 flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{nameOf(p.student_id)}</p>
-                      <p className="text-xs text-slate-400">{p.kind === 'pack' ? 'Video pack' : p.kind === 'theory' ? 'Monthly recordings' : p.kind} · {new Date(p.created_at).toLocaleDateString('en-GB')}</p>
-                    </div>
-                    <span className="text-sm font-bold text-slate-900 shrink-0">{fmtLKR(Number(p.amount ?? 0))}</span>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={() => viewSlip(p.slip_url)} disabled={!p.slip_url} title="View slip"
-                        className="w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-30 flex items-center justify-center">
-                        <ImageIcon className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => approve(p)} disabled={busyId === p.id} title="Approve"
-                        className="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center">
-                        {busyId === p.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <CheckIcon className="w-4 h-4" />}
-                      </button>
-                      <button onClick={() => setRejectTarget(p)} disabled={busyId === p.id} title="Reject"
-                        className="w-8 h-8 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center">
-                        <XIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {pending.length > 5 && (
-                  <p className="pt-3 text-xs text-slate-400 text-center">
-                    Showing 5 of {pending.length} — <Link to="/admin/payments" className="font-semibold text-blue-600 hover:underline">view the rest</Link>
-                  </p>
+                    <TrendingUpIcon className={`w-3 h-3 ${t.delta.startsWith('-') ? 'rotate-90' : ''}`} /> {t.delta}
+                  </span>
                 )}
               </div>
-            )}
-          </div>
 
-          {/* recent activity */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <h2 className="font-bold text-slate-900 mb-4">Recent Activity</h2>
-            {activity.length === 0 ? (
-              <p className="text-sm text-slate-400">No activity yet.</p>
-            ) : (
-              <div className="space-y-3.5">
-                {activity.map((a, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${a.tone}`}>
-                      <a.icon className="w-4 h-4" />
-                    </span>
-                    <p className="text-sm text-slate-700 flex-1 min-w-0 truncate">{a.text}</p>
-                    <span className="text-xs text-slate-400 shrink-0">{timeAgo(a.at)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── RIGHT column ── */}
-        <div className="space-y-6 min-w-0">
-          {/* recent students */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-slate-900">Recent Students</h2>
-              <Link to="/admin/students" className="text-xs font-semibold text-blue-600 hover:underline">View all</Link>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mt-4">{t.label}</p>
+              <p className="text-[28px] leading-none font-bold text-slate-900 tabular-nums mt-1.5">{t.value}</p>
+              {t.sub && <p className="text-[12px] text-slate-400 mt-1.5">{t.sub}</p>}
             </div>
-            {profiles.length === 0 ? (
-              <p className="text-sm text-slate-400">No students yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {profiles.slice(0, 5).map((p) => (
-                  <div key={p.id} className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-full bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center shrink-0">
-                      {(p.full_name ?? '?').split(' ').map((w: string) => w[0]).slice(0, 2).join('')}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{p.full_name ?? '—'}</p>
-                      <p className="text-xs text-slate-400 truncate">{[p.student_code, p.program, p.exam_year].filter(Boolean).join(' · ')}</p>
-                    </div>
-                    <span className="text-[11px] text-slate-400 shrink-0">{timeAgo(p.created_at)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* batch performance */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUpIcon className="w-4 h-4 text-blue-600" />
-              <h2 className="font-bold text-slate-900">Batch Performance</h2>
+            {/* the spark bleeds to the card edge, so the card has a floor */}
+            <div className="mt-3 -mb-px">
+              {t.spark && t.spark.length > 1
+                ? <AreaSpark points={t.spark} color={t.color} />
+                : <div className="h-[42px]" />}
             </div>
-            {batchPerf.length === 0 ? (
-              <p className="text-sm text-slate-400">Appears once paper marks are entered.</p>
-            ) : (
-              <div className="space-y-3.5">
-                {batchPerf.map((b) => (
-                  <div key={b.name}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="font-semibold text-slate-700 truncate">{b.name}</span>
-                      <span className="font-bold text-slate-900 shrink-0">{b.avg}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full rounded-full bg-blue-600" style={{ width: `${Math.min(b.avg ?? 0, 100)}%` }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-0.5">{b.n} mark{b.n === 1 ? '' : 's'} recorded</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          </Link>
+        ))}
+      </div>
 
-          {/* upcoming schedule hint */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-1">
-              <CalendarClockIcon className="w-4 h-4 text-slate-400" />
-              <h2 className="font-bold text-slate-900 text-sm">Getting started</h2>
+      {/* ── Revenue + verification mix ────────────────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 items-start">
+        <Panel
+          className="rise-in"
+          title="Revenue"
+          description={`Approved payments · ${revRangeDesc}`}
+          actions={
+            <div className="inline-flex rounded-xl bg-slate-100 p-1">
+              {rangeTabs.map((r) => (
+                <button
+                  key={r.v}
+                  onClick={() => setRevRange(r.v)}
+                  className={`h-8 px-3 rounded-lg text-[12px] font-bold transition-colors ${
+                    revRange === r.v ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Create a batch → upload a pack targeted at it → approve payments to unlock content for students.
-            </p>
-          </div>
-        </div>
+          }
+        >
+          <p className="text-[30px] font-bold text-slate-900 tabular-nums leading-none mb-1">{fmtLKR(revRangeTotal)}</p>
+          <p className="text-[12px] text-slate-400 mb-4">
+            collected {revRangeDesc}
+            {revTrend ? ` · ${revTrend}` : ''}
+          </p>
+          {/* keyed on range: a new series draws itself rather than morphing */}
+          <AreaChart key={revRange} points={revenueSeries} height={260} color="#c20f24" valueFormat={(n) => `Rs ${shortNum(n)}`} />
+        </Panel>
+
+        <Panel className="rise-in" title="ID verification" description="Where your students stand">
+          <Donut
+            centerValue={profiles.length ? `${Math.round((verifiedCount / profiles.length) * 100)}%` : '—'}
+            centerLabel="verified"
+            segments={[
+              { label: 'Verified', value: verifiedCount, color: '#059669' },
+              { label: 'Pending', value: pendingIds.length, color: '#d97706' },
+              { label: 'Rejected', value: rejectedCount, color: '#e11d48' },
+              { label: 'Not submitted', value: unsubmitted, color: '#e2e8f0' }
+            ]}
+          />
+          {pendingIds.length > 0 && (
+            <Link
+              to="/admin/students"
+              className="mt-5 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-[#c20f24] text-white text-[13px] font-bold hover:bg-[#a60d1f] transition-colors active:scale-[0.98] duration-150"
+            >
+              Review {pendingIds.length} pending ID{pendingIds.length === 1 ? '' : 's'} <ArrowRightIcon className="w-4 h-4" />
+            </Link>
+          )}
+        </Panel>
+      </div>
+
+      {/* ── Growth + batch marks ──────────────────────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+        <Panel className="rise-in" title="Student growth" description="New registrations per month">
+          <AreaChart points={growthBuckets} height={220} color="#2563eb" valueFormat={(n) => String(Math.round(n))} showAverage={false} />
+        </Panel>
+
+        <Panel className="rise-in" title="Batch performance" description="Average paper marks by batch">
+          {batchPerf.length === 0 ? (
+            <EmptyState icon={TrendingUpIcon} title="No marks yet" description="This fills in as you enter paper marks." />
+          ) : (
+            <BarChart points={batchPerf.map((b) => ({ label: b.name, total: b.avg ?? 0 }))} suffix="%" color="#c20f24" />
+          )}
+        </Panel>
+      </div>
+
+      {/* ── Work queues ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-6 items-start">
+        {/* pending payments */}
+        <Panel
+          className="rise-in"
+          title="Pending payments"
+          description="Approve or reject uploaded slips"
+          bodyClassName="p-0 mt-4"
+          actions={
+            <Link to="/admin/payments" className="text-[13px] font-semibold text-[#c20f24] hover:underline inline-flex items-center gap-1">
+              View all <ArrowRightIcon className="w-3.5 h-3.5" />
+            </Link>
+          }
+        >
+          {pending.length === 0 ? (
+            <EmptyState icon={ShieldCheckIcon} title="Nothing waiting" description="Every payment slip has been reviewed." />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50/80 border-y border-slate-100">
+                  <tr className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-left">
+                    <th className="px-5 py-3">Student</th>
+                    <th className="px-5 py-3">Type</th>
+                    <th className="px-5 py-3 text-right">Amount</th>
+                    <th className="px-5 py-3">Date</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {pending.slice(0, 6).map((p, i) => (
+                    <tr key={p.id} className="rise-in hover:bg-slate-50/60 transition-colors" style={{ animationDelay: `${i * 40}ms` }}>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <Initials name={nameOf(p.student_id)} size={32} />
+                          <span className="font-semibold text-slate-900 truncate">{nameOf(p.student_id)}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-slate-500 capitalize">{String(p.kind ?? '').replace('_', ' ') || '—'}</td>
+                      <td className="px-5 py-3.5 text-right font-bold text-slate-900 tabular-nums">{fmtLKR(Number(p.amount ?? 0))}</td>
+                      <td className="px-5 py-3.5 text-slate-500 whitespace-nowrap">
+                        {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center justify-end gap-1">
+                          {p.slip_path && (
+                            <button
+                              onClick={() => viewSlip(p.slip_path)}
+                              title="View slip"
+                              className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition-colors active:scale-95 duration-150"
+                            >
+                              <ImageIcon className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => approve(p)}
+                            disabled={busyId === p.id}
+                            title="Approve"
+                            className="w-8 h-8 rounded-lg text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors disabled:opacity-40 active:scale-95 duration-150"
+                          >
+                            {busyId === p.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <CheckIcon className="w-4 h-4" />}
+                          </button>
+                          <button
+                            onClick={() => setRejectTarget(p)}
+                            disabled={busyId === p.id}
+                            title="Reject"
+                            className="w-8 h-8 rounded-lg text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors disabled:opacity-40 active:scale-95 duration-150"
+                          >
+                            <XIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {pending.length > 6 && (
+                <p className="px-5 py-3 text-[12px] text-slate-400 border-t border-slate-100">
+                  Showing 6 of {pending.length}
+                </p>
+              )}
+            </div>
+          )}
+        </Panel>
+
+        {/* ID verifications */}
+        <Panel
+          className="rise-in"
+          title="ID verifications"
+          description="Students waiting to be let in"
+          bodyClassName="p-5 pt-4"
+        >
+          {pendingIds.length === 0 ? (
+            <EmptyState icon={ShieldCheckIcon} title="No IDs waiting" description="Every submitted ID has been reviewed." />
+          ) : (
+            <div className="space-y-2.5">
+              {pendingIds.slice(0, 5).map((s, i) => (
+                <div
+                  key={s.id}
+                  className="rise-in flex items-center gap-3 rounded-xl border border-slate-100 p-3"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
+                  <Initials name={s.full_name} size={36} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-slate-900 truncate">{s.full_name ?? '—'}</p>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {[s.student_code, s.program].filter(Boolean).join(' · ') || 'No code yet'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => viewIdImages(s)}
+                      title="View ID"
+                      className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition-colors active:scale-95 duration-150"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => approveId(s)}
+                      disabled={vBusyId === s.id}
+                      title="Approve"
+                      className="w-8 h-8 rounded-lg text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors disabled:opacity-40 active:scale-95 duration-150"
+                    >
+                      {vBusyId === s.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <CheckIcon className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => setIdRejectTarget(s)}
+                      disabled={vBusyId === s.id}
+                      title="Reject"
+                      className="w-8 h-8 rounded-lg text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors disabled:opacity-40 active:scale-95 duration-150"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+      </div>
+
+      {/* ── Activity + recent students ────────────────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-6 items-start">
+        <Panel className="rise-in" title="Recent activity" description="Everything happening across the platform">
+          {activity.length === 0 ? (
+            <EmptyState icon={CalendarClockIcon} title="Nothing yet" description="Registrations and payments show up here." />
+          ) : (
+            <div className="space-y-4">
+              {activity.map((a, i) => (
+                <div key={`${a.at}-${i}`} className="rise-in flex items-start gap-3" style={{ animationDelay: `${i * 40}ms` }}>
+                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${a.tone}`}>
+                    <a.icon className="w-4 h-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-slate-700 leading-snug">{a.text}</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{timeAgo(a.at)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+
+        <Panel
+          className="rise-in"
+          title="Recent students"
+          description="Latest registrations"
+          actions={
+            <Link to="/admin/students" className="text-[13px] font-semibold text-[#c20f24] hover:underline inline-flex items-center gap-1">
+              View all <ArrowRightIcon className="w-3.5 h-3.5" />
+            </Link>
+          }
+        >
+          {profiles.length === 0 ? (
+            <EmptyState icon={UsersIcon} title="No students yet" />
+          ) : (
+            <div className="space-y-3.5">
+              {profiles.slice(0, 6).map((p, i) => (
+                <div key={p.id} className="rise-in flex items-center gap-3" style={{ animationDelay: `${i * 40}ms` }}>
+                  <Initials name={p.full_name} size={36} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-900 truncate">{p.full_name ?? '—'}</p>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {[p.student_code, p.program, p.exam_year].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
+                  <span className="text-[11px] text-slate-400 shrink-0">{timeAgo(p.created_at)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
       </div>
 
       <ConfirmDialog

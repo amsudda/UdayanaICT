@@ -221,3 +221,23 @@
     animation: none;
   }
 }
+
+/* ══ Admin charts ══════════════════════════════════════════════════════
+   Entrances for the dashboard's charts. CSS, not JS: these play while the
+   dashboard is still fetching, which is exactly when a main-thread
+   animation would stutter. */
+
+@keyframes chart-draw { to { stroke-dashoffset: 0; } }
+@keyframes chart-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bar-grow   { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+
+/* Cards and rows arriving in sequence, 40ms apart (set per element). */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rise-in { animation: rise-in 320ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in { animation: chart-fade 200ms ease both; }
+}
