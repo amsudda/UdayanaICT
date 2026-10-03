@@ -13,9 +13,8 @@ import {
   XIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { Drawer } from '../components/Drawer';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { PageHeader, Button, SearchInput, FilterTabs, StatusPill, EmptyState, Initials, Panel } from '../components/ui';
+import { PageHeader, Button, SearchInput, FilterTabs, StatusPill, EmptyState, Initials, Panel, Modal } from '../components/ui';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -472,15 +471,16 @@ export function AdminBatchesPage() {
       )}
 
       {/* create / edit drawer */}
-      <Drawer
+      <Modal
         open={editorOpen}
         onClose={() => setEditorOpen(false)}
         title={editing ? 'Edit batch' : 'New batch'}
+        description={editing ? editing.name : 'A cohort students are assigned to.'}
         footer={
           <div className="flex gap-3">
-            <button onClick={() => setEditorOpen(false)} className="flex-1 h-11 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
-            <button onClick={saveBatch} disabled={saving || !form.name.trim()} className="flex-1 h-11 rounded-xl bg-[#c20f24] text-white font-semibold hover:bg-[#a60d1f] disabled:opacity-50">
-              {saving ? 'Saving…' : 'Save'}
+            <button onClick={() => setEditorOpen(false)} className="flex-1 h-11 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50 transition-colors active:scale-[0.98] duration-150">Cancel</button>
+            <button onClick={saveBatch} disabled={saving || !form.name.trim()} className="flex-1 h-11 rounded-xl bg-[#c20f24] text-white font-semibold hover:bg-[#a60d1f] disabled:opacity-50 transition-colors active:scale-[0.98] duration-150">
+              {saving ? 'Saving…' : editing ? 'Save changes' : 'Create batch'}
             </button>
           </div>
         }
@@ -520,21 +520,31 @@ export function AdminBatchesPage() {
             </span>
           </label>
         </div>
-      </Drawer>
+      </Modal>
 
       {/* members drawer */}
-      <Drawer
+      <Modal
         open={!!membersBatch}
         onClose={() => setMembersBatch(null)}
+        size="lg"
         title={membersBatch ? membersBatch.name : ''}
+        description={membersBatch ? `${members.length} student${members.length === 1 ? '' : 's'} in this batch` : undefined}
         footer={
           membersBatch ? (
-            <button
-              onClick={() => exportBatch(membersBatch)}
-              className="flex items-center justify-center gap-2 w-full h-11 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              <DownloadIcon className="w-4 h-4" /> Download student data (CSV)
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => exportBatch(membersBatch)}
+                className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50 transition-colors active:scale-[0.98] duration-150"
+              >
+                <DownloadIcon className="w-4 h-4" /> Download student data (CSV)
+              </button>
+              <button
+                onClick={() => setMembersBatch(null)}
+                className="h-11 px-6 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors active:scale-[0.98] duration-150"
+              >
+                Done
+              </button>
+            </div>
           ) : null
         }
       >
@@ -603,7 +613,7 @@ export function AdminBatchesPage() {
             ))}
           </div>
         )}
-      </Drawer>
+      </Modal>
 
       {/* delete confirm with export */}
       <ConfirmDialog

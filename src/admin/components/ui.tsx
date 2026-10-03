@@ -1,5 +1,6 @@
-import type { ComponentType, ReactNode } from 'react';
-import { ChevronRightIcon, SearchIcon } from 'lucide-react';
+import { useEffect, type ComponentType, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { ChevronRightIcon, SearchIcon, XIcon } from 'lucide-react';
 
 /**
  * The admin design kit.
@@ -382,5 +383,85 @@ export function Button({
       {Icon && <Icon className="w-4 h-4" />}
       {children}
     </button>
+  );
+}
+
+/* ── Modal ─────────────────────────────────────────────────────────── */
+
+/**
+ * A centred dialog, for work that needs the whole of someone's attention
+ * but not a whole page: a short form, a roster.
+ *
+ * Motion, per the house rules: scale from 0.97 and never from 0, 200ms on
+ * a strong ease-out, and `transform-origin: center` — a modal is not
+ * anchored to a trigger, so it has nowhere else to come from. Escape and
+ * a click on the backdrop both close it, and the body stops scrolling
+ * behind it.
+ */
+export function Modal({
+  open,
+  onClose,
+  title,
+  description,
+  size = 'md',
+  footer,
+  children
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  description?: string;
+  size?: 'md' | 'lg';
+  footer?: ReactNode;
+  children: ReactNode;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[70] flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] modal-backdrop" />
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        data-lenis-prevent
+        className={`relative w-full ${size === 'lg' ? 'max-w-2xl' : 'max-w-lg'} my-auto bg-white rounded-2xl shadow-2xl flex flex-col max-h-[88vh] modal-panel`}
+      >
+        <header className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-slate-100 shrink-0">
+          <div className="min-w-0">
+            <h2 className="font-bold text-slate-900 text-[17px] truncate">{title}</h2>
+            {description && <p className="text-[13px] text-slate-500 mt-0.5">{description}</p>}
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="w-9 h-9 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-colors active:scale-95 duration-150"
+          >
+            <XIcon className="w-4.5 h-4.5" />
+          </button>
+        </header>
+
+        <div data-lenis-prevent className="px-6 py-5 overflow-y-auto">{children}</div>
+
+        {footer && <footer className="px-6 py-4 border-t border-slate-100 shrink-0">{footer}</footer>}
+      </div>
+    </div>,
+    document.body
   );
 }
