@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   BellIcon,
   VideoIcon,
@@ -17,6 +18,37 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-LK', { month: 
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
+  // The dashboard's navbar is overflow-hidden, which clipped this panel to
+  // the height of the bar — the bell toggled and nothing appeared. It is
+  // portalled to the body now and positioned against the button, so no
+  // ancestor's overflow or stacking context can hide it.
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  const place = useCallback(() => {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (!r) return;
+    // Right-aligned to the bell by preference, but clamped to the viewport:
+    // this bell sits at the LEFT of the dashboard bar, so a 384px panel
+    // hung off its right edge lands at left:-10 and is never seen.
+    const w = window.innerWidth >= 640 ? 384 : 320;
+    const left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+    setPos({ top: r.bottom + 8, left });
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    place();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false); };
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, place]);
   const [notifications, setNotifications] = useState<Notif[]>([]);
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -59,7 +91,8 @@ export function NotificationBell() {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={btnRef}
+        onClick={() => { place(); setIsOpen((o) => !o); }}
         className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#c20f24]"
         aria-label="Notifications">
 
@@ -69,11 +102,12 @@ export function NotificationBell() {
         }
       </button>
 
+      {createPortal(
       <AnimatePresence>
         {isOpen &&
         <>
             <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 z-[85]"
             onClick={() => setIsOpen(false)} />
 
             <motion.div
@@ -95,7 +129,8 @@ export function NotificationBell() {
             transition={{
               duration: 0.2
             }}
-            className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-apple-hover border border-gray-100 z-50 overflow-hidden">
+            style={{ top: pos?.top ?? 64, left: pos?.left ?? 16 }}
+            className="fixed w-80 sm:w-96 max-w-[calc(100vw-1rem)] bg-white rounded-2xl shadow-apple-hover border border-gray-100 z-[90] overflow-hidden">
 
               <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-md">
                 <h3 className="font-semibold text-apple-text">Notifications</h3>
@@ -161,7 +196,9 @@ export function NotificationBell() {
             </motion.div>
           </>
         }
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+      )}
     </div>);
 
 }
