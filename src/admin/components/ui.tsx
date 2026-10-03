@@ -304,8 +304,12 @@ export function Th({ children, className = '' }: { children?: ReactNode; classNa
   return <th className={`px-5 py-3 font-bold ${className}`}>{children}</th>;
 }
 
-export function Td({ children, className = '' }: { children?: ReactNode; className?: string }) {
-  return <td className={`px-5 py-3.5 text-slate-700 ${className}`}>{children}</td>;
+export function Td({
+  children,
+  className = '',
+  ...rest
+}: { children?: ReactNode; className?: string } & React.TdHTMLAttributes<HTMLTableCellElement>) {
+  return <td {...rest} className={`px-5 py-3.5 text-slate-700 ${className}`}>{children}</td>;
 }
 
 /* ── Avatar ────────────────────────────────────────────────────────── */
