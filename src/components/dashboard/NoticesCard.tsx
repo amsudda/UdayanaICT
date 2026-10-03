@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BellIcon, ImageIcon, XIcon } from 'lucide-react';
+import { MegaphoneIcon, XIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
 import { DashboardCard, DashboardCardHeader, DashboardCardTitle, DashboardCardContent } from './DashboardCard';
@@ -18,15 +18,27 @@ interface Notice {
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-const longDate = (iso: string) =>
-  new Date(iso).toLocaleString('en-LK', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const shortDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
+const longDate = (iso: string) =>
+  new Date(iso).toLocaleString('en-LK', { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit' });
+
+/**
+ * The notice board.
+ *
+ * Only the teacher's own announcements appear here. XP and achievement
+ * messages used to share the space and, being far more frequent, pushed a
+ * real notice out of sight within a day — they live in the bell now.
+ *
+ * A notice is usually a picture (a timetable, a hall list), so the newest
+ * one is shown as a post with its image, and the ones behind it as compact
+ * rows with a thumbnail. Tapping any of them opens it full size.
+ */
 export function NoticesCard() {
   const { user } = useAuth();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-  // The card is a column in the rail, far too narrow for a timetable photo,
-  // so a notice opens full size rather than being squeezed into it.
   const [open, setOpen] = useState<Notice | null>(null);
 
   useEffect(() => {
@@ -35,27 +47,22 @@ export function NoticesCard() {
     const fetchNotices = async () => {
       setLoading(true);
       // No student_id filter: RLS already limits this to the student's own
-      // rows, their batch's, and the ones posted to everyone. Filtering here
-      // threw away every announcement that was not addressed individually.
+      // rows, their batch's, and the ones posted to everyone.
       const { data } = await supabase
         .from('notifications')
         .select('*')
+        .eq('type', 'announcement')
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(4);
 
-      // The teacher's announcements come first: XP messages are frequent
-      // enough to bury a real notice otherwise, and they have the bell.
-      const rows = (data ?? []) as Notice[];
-      const announcements = rows.filter((n) => n.type === 'announcement');
-      const rest = rows.filter((n) => n.type !== 'announcement');
-      setNotices([...announcements, ...rest].slice(0, 3));
+      setNotices((data ?? []) as Notice[]);
       setLoading(false);
     };
 
     fetchNotices();
   }, [user]);
 
-  // Reading a notice marks it read, so the red dot means "new to you".
+  // Reading a notice marks it read, so the dot means "new to you".
   const openNotice = async (n: Notice) => {
     setOpen(n);
     if (n.is_read) return;
@@ -70,80 +77,131 @@ export function NoticesCard() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  const unread = notices.filter((n) => !n.is_read).length;
+  const [lead, ...rest] = notices;
+
   return (
     <DashboardCard delay={0.4} className="flex flex-col h-full">
       <DashboardCardHeader>
-        <DashboardCardTitle icon={BellIcon}>Important Notices</DashboardCardTitle>
+        <DashboardCardTitle icon={MegaphoneIcon}>Notice Board</DashboardCardTitle>
+        {unread > 0 && (
+          <span className="text-[10px] font-black uppercase tracking-wider text-white bg-[#c20f24] px-2 py-1 rounded-full shrink-0">
+            {unread} new
+          </span>
+        )}
       </DashboardCardHeader>
 
       <DashboardCardContent className="flex-1 flex flex-col">
         {loading ? (
           <div className="space-y-4">
-            {[1, 2, 3].map(i => (
+            <div className="animate-pulse space-y-2">
+              <div className="h-32 bg-gray-100 dark:bg-slate-800 rounded-2xl" />
+              <div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-3/4" />
+            </div>
+            {[1, 2].map((i) => (
               <div key={i} className="animate-pulse flex gap-3">
-                <div className="w-2 h-2 mt-1.5 rounded-full bg-gray-200 dark:bg-slate-700 shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
+                <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-slate-800 shrink-0" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-5/6" />
+                  <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/3" />
                 </div>
               </div>
             ))}
           </div>
-        ) : notices.length > 0 ? (
-          <div className="space-y-4 flex-1">
-            {notices.map((notice) => (
-              <button
-                key={notice.id}
-                type="button"
-                onClick={() => openNotice(notice)}
-                className="group relative w-full text-left flex gap-3 rounded-xl -mx-2 px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors"
-              >
-                <div className="shrink-0 mt-1.5">
-                  <span className={`w-2 h-2 rounded-full block ${!notice.is_read ? 'bg-[#c20f24]' : 'bg-gray-300 dark:bg-slate-600'}`} />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  {notice.title && (
-                    <p className="text-sm font-semibold text-[#172033] dark:text-apple-light mb-0.5 truncate group-hover:text-[#c20f24] transition-colors">
-                      {notice.title}
-                    </p>
-                  )}
-                  {notice.message && (
-                    <p className="text-[12px] text-[#64748B] dark:text-slate-400 line-clamp-2 leading-relaxed">
-                      {notice.message}
-                    </p>
-                  )}
-
-                  {notice.image_url && (
-                    <div className="mt-2 rounded-lg overflow-hidden border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/40">
-                      <img
-                        src={notice.image_url}
-                        alt=""
-                        loading="lazy"
-                        className="w-full max-h-28 object-cover group-hover:opacity-95 transition-opacity"
-                      />
-                    </div>
-                  )}
-
-                  <p className="text-[10px] uppercase tracking-wider text-[#64748B]/70 mt-1.5 flex items-center gap-1.5">
-                    {new Date(notice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    {notice.image_url && <ImageIcon className="w-3 h-3" />}
-                  </p>
-                </div>
-              </button>
-            ))}
+        ) : notices.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
+            <MegaphoneIcon className="w-10 h-10 text-gray-200 dark:text-slate-700 mb-3" />
+            <h4 className="text-sm font-semibold text-[#172033] dark:text-white mb-1">No notices yet</h4>
+            <p className="text-xs text-[#64748B] dark:text-slate-400 max-w-[220px]">
+              Announcements from your teacher — timetables, class changes, results — appear here.
+            </p>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-            <BellIcon className="w-10 h-10 text-gray-200 dark:text-slate-700 mb-3" />
-            <h4 className="text-sm font-semibold text-[#172033] dark:text-white mb-1">No notices available</h4>
-            <p className="text-xs text-[#64748B] dark:text-slate-400 max-w-[200px]">Important announcements from your teacher will show up here.</p>
+          <div className="space-y-4">
+            {/* ── The newest notice, as a post ── */}
+            <button
+              type="button"
+              onClick={() => openNotice(lead)}
+              className="group block w-full text-left"
+            >
+              {lead.image_url && (
+                <div className="relative rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 mb-3">
+                  <img
+                    src={lead.image_url}
+                    alt=""
+                    className="w-full aspect-[16/10] object-cover transition-transform duration-500 ease-out [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.03]"
+                  />
+                  {!lead.is_read && (
+                    <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-wider text-white bg-[#c20f24] px-2 py-1 rounded-full shadow-sm">
+                      New
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-start gap-2">
+                {!lead.image_url && !lead.is_read && (
+                  <span className="w-2 h-2 rounded-full bg-[#c20f24] mt-1.5 shrink-0" />
+                )}
+                <div className="min-w-0">
+                  {lead.title && (
+                    <p className="text-[15px] font-bold text-[#172033] dark:text-white leading-snug group-hover:text-[#c20f24] transition-colors line-clamp-2">
+                      {lead.title}
+                    </p>
+                  )}
+                  {lead.message && (
+                    <p className="text-[12.5px] text-[#64748B] dark:text-slate-400 leading-relaxed mt-1 line-clamp-2">
+                      {lead.message}
+                    </p>
+                  )}
+                  <p className="text-[10px] uppercase tracking-wider text-[#64748B]/70 mt-2">{shortDate(lead.created_at)}</p>
+                </div>
+              </div>
+            </button>
+
+            {/* ── Older ones, compact ── */}
+            {rest.length > 0 && (
+              <div className="pt-3 border-t border-gray-50 dark:border-slate-800/60 space-y-2">
+                {rest.map((n) => (
+                  <button
+                    key={n.id}
+                    type="button"
+                    onClick={() => openNotice(n)}
+                    className="group flex items-start gap-3 w-full text-left rounded-xl -mx-2 px-2 py-2 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors"
+                  >
+                    {n.image_url ? (
+                      <img
+                        src={n.image_url}
+                        alt=""
+                        loading="lazy"
+                        className="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-slate-800 shrink-0"
+                      />
+                    ) : (
+                      <span className="w-12 h-12 rounded-xl bg-[#c20f24]/[0.06] text-[#c20f24] flex items-center justify-center shrink-0">
+                        <MegaphoneIcon className="w-5 h-5" />
+                      </span>
+                    )}
+
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5">
+                        {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-[#c20f24] shrink-0" />}
+                        <span className="text-[13px] font-semibold text-[#172033] dark:text-apple-light truncate group-hover:text-[#c20f24] transition-colors">
+                          {n.title || n.message || 'Notice'}
+                        </span>
+                      </span>
+                      <span className="block text-[10px] uppercase tracking-wider text-[#64748B]/70 mt-1">
+                        {shortDate(n.created_at)}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </DashboardCardContent>
 
-      {/* Full notice. Portalled, so the dashboard's own stacking and the
-          rail's overflow cannot clip it. */}
+      {/* Full notice. Portalled, so the rail's overflow cannot clip it. */}
       {createPortal(
         <AnimatePresence>
           {open && (

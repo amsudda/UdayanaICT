@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-type Notif = { id: string; message: string; type: string; isRead: boolean; timestamp: string };
+type Notif = { id: string; title?: string | null; message: string; image?: string | null; type: string; isRead: boolean; timestamp: string };
 
 const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-LK', { month: 'short', day: '2-digit' });
 
@@ -22,7 +22,15 @@ export function NotificationBell() {
 
   useEffect(() => {
     supabase.from('notifications').select('*').order('created_at', { ascending: false }).limit(20).then(({ data }) => {
-      setNotifications((data ?? []).map((n: any) => ({ id: n.id, message: n.message, type: n.type ?? 'announcement', isRead: n.is_read, timestamp: fmt(n.created_at) })));
+      setNotifications((data ?? []).map((n: any) => ({
+        id: n.id,
+        title: n.title ?? null,
+        message: n.message,
+        image: n.image_url ?? null,
+        type: n.type ?? 'announcement',
+        isRead: n.is_read,
+        timestamp: fmt(n.created_at)
+      })));
     });
   }, []);
 
@@ -110,14 +118,27 @@ export function NotificationBell() {
                   onClick={() => markAsRead(notification.id)}
                   className={`p-4 border-b border-gray-50 flex gap-3 cursor-pointer transition-colors hover:bg-gray-50 ${!notification.isRead ? 'bg-red-50/30' : ''}`}>
 
-                        <div
-                    className={`mt-0.5 p-2 rounded-full h-fit flex-shrink-0 ${!notification.isRead ? 'bg-white shadow-sm' : 'bg-gray-100'}`}>
-
-                          {getIcon(notification.type)}
-                        </div>
-                        <div className="flex-1">
+                        {notification.image ? (
+                          <img
+                            src={notification.image}
+                            alt=""
+                            loading="lazy"
+                            className="w-10 h-10 rounded-xl object-cover flex-shrink-0 border border-gray-100"
+                          />
+                        ) : (
+                          <div
+                            className={`mt-0.5 p-2 rounded-full h-fit flex-shrink-0 ${!notification.isRead ? 'bg-white shadow-sm' : 'bg-gray-100'}`}>
+                            {getIcon(notification.type)}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          {notification.title && (
+                            <p className={`text-sm font-semibold truncate ${!notification.isRead ? 'text-apple-text' : 'text-apple-subtext'}`}>
+                              {notification.title}
+                            </p>
+                          )}
                           <p
-                      className={`text-sm ${!notification.isRead ? 'font-medium text-apple-text' : 'text-apple-subtext'}`}>
+                      className={`text-sm ${notification.title ? 'text-apple-subtext line-clamp-2' : !notification.isRead ? 'font-medium text-apple-text' : 'text-apple-subtext'}`}>
 
                             {notification.message}
                           </p>
