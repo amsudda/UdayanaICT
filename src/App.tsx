@@ -186,6 +186,8 @@ function AnimatedRoutes() {
           <Route path="packs" element={<AdminPacksPage />} />
           <Route path="papers" element={<AdminPapersPage />} />
           <Route path="theory" element={<AdminTheoryPage />} />
+          {/* a month opens as its own pushed page, not a drawer */}
+          <Route path="theory/:monthId" element={<AdminTheoryPage />} />
           <Route path="students" element={<AdminStudentsPage />} />
           <Route path="students/:id" element={<AdminStudentDetailPage />} />
           <Route path="students/:id/edit" element={<AdminStudentEditPage />} />
