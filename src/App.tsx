@@ -195,6 +195,8 @@ function AnimatedRoutes() {
           <Route path="books" element={<AdminBooksPage />} />
           <Route path="featured" element={<AdminFeaturedPage />} />
           <Route path="marks" element={<AdminMarksPage />} />
+          {/* each student gets their own view, not an overlay */}
+          <Route path="marks/:studentId" element={<AdminMarksPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="quizzes" element={<AdminQuizListPage />} />
           <Route path="quizzes/new" element={<AdminQuizBuilderPage />} />
