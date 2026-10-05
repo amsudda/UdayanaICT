@@ -120,7 +120,7 @@ export function AdminStudentEditPage() {
             <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <Input label="NIC" value={nic} onChange={(e) => setNic(e.target.value)} />
             <Input label="Date of Birth" type="date" value={dob} onChange={(e) => setDob(e.target.value)} />
-            <Select label="Gender" options={[{value: 'Male', label: 'Male'}, {value: 'Female', label: 'Female'}, {value: 'Other', label: 'Other'}]} value={gender} onChange={(e) => setGender(e.target.value)} placeholder="Select gender" />
+            <Select label="Gender" options={['Male', 'Female', 'Other']} value={gender} onChange={(e) => setGender(e.target.value)} placeholder="Select gender" />
           </div>
         </div>
 
@@ -157,16 +157,18 @@ export function AdminStudentEditPage() {
             Verification Status
           </h2>
           <div className="max-w-md">
-            <Select 
-              label="Account Verification" 
-              options={[
-                { value: 'pending', label: 'Pending' },
-                { value: 'approved', label: 'Approved (Verified)' },
-                { value: 'rejected', label: 'Rejected' }
-              ]} 
-              value={verification} 
-              onChange={(e) => setVerification(e.target.value)} 
-            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-slate-700 ml-1">Account Verification</label>
+              <select
+                value={verification}
+                onChange={(e) => setVerification(e.target.value)}
+                className="flex h-12 w-full appearance-none rounded-xl border border-slate-200 bg-white px-4 py-2 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-[#c20f24] focus:border-transparent text-slate-900"
+              >
+                <option value="pending">Pending</option>
+                <option value="approved">Approved (Verified)</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
           </div>
         </div>
 
