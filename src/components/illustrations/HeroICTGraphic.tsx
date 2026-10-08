@@ -40,25 +40,25 @@ export function HeroICTGraphic({ className = '' }: { className?: string }) {
         />
 
         {/* Binary Text scattered */}
-        <motion.text x="120" y="220" fontSize="16" fontFamily="monospace" fill="currentColor" opacity="0.4"
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 0.4, y: 0 }} transition={{ delay: 1 }}
+        <motion.text x="120" y="220" fontSize="16" fontFamily="monospace" fill="currentColor" opacity="0.6"
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 0.6, y: 0 }} transition={{ delay: 1 }}
         >
           01011001
         </motion.text>
-        <motion.text x="700" y="650" fontSize="14" fontFamily="monospace" fill="currentColor" opacity="0.3"
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 0.3, y: 0 }} transition={{ delay: 1.2 }}
+        <motion.text x="700" y="650" fontSize="14" fontFamily="monospace" fill="currentColor" opacity="0.5"
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 0.5, y: 0 }} transition={{ delay: 1.2 }}
         >
           11000101
         </motion.text>
 
         {/* Code Brackets */}
-        <motion.text x="250" y="280" fontSize="72" fontWeight="900" fill="currentColor" opacity="0.15"
-          initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 0.15 }} transition={{ delay: 0.8, type: 'spring' }}
+        <motion.text x="250" y="280" fontSize="72" fontWeight="900" fill="currentColor" opacity="0.25"
+          initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 0.25 }} transition={{ delay: 0.8, type: 'spring' }}
         >
           &lt;/&gt;
         </motion.text>
-        <motion.text x="650" y="200" fontSize="84" fontWeight="900" fill="#c20f24" opacity="0.08"
-          initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 0.08 }} transition={{ delay: 1, type: 'spring' }}
+        <motion.text x="650" y="200" fontSize="84" fontWeight="900" fill="#c20f24" opacity="0.15"
+          initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 0.15 }} transition={{ delay: 1, type: 'spring' }}
         >
           &#123; &#125;
         </motion.text>
@@ -80,8 +80,8 @@ export function HeroICTGraphic({ className = '' }: { className?: string }) {
         <motion.circle cx="800" cy="450" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.8 }} />
 
         {/* Subtle glowing orbs */}
-        <circle cx="250" cy="250" r="80" fill="#c20f24" opacity="0.03" filter="blur(20px)" />
-        <circle cx="650" cy="500" r="100" fill="currentColor" opacity="0.03" filter="blur(30px)" />
+        <circle cx="250" cy="250" r="80" fill="#c20f24" opacity="0.06" filter="blur(20px)" />
+        <circle cx="650" cy="500" r="100" fill="currentColor" opacity="0.06" filter="blur(30px)" />
       </svg>
     </div>
   );

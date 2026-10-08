@@ -315,12 +315,7 @@ export function LandingPage() {
                 className="relative flex justify-center lg:justify-end items-end w-full lg:pl-10"
               >
                 {/* Tech lines decoration (faint) */}
-                <HeroICTGraphic className="top-10 lg:top-[-40px] right-0 lg:right-[-60px] w-full h-full opacity-60 dark:opacity-30 hidden md:block" />
-
-                {/* Solid Card Background behind person */}
-                <div 
-                  className="absolute bottom-10 right-4 sm:right-10 lg:right-4 w-[280px] sm:w-[360px] lg:w-[460px] h-[360px] sm:h-[460px] lg:h-[540px] bg-white dark:bg-slate-900 rounded-[2.5rem] lg:rounded-[3.5rem] shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] border border-gray-100/50 dark:border-slate-800 -z-10"
-                />
+                <HeroICTGraphic className="top-0 lg:top-[-40px] right-0 lg:right-[-40px] w-full h-[120%] opacity-100 dark:opacity-80 hidden md:block" />
 
                 {/* Floating achievement pill */}
                 <motion.div
