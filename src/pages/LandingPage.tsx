@@ -2,15 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  CreditCardIcon,
-  HelpCircleIcon,
-  VideoIcon,
   StarIcon,
   MessageCircleIcon,
   BookOpenIcon,
-  CheckCircle2Icon,
   ArrowRightIcon,
-  LayersIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   GraduationCapIcon,
@@ -25,12 +20,9 @@ import {
 
 import {
   FadeUp,
-  SoftReveal,
   ImageReveal,
-  SplitText,
   Stagger,
   StaggerItem,
-  DURATION,
   EASE
 } from '../components/shared/motion';
 
@@ -41,32 +33,10 @@ import { CourseCard } from '../components/shared/CourseCard';
 import { PixelPageBurst, PixelReveal } from '../components/shared/PixelFx';
 import { ReviewCard, type Review } from '../components/shared/ReviewCard';
 import { BookMockup } from '../components/shared/BookMockup';
-import { LiquidyGradient } from '../components/shared/LiquidyGradient';
 import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
 
-/* ── tiny 8-bit pixel sprites (SVG, crisp) ── */
-const svgBase = 'pixel-svg w-full h-full';
-const PixelFloppy = () => (
-  <svg viewBox="0 0 16 16" className={svgBase} fill="currentColor"><rect x="1" y="1" width="14" height="14" /><rect x="3" y="2" width="8" height="4" fill="#fff" /><rect x="9" y="2" width="2" height="4" /><rect x="4" y="9" width="8" height="5" fill="#fff" /><rect x="6" y="10" width="4" height="3" /></svg>
-);
-const PixelTerminal = () => (
-  <svg viewBox="0 0 16 16" className={svgBase} fill="currentColor"><rect x="1" y="2" width="14" height="12" /><rect x="2" y="3" width="12" height="2" fill="#fff" opacity=".35" /><rect x="3" y="8" width="2" height="2" fill="#fff" /><rect x="6" y="8" width="6" height="2" fill="#fff" /></svg>
-);
-const PixelController = () => (
-  <svg viewBox="0 0 16 16" className={svgBase} fill="currentColor"><rect x="2" y="6" width="12" height="6" /><rect x="1" y="8" width="2" height="3" /><rect x="13" y="8" width="2" height="3" /><rect x="4" y="8" width="2" height="2" fill="#fff" /><rect x="10" y="8" width="2" height="2" fill="#fff" /></svg>
-);
-const PixelStar = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 16 16" className={`pixel-svg ${className}`} fill="currentColor"><rect x="7" y="2" width="2" height="12" /><rect x="2" y="7" width="12" height="2" /><rect x="4" y="4" width="2" height="2" /><rect x="10" y="4" width="2" height="2" /><rect x="4" y="10" width="2" height="2" /><rect x="10" y="10" width="2" height="2" /></svg>
-);
 
-const heroSprites = [
-  { Comp: PixelFloppy, cls: 'top-10 left-[5%] w-8 h-8 text-[#c20f24]/25', delay: '0s' },
-  { Comp: PixelController, cls: 'top-1/2 left-[1%] w-7 h-7 text-violet-400/25', delay: '1.3s' },
-  { Comp: PixelStar, cls: 'bottom-14 left-[9%] w-5 h-5 text-amber-400/40', delay: '2.1s' },
-  { Comp: PixelTerminal, cls: 'top-8 right-[3%] w-8 h-8 text-emerald-400/25', delay: '0.6s' },
-  { Comp: PixelStar, cls: 'bottom-24 right-[2%] w-4 h-4 text-blue-400/40', delay: '1.7s' }
-];
 
 /* Two-tone paper plane, decorative */
 const PaperPlane = ({ dark, light, className = '', style }: { dark: string; light: string; className?: string; style?: React.CSSProperties }) => (
@@ -248,192 +218,156 @@ export function LandingPage() {
       <Navbar />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative pt-16 pb-24 lg:pb-32 overflow-hidden bg-white dark:bg-slate-950 transition-colors">
-          <LiquidyGradient />
+        {/* ── Hero Section ── */}
+        <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors">
 
-          {/* floating 8-bit sprites */}
-          <div className="pointer-events-none absolute inset-0 hidden sm:block" style={{ zIndex: -1 }} aria-hidden>
-            {heroSprites.map((s, i) => (
-              <span key={i} className={`pixel-float absolute ${s.cls}`} style={{ animationDelay: s.delay }}>
-                <s.Comp />
-              </span>
-            ))}
-          </div>
+          {/* Subtle dot/grid background */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            aria-hidden
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(0,0,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+            }}
+          />
+          {/* Soft red glow, top-right */}
+          <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.10),transparent_65%)] blur-[80px]" aria-hidden />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-end min-h-[520px] lg:min-h-[600px]">
 
-              {/* LEFT: brand block — poster style */}
-              {/* LEFT: brand block — poster style */}
-              <div className="flex flex-col items-center text-center pb-6 sm:pb-10 lg:pb-20 pt-4">
-                {/* Pixel "level up" chip */}
+              {/* ── LEFT: Text block ── */}
+              <div className="flex flex-col justify-center pt-10 pb-16 lg:pb-24 pr-0 lg:pr-12 text-center lg:text-left">
+
+                {/* Eyebrow */}
                 <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: DURATION, delay: 0.1, ease: EASE }}
-                  className="font-pixel inline-flex items-center gap-2 mb-3 md:mb-1 text-[9px] leading-none px-3 py-2 rounded-md bg-apple-text text-white dark:bg-white dark:text-slate-900 z-10"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.05, ease: EASE }}
+                  className="flex items-center justify-center lg:justify-start gap-2 mb-5"
                 >
-                  <PixelStar className="w-3 h-3 text-amber-400" />
-                  LEVEL UP YOUR ICT
-                  <span className="pixel-cursor">_</span>
+                  <span className="block w-7 h-px bg-[#c20f24]" />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#c20f24]">
+                    A/L ICT · Pasindu Dissanayake
+                  </span>
                 </motion.div>
 
-                {/* Brand Logo */}
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
-                  src="/images/pd-logo.png"
-                  alt="Pasindu Dissanayake Logo"
-                  className="w-32 h-32 sm:w-40 sm:h-40 md:w-56 md:h-56 -mt-2 -mb-2 sm:-mt-4 sm:-mb-4 md:-mt-6 md:-mb-10 object-contain drop-shadow-lg"
-                />
-
-                {/* Name */}
-                <SplitText
-                  as="h1"
-                  trigger="mount"
-                  delay={0.25}
-                  tier="heading"
-                  className="text-[2.5rem] leading-[1.05] sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-apple-text dark:text-apple-light transition-colors"
+                {/* Main headline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
                 >
-                  Pasindu Dissanayake
-                </SplitText>
+                  <h1 className="text-[3.2rem] sm:text-[4rem] lg:text-[4.8rem] font-black leading-[1.05] tracking-tight text-apple-text dark:text-apple-light transition-colors">
+                    දිනෙල් ලොව<br />
+                    <span className="text-[#c20f24]">ICT</span>{' '}
+                    <span>ජයගන්නේ</span>
+                  </h1>
+                </motion.div>
+
+                {/* Sub-headline */}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: DURATION, delay: 0.44, ease: EASE }}
-                  className="mt-2 md:mt-3 text-[10px] sm:text-[11px] md:text-xs font-semibold tracking-[0.18em] sm:tracking-[0.22em] md:tracking-[0.32em] uppercase text-apple-subtext dark:text-slate-400 transition-colors px-2"
+                  transition={{ duration: 0.6, delay: 0.28, ease: EASE }}
+                  className="mt-5 text-base sm:text-lg text-apple-subtext dark:text-slate-400 leading-relaxed max-w-md mx-auto lg:mx-0 transition-colors"
                 >
-                  Advanced Level Information & Communication Technology
+                  ශ්‍රී ලංකාවේ ප්‍රමුඛ A/L ICT Platform — පිට පිටම දෙවන වරටත්,
+                  <br className="hidden sm:block" />
+                  <strong className="text-apple-text dark:text-apple-light font-semibold"> දිවයිනේ ප්‍රථමයා.</strong> නිර්මාණය කළ පන්තිය.
                 </motion.p>
 
-                {/* Tagline */}
-                <SplitText
-                  as="p"
-                  trigger="mount"
-                  delay={0.52}
-                  tier="text"
-                  prefix={<span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none mr-1">"</span>}
-                  suffix={<span className="text-[#c20f24] text-xl md:text-2xl font-serif leading-none ml-1">"</span>}
-                  className="mt-5 md:mt-7 text-[17px] sm:text-lg md:text-xl font-medium text-apple-text dark:text-apple-light leading-relaxed max-w-md transition-colors px-4"
-                >
-                  ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
-                </SplitText>
-
-                {/* CTA Buttons */}
+                {/* CTA buttons */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: DURATION, delay: 0.7, ease: EASE }}
-                  className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 w-full max-w-[280px] sm:max-w-none mx-auto"
+                  transition={{ duration: 0.6, delay: 0.42, ease: EASE }}
+                  className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3"
                 >
-                  <a
-                    href="https://whatsapp.com/channel/0029Vb6zVpy4tRrtEpCZ7n1i"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative inline-flex items-center justify-center gap-2.5 h-12 px-7 text-[15px] sm:text-base rounded-full font-semibold bg-[#25D366] hover:bg-[#20b858] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+                  <Link
+                    to="/signup"
+                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full bg-[#c20f24] hover:bg-[#a50d1e] text-white font-bold text-base transition-all duration-200 shadow-lg shadow-red-700/25 hover:shadow-red-700/40 hover:scale-[1.03] active:scale-[0.97] w-full sm:w-auto justify-center"
                   >
-                    {/* Live ping dot */}
-                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400" />
-                    </span>
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                    </svg>
-                    Join Our WhatsApp Channel
-                  </a>
+                    පන්තියට එකතු වන්න
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </Link>
                   <a
                     href="https://wa.me/94719735601"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2.5 h-12 px-7 text-[15px] sm:text-base rounded-full font-semibold bg-[#c20f24] hover:bg-[#9c0c1d] text-white transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full border-2 border-zinc-200 dark:border-slate-700 text-apple-text dark:text-apple-light hover:border-[#c20f24] hover:text-[#c20f24] dark:hover:border-[#c20f24] dark:hover:text-[#c20f24] font-bold text-base transition-all duration-200 bg-white dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 w-full sm:w-auto justify-center"
                   >
-                    <MessageCircleIcon className="w-5 h-5 flex-shrink-0" />
-                    පන්ති පිළිබඳ විමසීම්
+                    <MessageCircleIcon className="w-5 h-5" />
+                    අප ගැන විමසන්න
                   </a>
                 </motion.div>
 
-                {/* Scroll-down arrow */}
-                <motion.a
+                {/* Social proof strip */}
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: DURATION, delay: 0.88, ease: EASE }}
-                  href="#promos"
-                  className="mt-8 md:mt-10 inline-flex flex-col items-center gap-1 text-apple-subtext dark:text-slate-500 hover:text-[#c20f24] dark:hover:text-[#c20f24] transition-colors"
-                  aria-label="Scroll down"
+                  transition={{ duration: 0.6, delay: 0.58, ease: EASE }}
+                  className="mt-10 flex items-center justify-center lg:justify-start gap-6"
                 >
-                  <span className="text-[10px] font-semibold uppercase tracking-widest">Scroll</span>
-                  <motion.svg
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                    className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path d="M12 5v14M5 12l7 7 7-7" />
-                  </motion.svg>
-                </motion.a>
+                  <div className="flex -space-x-2.5">
+                    {['/images/avatar-pasindu-1.jpg', '/images/avatar-pasindu-2.jpg'].map((src, i) => (
+                      <img key={i} src={src} alt="" className="w-9 h-9 rounded-full ring-2 ring-white dark:ring-slate-950 object-cover" />
+                    ))}
+                    <div className="w-9 h-9 rounded-full ring-2 ring-white dark:ring-slate-950 bg-[#c20f24] flex items-center justify-center text-white text-[10px] font-black">+2k</div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <StarIcon key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-xs text-apple-subtext dark:text-slate-500 mt-0.5">2,000+ සිසුන් සමග</p>
+                  </div>
+                </motion.div>
               </div>
 
-              {/* RIGHT: cutout portrait rising from the section edge */}
+              {/* ── RIGHT: Portrait + floating badge ── */}
               <motion.div
-                initial={{ opacity: 0, y: 15, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.9, delay: 0.3, ease: EASE }}
-                className="relative flex justify-center lg:justify-end items-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
+                className="relative flex justify-center lg:justify-end items-end"
               >
-                {/* 1. Atmospheric Background Blend: A large, soft, diffuse warm glow transition */}
-                <div 
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:left-auto lg:right-[-10%] lg:translate-x-0 lg:translate-y-[10%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(220,20,45,0.12),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(220,20,45,0.22),transparent_65%)] blur-[60px] pointer-events-none" 
-                  aria-hidden 
-                />
+                {/* Floating achievement pill */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
+                  className="absolute top-6 left-4 sm:left-8 lg:left-0 z-20 flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-lg rounded-2xl px-4 py-2.5"
+                >
+                  <span className="text-xl">🏆</span>
+                  <div>
+                    <p className="text-[13px] font-black text-apple-text dark:text-apple-light leading-tight">දිවයිනේ ප්‍රථමයා</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">2nd year running</p>
+                  </div>
+                </motion.div>
 
-                {/* Container to bound the overlays perfectly to the image dimensions */}
+                {/* Portrait image */}
                 <div className="relative">
-                  
-                  {/* 2. Contact / Grounding Shadow: Soft ambient occlusion at the base */}
-                  <div 
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[75%] h-[30px] bg-black/15 dark:bg-black/40 blur-xl rounded-full pointer-events-none" 
-                    aria-hidden 
-                  />
-                  
-                  {/* The Person Image */}
+                  {/* Soft base shadow */}
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-8 bg-black/10 dark:bg-black/30 blur-2xl rounded-full" aria-hidden />
+
                   <img
-                    src="/images/pasindu-hero.png"
+                    src="/images/udayana-hero.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                    className="relative w-[340px] sm:w-[420px] lg:w-[500px] max-w-full select-none pointer-events-none"
+                    className="relative w-[300px] sm:w-[380px] lg:w-[460px] max-w-full select-none pointer-events-none"
                     style={{
-                      // 3. Ribbon Light Interaction (via drop-shadow for atmospheric light wrap)
-                      // 5. Color Integration: warm highlights, reduce blue cast (sepia, saturate, contrast)
-                      filter: 'drop-shadow(-20px 20px 40px rgba(220, 20, 45, 0.12)) drop-shadow(0px 10px 20px rgba(220, 20, 45, 0.08)) sepia(0.12) hue-rotate(-5deg) saturate(1.1) contrast(1.02) brightness(1.02)',
-                      // 4. Edge Integration: Smoothly fade the hard bottom edge into the environment
-                      WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0.1) 98%, rgba(0,0,0,0) 100%)',
-                      maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0.1) 98%, rgba(0,0,0,0) 100%)'
+                      filter: 'drop-shadow(-8px 8px 32px rgba(194,15,36,0.10)) drop-shadow(0 16px 32px rgba(0,0,0,0.08))',
+                      WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+                      maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
                     }}
                     draggable={false}
                   />
-
-                  {/* 3. & 5. Ribbon Light Interaction & Color Integration (Inner Rim Light)
-                      Uses the image itself as a mask to apply a subtle red overlay exactly onto the person.
-                  */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-40 dark:opacity-50"
-                    style={{
-                      WebkitMaskImage: 'url(/images/pasindu-hero.png)',
-                      maskImage: 'url(/images/pasindu-hero.png)',
-                      WebkitMaskSize: 'contain',
-                      maskSize: 'contain',
-                      WebkitMaskRepeat: 'no-repeat',
-                      maskRepeat: 'no-repeat',
-                      WebkitMaskPosition: 'center',
-                      maskPosition: 'center',
-                      // Casts a subtle warm red glow from the bottom left where the ribbon passes
-                      background: 'radial-gradient(circle at 10% 80%, rgba(220, 20, 45, 0.8) 0%, rgba(255, 180, 180, 0.3) 40%, transparent 70%)'
-                    }}
-                  />
                 </div>
               </motion.div>
-            </div>
 
+            </div>
           </div>
         </section>
 
@@ -707,7 +641,7 @@ export function LandingPage() {
               </FadeUp>
 
               <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 justify-items-center">
-                {books.map((b, idx) => (
+                {books.map((b) => (
                   <StaggerItem
                     key={b.id}
                     className="flex flex-col items-center w-full max-w-[240px]"
@@ -751,7 +685,7 @@ export function LandingPage() {
             </FadeUp>
 
             <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {PROCESS_STEPS.map((step, idx) => (
+              {PROCESS_STEPS.map((step) => (
                 <StaggerItem
                   key={step.title}
                   hoverLift={8}
