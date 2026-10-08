@@ -222,14 +222,14 @@ export function LandingPage() {
           
           {/* Graph paper grid background across entire section */}
           <div
-            className="pointer-events-none absolute inset-0 opacity-100 dark:opacity-20"
+            className="pointer-events-none absolute inset-0 opacity-100 dark:opacity-40"
             aria-hidden
             style={{
               backgroundImage: `
-                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)
+                linear-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.06) 1px, transparent 1px)
               `,
-              backgroundSize: '40px 40px',
+              backgroundSize: '64px 64px',
             }}
           />
 

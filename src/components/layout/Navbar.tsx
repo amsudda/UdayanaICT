@@ -255,6 +255,7 @@ export function Navbar() {
           /* ── Landing page nav (animated pill) ── */
           <motion.nav
             layout
+            initial={false}
             transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="pointer-events-auto overflow-hidden"
             style={{
@@ -289,8 +290,8 @@ export function Navbar() {
           >
             <div className={`flex justify-between items-center transition-all duration-500 ${isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'}`}>
               <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-                <motion.img src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={{ scale: 1.08, rotate: -4 }} />
-                <motion.span animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: 0.45 }} className="font-bold tracking-tight whitespace-nowrap text-apple-text dark:text-apple-light">
+                <motion.img initial={false} src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={{ scale: 1.08, rotate: -4 }} />
+                <motion.span initial={false} animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: 0.45 }} className="font-bold tracking-tight whitespace-nowrap text-apple-text dark:text-apple-light">
                   Pasindu Dissanayake
                 </motion.span>
               </Link>
