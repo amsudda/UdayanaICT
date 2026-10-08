@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  StarIcon,
   MessageCircleIcon,
   BookOpenIcon,
   ArrowRightIcon,
@@ -259,10 +258,10 @@ export function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
                 >
-                  <h1 className="text-[3.2rem] sm:text-[4rem] lg:text-[4.8rem] font-black leading-[1.05] tracking-tight text-apple-text dark:text-apple-light transition-colors">
-                    දිනෙල් ලොව<br />
-                    <span className="text-[#c20f24]">ICT</span>{' '}
-                    <span>ජයගන්නේ</span>
+                  <h1 className="text-[2.8rem] sm:text-[3.5rem] lg:text-[4.2rem] font-black leading-[1.1] tracking-tight text-apple-text dark:text-apple-light transition-colors">
+                    ඉගෙනගන්න,<br />
+                    <span className="text-[#c20f24]">ඉගෙනගත්ත</span> කෙනෙක්ගෙන්<br />
+                    අහලා බලන්න..!
                   </h1>
                 </motion.div>
 
@@ -302,29 +301,6 @@ export function LandingPage() {
                     අප ගැන විමසන්න
                   </a>
                 </motion.div>
-
-                {/* Social proof strip */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.58, ease: EASE }}
-                  className="mt-10 flex items-center justify-center lg:justify-start gap-6"
-                >
-                  <div className="flex -space-x-2.5">
-                    {['/images/avatar-pasindu-1.jpg', '/images/avatar-pasindu-2.jpg'].map((src, i) => (
-                      <img key={i} src={src} alt="" className="w-9 h-9 rounded-full ring-2 ring-white dark:ring-slate-950 object-cover" />
-                    ))}
-                    <div className="w-9 h-9 rounded-full ring-2 ring-white dark:ring-slate-950 bg-[#c20f24] flex items-center justify-center text-white text-[10px] font-black">+2k</div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    <p className="text-xs text-apple-subtext dark:text-slate-500 mt-0.5">2,000+ සිසුන් සමග</p>
-                  </div>
-                </motion.div>
               </div>
 
               {/* ── RIGHT: Portrait + floating badge ── */}
@@ -354,7 +330,7 @@ export function LandingPage() {
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-8 bg-black/10 dark:bg-black/30 blur-2xl rounded-full" aria-hidden />
 
                   <img
-                    src="/images/udayana-hero.png"
+                    src="/images/pasindu-hero-new.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
                     className="relative w-[300px] sm:w-[380px] lg:w-[460px] max-w-full select-none pointer-events-none"
                     style={{
