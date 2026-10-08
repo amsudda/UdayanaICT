@@ -34,6 +34,7 @@ import { ReviewCard, type Review } from '../components/shared/ReviewCard';
 import { BookMockup } from '../components/shared/BookMockup';
 import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
+import { HeroICTGraphic } from '../components/illustrations/HeroICTGraphic';
 
 
 
@@ -314,17 +315,7 @@ export function LandingPage() {
                 className="relative flex justify-center lg:justify-end items-end w-full lg:pl-10"
               >
                 {/* Tech lines decoration (faint) */}
-                <div className="absolute top-10 lg:top-[-40px] right-0 lg:right-[-60px] w-full h-full pointer-events-none -z-20 opacity-40 dark:opacity-20 hidden md:block">
-                  <svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute right-0 top-0 text-slate-300 dark:text-slate-600">
-                    <path d="M500 100 L450 150 L300 150 L250 200" stroke="currentColor" strokeWidth="1.5" />
-                    <circle cx="500" cy="100" r="4" fill="#c20f24" />
-                    <circle cx="250" cy="200" r="3" fill="currentColor" />
-                    <path d="M550 250 L500 250 L450 300 L200 300" stroke="currentColor" strokeWidth="1" />
-                    <circle cx="550" cy="250" r="3" fill="#c20f24" />
-                    <path d="M150 400 L200 350 L400 350 L450 400" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
-                    <circle cx="150" cy="400" r="3" fill="currentColor" />
-                  </svg>
-                </div>
+                <HeroICTGraphic className="top-10 lg:top-[-40px] right-0 lg:right-[-60px] w-full h-full opacity-60 dark:opacity-30 hidden md:block" />
 
                 {/* Solid Card Background behind person */}
                 <div 
