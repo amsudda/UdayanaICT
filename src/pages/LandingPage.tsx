@@ -314,8 +314,32 @@ export function LandingPage() {
                 transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
                 className="relative flex justify-center lg:justify-end items-end w-full lg:pl-10"
               >
-                {/* Tech lines decoration (faint) */}
-                <HeroICTGraphic className="top-0 lg:top-[-40px] right-0 lg:right-[-40px] w-full h-[120%] opacity-100 dark:opacity-80 hidden md:block" />
+                {/* Custom Tech Frame Background (Matches Reference) */}
+                <div className="absolute bottom-10 right-0 sm:right-10 lg:right-0 w-[300px] sm:w-[380px] lg:w-[480px] h-[380px] sm:h-[480px] lg:h-[560px] -z-10 pointer-events-none">
+                  
+                  {/* Thin structural outline (tech frame) */}
+                  <svg
+                    className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)] text-slate-200 dark:text-slate-700/50"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="0.3"
+                  >
+                    <path d="M 0 15 L 15 0 L 85 0 L 100 15 L 100 100 L 0 100 Z" strokeDasharray="1 1" />
+                  </svg>
+                  
+                  {/* Solid background shape with chamfered top corners and rounded bottom corners */}
+                  <svg
+                    className="absolute inset-0 w-full h-full text-white dark:text-slate-900"
+                    viewBox="0 0 400 500"
+                    preserveAspectRatio="none"
+                    fill="currentColor"
+                    style={{ filter: 'drop-shadow(0 12px 30px rgba(0,0,0,0.06))' }}
+                  >
+                    <path d="M 0 60 L 60 0 L 340 0 L 400 60 L 400 440 Q 400 500 340 500 L 60 500 Q 0 500 0 440 Z" />
+                  </svg>
+                </div>
 
                 {/* Floating achievement pill */}
                 <motion.div
