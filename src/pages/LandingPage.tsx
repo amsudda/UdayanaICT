@@ -308,41 +308,40 @@ export function LandingPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-                className="relative flex justify-center lg:justify-end items-end"
+                className="relative flex justify-center lg:justify-end items-end w-full"
               >
                 {/* Floating achievement pill */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-                  className="absolute top-6 left-4 sm:left-8 lg:left-0 z-20"
+                  className="absolute top-0 sm:top-10 lg:-top-10 left-4 sm:left-10 lg:left-0 z-20"
                 >
                   <motion.div 
                     animate={{ y: [0, -6, 0] }}
                     transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                    className="flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-lg rounded-2xl px-4 py-2.5"
+                    className="flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-xl shadow-black/5 rounded-2xl px-5 py-3"
                   >
-                    <span className="text-xl">🎓</span>
+                    <span className="text-2xl drop-shadow-sm">🎓</span>
                     <div>
-                      <p className="text-[13px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
+                      <p className="text-[14px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
                     </div>
                   </motion.div>
                 </motion.div>
 
                 {/* Portrait image */}
-                <div className="relative">
-                  {/* Soft base shadow */}
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-8 bg-black/10 dark:bg-black/30 blur-2xl rounded-full" aria-hidden />
+                <div className="relative z-10 flex justify-center lg:justify-end items-end w-full lg:w-[110%] lg:-mr-[5%]">
+                  
+                  {/* Decorative shape behind person (like the reference) */}
+                  <div className="absolute bottom-0 w-full h-[60%] bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 z-20 pointer-events-none opacity-0" aria-hidden />
 
                   <img
                     src="/images/hersoimage.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                    className="relative w-[300px] sm:w-[380px] lg:w-[460px] max-w-full select-none pointer-events-none"
+                    className="relative w-[400px] sm:w-[500px] lg:w-[680px] 2xl:w-[760px] max-w-none select-none pointer-events-none object-contain object-bottom -mt-16 sm:-mt-24 lg:-mt-32"
                     style={{
-                      filter: 'drop-shadow(-8px 8px 32px rgba(194,15,36,0.10)) drop-shadow(0 16px 32px rgba(0,0,0,0.08))',
-                      WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
-                      maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+                      filter: 'drop-shadow(-12px 12px 40px rgba(194,15,36,0.12)) drop-shadow(0 20px 40px rgba(0,0,0,0.1))',
                     }}
                     draggable={false}
                   />
