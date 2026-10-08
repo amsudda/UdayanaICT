@@ -219,9 +219,22 @@ export function LandingPage() {
       <main className="flex-1">
         {/* ── Hero Section ── */}
         <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors">
+          
+          {/* Graph paper grid background across entire section */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-100 dark:opacity-20"
+            aria-hidden
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px',
+            }}
+          />
 
           {/* Soft red glow, top-right */}
-          <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.10),transparent_65%)] blur-[80px]" aria-hidden />
+          <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.08),transparent_65%)] blur-[80px]" aria-hidden />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-end min-h-[520px] lg:min-h-[600px]">
@@ -300,23 +313,23 @@ export function LandingPage() {
                 transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
                 className="relative flex justify-center lg:justify-end items-end w-full lg:pl-10"
               >
-                {/* Image Background Grid Design */}
-                <div 
-                  className="absolute bottom-0 right-0 w-full sm:w-[90%] lg:w-[110%] h-[90%] sm:h-[100%] lg:h-[115%] bg-slate-50/50 dark:bg-slate-900/30 rounded-t-[3rem] sm:rounded-tl-[5rem] overflow-hidden -z-10"
-                >
-                  <div
-                    className="absolute inset-0 opacity-100 dark:opacity-20 pointer-events-none"
-                    style={{
-                      backgroundImage: `
-                        linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px)
-                      `,
-                      backgroundSize: '32px 32px',
-                    }}
-                  />
-                  {/* Faded edge at the top */}
-                  <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white dark:from-slate-950 to-transparent" />
+                {/* Tech lines decoration (faint) */}
+                <div className="absolute top-10 lg:top-[-40px] right-0 lg:right-[-60px] w-full h-full pointer-events-none -z-20 opacity-40 dark:opacity-20 hidden md:block">
+                  <svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute right-0 top-0 text-slate-300 dark:text-slate-600">
+                    <path d="M500 100 L450 150 L300 150 L250 200" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="500" cy="100" r="4" fill="#c20f24" />
+                    <circle cx="250" cy="200" r="3" fill="currentColor" />
+                    <path d="M550 250 L500 250 L450 300 L200 300" stroke="currentColor" strokeWidth="1" />
+                    <circle cx="550" cy="250" r="3" fill="#c20f24" />
+                    <path d="M150 400 L200 350 L400 350 L450 400" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
+                    <circle cx="150" cy="400" r="3" fill="currentColor" />
+                  </svg>
                 </div>
+
+                {/* Solid Card Background behind person */}
+                <div 
+                  className="absolute bottom-10 right-4 sm:right-10 lg:right-4 w-[280px] sm:w-[360px] lg:w-[460px] h-[360px] sm:h-[460px] lg:h-[540px] bg-white dark:bg-slate-900 rounded-[2.5rem] lg:rounded-[3.5rem] shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] border border-gray-100/50 dark:border-slate-800 -z-10"
+                />
 
                 {/* Floating achievement pill */}
                 <motion.div
