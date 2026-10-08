@@ -231,6 +231,8 @@ export function LandingPage() {
                 linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px)
               `,
               backgroundSize: '64px 64px',
+              maskImage: 'radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%)'
             }}
           />
 
@@ -238,17 +240,17 @@ export function LandingPage() {
           <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.08),transparent_65%)] blur-[80px]" aria-hidden />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-end min-h-[520px] lg:min-h-[600px]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-end min-h-[520px] lg:min-h-[600px]">
 
               {/* ── LEFT: Text block ── */}
-              <div className="flex flex-col justify-center pt-10 pb-16 lg:pb-24 pr-0 lg:pr-12 text-center lg:text-left">
+              <div className="flex flex-col justify-center pt-10 pb-16 lg:pb-24 pr-0 lg:pr-12 text-center lg:text-left z-20">
 
                 {/* Eyebrow */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.05, ease: EASE }}
-                  className="flex items-center justify-center lg:justify-start gap-2 mb-5"
+                  className="flex items-center justify-center lg:justify-start gap-2 mb-6"
                 >
                   <span className="block w-7 h-px bg-[#c20f24]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#c20f24]">
@@ -261,9 +263,9 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
-                  className="flex justify-center lg:justify-start"
+                  className="flex justify-center lg:justify-start mb-6"
                 >
-                  <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="h-28 sm:h-36 lg:h-48 w-auto object-contain drop-shadow-sm" draggable={false} />
+                  <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="h-28 sm:h-36 lg:h-44 w-auto object-contain drop-shadow-sm" draggable={false} />
                 </motion.div>
 
                 {/* Sub-headline */}
@@ -271,7 +273,7 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.28, ease: EASE }}
-                  className="mt-5 text-base sm:text-lg text-apple-subtext dark:text-slate-400 leading-relaxed max-w-md mx-auto lg:mx-0 transition-colors"
+                  className="text-base sm:text-lg text-apple-subtext dark:text-slate-400 leading-relaxed max-w-md mx-auto lg:mx-0 transition-colors"
                 >
                   <strong className="text-apple-text dark:text-apple-light font-medium text-lg sm:text-xl">
                     ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
@@ -283,20 +285,21 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.42, ease: EASE }}
-                  className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3"
+                  className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
                 >
                   <Link
                     to="/signup"
-                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full bg-[#c20f24] hover:bg-[#a50d1e] text-white font-bold text-base transition-all duration-200 shadow-lg shadow-red-700/25 hover:shadow-red-700/40 hover:scale-[1.03] active:scale-[0.97] w-full sm:w-auto justify-center"
+                    className="group relative inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full bg-gradient-to-b from-[#e51930] to-[#c20f24] hover:from-[#c20f24] hover:to-[#a50d1e] text-white font-bold text-base transition-all duration-200 shadow-[0_8px_20px_rgba(194,15,36,0.25)] hover:shadow-[0_12px_30px_rgba(194,15,36,0.4)] hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto justify-center overflow-hidden border border-[#e51930]/80"
                   >
-                    පන්තියට එකතු වන්න
-                    <ArrowRightIcon className="w-4 h-4" />
+                    <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[50%] transition-transform duration-700 ease-in-out" />
+                    <span className="relative z-10 drop-shadow-sm">පන්තියට එකතු වන්න</span>
+                    <ArrowRightIcon className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <a
                     href="https://wa.me/94719735601"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full border-2 border-zinc-200 dark:border-slate-700 text-apple-text dark:text-apple-light hover:border-[#c20f24] hover:text-[#c20f24] dark:hover:border-[#c20f24] dark:hover:text-[#c20f24] font-bold text-base transition-all duration-200 bg-white dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 w-full sm:w-auto justify-center"
+                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full border-2 border-zinc-200 dark:border-slate-700 text-apple-text dark:text-apple-light hover:border-[#c20f24] hover:text-[#c20f24] dark:hover:border-[#c20f24] dark:hover:text-[#c20f24] font-bold text-base transition-all duration-200 bg-white dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 w-full sm:w-auto justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <MessageCircleIcon className="w-5 h-5" />
                     අප ගැන විමසන්න
@@ -309,41 +312,39 @@ export function LandingPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-                className="relative flex justify-center lg:justify-end items-end w-full lg:pl-10"
+                className="relative flex justify-center lg:justify-end items-end w-full h-full lg:pl-10"
               >
-                {/* Tech lines decoration (faint) */}
-                <HeroICTGraphic className="top-0 lg:top-[-40px] right-0 lg:right-[-40px] w-full h-[120%] opacity-100 dark:opacity-80 hidden md:block" />
-
-                {/* Floating achievement pill */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-                  className="absolute top-0 sm:top-10 lg:-top-10 left-4 sm:left-10 lg:left-0 z-20"
-                >
-                  <motion.div 
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                    className="flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-xl shadow-black/5 rounded-2xl px-5 py-3"
-                  >
-                    <span className="text-2xl drop-shadow-sm">🎓</span>
-                    <div>
-                      <p className="text-[14px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
-                    </div>
-                  </motion.div>
-                </motion.div>
-
-                {/* Portrait image */}
-                <div className="relative z-10 flex justify-center lg:justify-end items-end w-full lg:w-[110%] lg:-mr-[5%]">
+                {/* Constrained bounding box for the portrait to prevent overlap */}
+                <div className="relative w-full max-w-[360px] sm:max-w-[460px] lg:max-w-[620px] flex items-end justify-center pt-20">
                   
-                  {/* Decorative shape behind person (like the reference) */}
-                  <div className="absolute bottom-0 w-full h-[60%] bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 z-20 pointer-events-none opacity-0" aria-hidden />
+                  {/* Tech lines decoration strictly anchored to the portrait */}
+                  <HeroICTGraphic className="top-[-10%] left-[-10%] w-[120%] h-[120%] opacity-100 dark:opacity-80 hidden md:block -z-10" />
 
+                  {/* Floating achievement pill (Premium Glassmorphism) */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
+                    className="absolute top-10 sm:top-24 lg:top-16 -left-2 sm:-left-12 lg:-left-12 z-20"
+                  >
+                    <motion.div 
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                      className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(0,0,0,0.12)] rounded-2xl px-5 py-3"
+                    >
+                      <span className="text-2xl drop-shadow-sm">🎓</span>
+                      <div>
+                        <p className="text-[14px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Portrait image firmly grounded at the bottom */}
                   <img
                     src="/images/hersoimage.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                    className="relative w-[340px] sm:w-[440px] lg:w-[540px] 2xl:w-[600px] max-w-none select-none pointer-events-none object-contain object-bottom -mt-12 sm:-mt-16 lg:-mt-20 2xl:-mt-24"
+                    className="relative w-full h-auto object-contain object-bottom z-10 select-none pointer-events-none"
                     style={{
                       filter: 'drop-shadow(-12px 12px 40px rgba(194,15,36,0.12)) drop-shadow(0 20px 40px rgba(0,0,0,0.1))',
                     }}
