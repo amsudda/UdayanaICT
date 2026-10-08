@@ -258,10 +258,10 @@ export function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
                 >
-                  <h1 className="text-[2.8rem] sm:text-[3.5rem] lg:text-[4.2rem] font-black leading-[1.1] tracking-tight text-apple-text dark:text-apple-light transition-colors">
-                    ඉගෙනගන්න,<br />
-                    <span className="text-[#c20f24]">ඉගෙනගත්ත</span> කෙනෙක්ගෙන්<br />
-                    අහලා බලන්න..!
+                  <h1 className="text-[3.2rem] sm:text-[4rem] lg:text-[4.8rem] font-black leading-[1.05] tracking-tight text-apple-text dark:text-apple-light transition-colors">
+                    The Ultimate<br />
+                    <span className="text-[#c20f24]">A/L ICT</span><br />
+                    Experience
                   </h1>
                 </motion.div>
 
@@ -272,9 +272,9 @@ export function LandingPage() {
                   transition={{ duration: 0.6, delay: 0.28, ease: EASE }}
                   className="mt-5 text-base sm:text-lg text-apple-subtext dark:text-slate-400 leading-relaxed max-w-md mx-auto lg:mx-0 transition-colors"
                 >
-                  ශ්‍රී ලංකාවේ ප්‍රමුඛ A/L ICT Platform — පිට පිටම දෙවන වරටත්,
-                  <br className="hidden sm:block" />
-                  <strong className="text-apple-text dark:text-apple-light font-semibold"> දිවයිනේ ප්‍රථමයා.</strong> නිර්මාණය කළ පන්තිය.
+                  <strong className="text-apple-text dark:text-apple-light font-medium text-lg sm:text-xl">
+                    ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
+                  </strong>
                 </motion.p>
 
                 {/* CTA buttons */}
@@ -315,13 +315,19 @@ export function LandingPage() {
                   initial={{ opacity: 0, scale: 0.8, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-                  className="absolute top-6 left-4 sm:left-8 lg:left-0 z-20 flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-lg rounded-2xl px-4 py-2.5"
+                  className="absolute top-6 left-4 sm:left-8 lg:left-0 z-20"
                 >
-                  <span className="text-xl">🎓</span>
-                  <div>
-                    <p className="text-[13px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
-                  </div>
+                  <motion.div 
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                    className="flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-lg rounded-2xl px-4 py-2.5"
+                  >
+                    <span className="text-xl">🎓</span>
+                    <div>
+                      <p className="text-[13px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
+                    </div>
+                  </motion.div>
                 </motion.div>
 
                 {/* Portrait image */}
@@ -330,7 +336,7 @@ export function LandingPage() {
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-8 bg-black/10 dark:bg-black/30 blur-2xl rounded-full" aria-hidden />
 
                   <img
-                    src="/images/pasindu-hero-new.png"
+                    src="/images/pasindu-hero-latest.jpg"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
                     className="relative w-[300px] sm:w-[380px] lg:w-[460px] max-w-full select-none pointer-events-none"
                     style={{
