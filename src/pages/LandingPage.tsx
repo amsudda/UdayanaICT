@@ -256,17 +256,14 @@ export function LandingPage() {
                   </span>
                 </motion.div>
 
-                {/* Main headline */}
+                {/* Main Logo instead of headline */}
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
+                  className="flex justify-center lg:justify-start"
                 >
-                  <h1 className="text-[3.2rem] sm:text-[4rem] lg:text-[4.8rem] font-black leading-[1.05] tracking-tight text-apple-text dark:text-apple-light transition-colors">
-                    The Ultimate<br />
-                    <span className="text-[#c20f24]">A/L ICT</span><br />
-                    Experience
-                  </h1>
+                  <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="h-28 sm:h-36 lg:h-48 w-auto object-contain drop-shadow-sm" draggable={false} />
                 </motion.div>
 
                 {/* Sub-headline */}
