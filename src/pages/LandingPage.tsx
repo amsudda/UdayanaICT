@@ -218,16 +218,18 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* ── Hero Section ── */}
-        <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors">
+        <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors border-b border-gray-100 dark:border-slate-800">
 
-          {/* Subtle dot/grid background */}
+          {/* Graph paper grid background */}
           <div
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 opacity-100 dark:opacity-20"
             aria-hidden
             style={{
-              backgroundImage:
-                'linear-gradient(rgba(0,0,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px)',
-              backgroundSize: '40px 40px',
+              backgroundImage: `
+                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)
+              `,
+              backgroundSize: '32px 32px',
             }}
           />
           {/* Soft red glow, top-right */}
@@ -339,7 +341,7 @@ export function LandingPage() {
                   <img
                     src="/images/hersoimage.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                    className="relative w-[400px] sm:w-[500px] lg:w-[680px] 2xl:w-[760px] max-w-none select-none pointer-events-none object-contain object-bottom -mt-16 sm:-mt-24 lg:-mt-32"
+                    className="relative w-[340px] sm:w-[440px] lg:w-[540px] 2xl:w-[600px] max-w-none select-none pointer-events-none object-contain object-bottom -mt-12 sm:-mt-16 lg:-mt-20 2xl:-mt-24"
                     style={{
                       filter: 'drop-shadow(-12px 12px 40px rgba(194,15,36,0.12)) drop-shadow(0 20px 40px rgba(0,0,0,0.1))',
                     }}
