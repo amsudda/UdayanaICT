@@ -15,7 +15,8 @@ import {
   AwardIcon,
   CalendarClockIcon,
   PanelLeftCloseIcon,
-  PanelLeftOpenIcon
+  PanelLeftOpenIcon,
+  PackageIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { useEffect, useState } from 'react';
@@ -32,7 +33,8 @@ const menuGroups = [
       { name: 'My Classes', path: '/dashboard/courses', icon: BookOpenIcon },
       { name: 'AQuiz', path: '/dashboard/quizzes', icon: ClipboardListIcon },
       { name: 'Lesson Store', path: '/dashboard/extra-classes', icon: ShoppingCartIcon },
-      { name: 'Papers', path: '/dashboard/papers', icon: FileTextIcon }
+      { name: 'Papers', path: '/dashboard/papers', icon: FileTextIcon },
+      { name: 'Tute Tracking', path: '/dashboard/tute-tracking', icon: PackageIcon }
     ]
   },
   {

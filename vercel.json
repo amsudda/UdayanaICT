@@ -4,6 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/admin/:path*", "destination": "/probe-admin.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

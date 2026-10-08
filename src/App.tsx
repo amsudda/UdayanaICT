@@ -52,6 +52,7 @@ import { RankPage } from './pages/RankPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { AchievementsPage } from './pages/AchievementsPage';
 import { XpHistoryPage } from './pages/XpHistoryPage';
+import { TuteTrackingPage } from './pages/dashboard/TuteTrackingPage';
 
 function FullSpinner() {
   return <LogoLoader />;
@@ -122,6 +123,7 @@ function AnimatedRoutes() {
           <Route path="courses/:packId" element={<VerificationGate><CourseDetailsPage /></VerificationGate>} />
           <Route path="extra-classes" element={<VerificationGate><ExtraClassesPage /></VerificationGate>} />
           <Route path="papers" element={<PapersPage />} />
+          <Route path="tute-tracking" element={<TuteTrackingPage />} />
           <Route path="history" element={<ClassHistoryPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="help" element={<HelpPage />} />

@@ -6,7 +6,8 @@ import {
   CreditCardIcon,
   UserIcon,
   FileTextIcon,
-  ClipboardListIcon
+  ClipboardListIcon,
+  PackageIcon
 } from 'lucide-react';
 
 export function MobileNav() {
@@ -14,6 +15,7 @@ export function MobileNav() {
     { name: 'Home',      path: '/dashboard',              icon: LayoutDashboardIcon, end: true },
     { name: 'Classes',   path: '/dashboard/courses',      icon: BookOpenIcon },
     { name: 'Papers',    path: '/dashboard/papers',       icon: FileTextIcon },
+    { name: 'Tutes',     path: '/dashboard/tute-tracking',icon: PackageIcon },
     { name: 'AQuiz',     path: '/dashboard/quizzes',      icon: ClipboardListIcon },
     { name: 'Store',     path: '/dashboard/extra-classes',icon: ShoppingCartIcon },
     { name: 'Payments',  path: '/dashboard/payments',     icon: CreditCardIcon },
