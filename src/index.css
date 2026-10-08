@@ -136,29 +136,45 @@
   .landing-credential-subtitle { font-size: 9px; }
 }
 @media (max-width: 1023px) {
-  .landing-tech > svg:first-child { opacity: .2; }
-  .landing-hero-layout { display: flex; flex-direction: column; height: auto; padding: 40px 24px 22px; }
+  .landing-tech > svg:first-child { opacity: .16; }
+  .landing-tech > svg:not(:first-child) { opacity: .2; }
+  .landing-tech-pixels { opacity: .38; }
+  .landing-circuit-flow { opacity: .2; }
+  .landing-hero-grid { opacity: .64; }
+  .landing-hero-ambient-glow { opacity: .42; }
+  .landing-hero-layout { display: flex; flex-direction: column; height: auto; padding: 32px 24px 18px; }
   .landing-hero-copy { position: relative; left: auto; top: auto; width: 100%; align-items: center; text-align: center; }
   .landing-hero-eyebrow { justify-content: center; margin: 0; gap: 12px; }
   .landing-hero-eyebrow > span:last-child { font-size: 9px; letter-spacing: .15em; }
-  .landing-hero-logo { width: 132px; margin: 16px 0; }
-  .landing-hero-heading { max-width: 480px; font-size: 21px; }
-  .landing-hero-actions { justify-content: center; width: 100%; flex-wrap: wrap; margin-top: 22px; gap: 12px; }
-  .landing-hero-actions > a { font-size: 14px; height: 48px; padding-inline: 23px; }
-  .landing-portrait { position: relative; left: auto; top: auto; width: min(100%, 540px); height: auto; aspect-ratio: 1.08; margin: 42px auto 0; }
+  .landing-hero-logo { width: clamp(112px, 17vw, 132px); margin: 12px 0 10px; }
+  .landing-hero-heading { max-width: 480px; font-size: clamp(19px, 2.6vw, 21px); line-height: 1.42; }
+  .landing-hero-actions { justify-content: center; width: 100%; flex-wrap: wrap; margin-top: 18px; gap: 10px; }
+  .landing-hero-actions > a { font-size: 14px; height: 46px; padding-inline: 20px; }
+  .landing-portrait { position: relative; left: auto; top: auto; width: min(100%, 480px); height: auto; aspect-ratio: 1.1; margin: 28px auto 0; }
   .landing-portrait-panel { border-radius: 70px 70px 0 0; }
-  .landing-credential { left: 0; top: -3%; gap: 8px; padding: 12px 16px; }
-  .landing-credential-title { font-size: 11px; }
-  .landing-credential-subtitle { font-size: 8px; }
+  .landing-credential { left: 2%; top: -2%; gap: 8px; padding: 11px 14px; }
+  .landing-credential-title { font-size: 10.5px; }
+  .landing-credential-subtitle { font-size: 7.5px; }
   .landing-credential-icon { font-size: 21px; }
-  .landing-credential-signal { height: 23px; }
+  .landing-credential-signal { height: 19px; }
 }
 @media (max-width: 479px) {
-  .landing-hero-layout { padding-inline: 20px; }
-  .landing-hero-heading { font-size: 19px; }
-  .landing-hero-actions { flex-direction: column; }
-  .landing-hero-actions > a { width: 100%; max-width: 320px; }
-  .landing-portrait { margin-top: 38px; }
+  .landing-tech > svg:not(:first-child) { opacity: .12; }
+  .landing-tech-pixels { opacity: .24; }
+  .landing-circuit-flow { display: none; }
+  .landing-hero-grid { opacity: .48; }
+  .landing-hero-layout { padding: 26px 20px 14px; }
+  .landing-hero-eyebrow > span:last-child { font-size: 8px; letter-spacing: .13em; }
+  .landing-hero-logo { width: 112px; margin: 10px 0 8px; }
+  .landing-hero-heading { max-width: 370px; font-size: 18.5px; line-height: 1.42; }
+  .landing-hero-actions { flex-direction: column; margin-top: 16px; gap: 9px; }
+  .landing-hero-actions > a { width: 100%; max-width: 320px; height: 46px; }
+  .landing-portrait { width: min(100%, 420px); aspect-ratio: 1.12; margin-top: 23px; }
+  .landing-credential { left: 1%; top: -1%; padding: 10px 13px; }
+  .landing-credential-title { font-size: 10px; }
+  .landing-credential-subtitle { font-size: 7px; }
+  .landing-credential-icon { font-size: 19px; }
+  .landing-credential-signal { height: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-credential, .landing-circuit-paths path, .landing-circuit-flow path, .landing-circuit-nodes > *, .landing-tech-pixels rect, .landing-tech-code, .landing-tech-binary, .landing-tech-braces, .landing-tech-status, .landing-tech-api, .landing-tech-concept, .landing-hero-ambient-glow, .landing-portrait-glow, .landing-portrait-rim-glow, .landing-orbit-flow, .landing-portrait-orbit circle { animation: none !important; }
