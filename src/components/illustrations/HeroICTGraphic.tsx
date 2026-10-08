@@ -1,108 +1,95 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-
 export function HeroICTGraphic({ className = '' }: { className?: string }) {
-  // A clean, minimal ICT network system representing "Premium Academic Technology"
-  // It avoids cyberpunk neon, relying on extremely subtle structural lines, orbital curves,
-  // delicate branching nodes, and very faint typographic tech-texture.
   return (
-    <div className={`absolute pointer-events-none select-none overflow-visible ${className}`}>
-      
-      {/* Subtle Depth Glows (Creates separation without heavy gradients, predominantly white/pale-blue/pale-red) */}
-      <div className="absolute top-[40%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-blue-50/40 dark:bg-sky-900/10 blur-[120px] rounded-full" />
-      <div className="absolute top-[60%] right-[10%] w-[50%] h-[50%] bg-red-50/30 dark:bg-red-900/5 blur-[100px] rounded-full" />
-
+    <div
+      aria-hidden="true"
+      className={`landing-tech pointer-events-none absolute inset-0 select-none overflow-hidden ${className}`}
+    >
       <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 800 800"
+        className="landing-tech-circuit absolute inset-0 h-full w-full text-slate-200 dark:text-slate-800"
+        viewBox="0 0 1600 760"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="text-slate-200 dark:text-slate-800/80 w-full h-full"
+        preserveAspectRatio="xMidYMid slice"
       >
-        {/* Abstract Orbital / System Paths (Information Flow) */}
-        <motion.path
-          d="M 50 750 C 150 450 500 200 850 150"
-          stroke="currentColor"
-          strokeWidth="0.5"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.6 }}
-          transition={{ duration: 2.5, ease: 'easeOut' }}
-        />
-        <motion.path
-          d="M -50 550 C 250 650 600 450 850 0"
-          stroke="currentColor"
-          strokeWidth="0.5"
-          strokeDasharray="4 4"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.4 }}
-          transition={{ duration: 3, delay: 0.2, ease: 'easeOut' }}
-        />
-
-        {/* Minimal Network Branching (System Architecture) */}
-        <g opacity="0.85">
-          {/* Main vertical to horizontal branch */}
-          <motion.path
-            d="M 650 150 L 650 350 L 480 350"
-            stroke="currentColor"
-            strokeWidth="0.75"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 2, delay: 0.5, ease: 'easeOut' }}
-          />
-          {/* Connection nodes */}
-          <motion.circle cx="650" cy="150" r="3" fill="#c20f24" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2 }} />
-          <motion.circle cx="480" cy="350" r="2.5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2.2 }} />
-          
-          {/* Sub-branch with subtle cyan technology accent */}
-          <motion.path
-            d="M 650 280 L 780 280 L 780 420"
-            stroke="currentColor"
-            strokeWidth="0.5"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 2, delay: 0.8, ease: 'easeOut' }}
-          />
-          <motion.circle cx="780" cy="420" r="2.5" fill="#0ea5e9" opacity="0.7" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2.6 }} />
+        <g className="landing-circuit-paths" stroke="currentColor" strokeWidth="1.15" opacity="0.95">
+          <path pathLength="1" d="M0 202H42L82 242V302" />
+          <path pathLength="1" d="M18 36H228" />
+          <path pathLength="1" d="M576 0V102L612 138H688L720 170V286" />
+          <path pathLength="1" d="M1440 0V64L1484 108H1600" />
+          <path pathLength="1" d="M1436 454H1512L1550 492H1600" />
+          <path pathLength="1" d="M1294 760V704L1356 642H1438" />
+          <path pathLength="1" d="M560 760V704L598 666H742" />
+          <path pathLength="1" d="M38 516V650" />
         </g>
 
-        {/* Integration Lines for the Floating University Card (Left side area) */}
-        <g opacity="0.6">
-           <motion.path
-             d="M 120 420 L 220 420 L 220 350"
-             stroke="currentColor"
-             strokeWidth="0.5"
-             strokeDasharray="2 3"
-             initial={{ pathLength: 0 }}
-             animate={{ pathLength: 1 }}
-             transition={{ duration: 1.5, delay: 1 }}
-           />
-           <motion.circle cx="220" cy="350" r="2" fill="#c20f24" opacity="0.8" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2.4 }} />
-           <motion.circle cx="120" cy="420" r="1.5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1 }} />
+        <g className="landing-circuit-flow" stroke="#ef4055" strokeWidth="2" strokeLinecap="round">
+          <path pathLength="1" d="M576 0V102L612 138H688L720 170V286" />
+          <path pathLength="1" d="M1440 0V64L1484 108H1600" />
+          <path pathLength="1" d="M1294 760V704L1356 642H1438" />
         </g>
 
-        {/* Subtle Tech/Data Texture (Extremely low opacity, decorative only) */}
-        <g fill="currentColor" opacity="0.15" fontSize="11" fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" letterSpacing="0.05em">
-          {/* Slow pulsing opacity on code fragments */}
-          <motion.text x="180" y="240" animate={{ opacity: [0.05, 0.2, 0.05] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}>
-            import &#123; System &#125;
-          </motion.text>
-          <motion.text x="680" y="580" animate={{ opacity: [0.05, 0.15, 0.05] }} transition={{ duration: 5, repeat: Infinity, delay: 1.5, ease: 'easeInOut' }}>
-            API_RES_200
-          </motion.text>
-          <motion.text x="720" y="120" opacity="0.15">
-            10110
-          </motion.text>
+        <g className="landing-tech-pixels" fill="#e51930" opacity="0.72">
+          <rect x="25" y="192" width="9" height="9" rx="1" />
+          <rect x="573" y="94" width="8" height="8" rx="1" />
+          <rect x="1436" y="57" width="8" height="8" rx="1" />
+          <rect x="1436" y="636" width="8" height="8" rx="1" />
         </g>
 
-        {/* Tiny slow data-flow particle along the main orbital path */}
-        <circle r="1.5" fill="#0ea5e9" opacity="0.6">
-          <animateMotion
-            dur="12s"
-            repeatCount="indefinite"
-            path="M 50 750 C 150 450 500 200 850 150"
-          />
-        </circle>
+        <g className="landing-circuit-nodes" fill="#93c5fd" opacity="0.62">
+          <circle cx="82" cy="302" r="4" />
+          <circle cx="720" cy="286" r="4" />
+          <circle cx="1438" cy="454" r="4" />
+          <circle cx="598" cy="666" r="4" />
+        </g>
+
+      </svg>
+
+      <div className="landing-tech-code absolute left-[45.5%] top-[31%] hidden flex-col font-mono text-[11px] font-semibold leading-[1.55] text-blue-200/80 lg:flex dark:text-slate-600">
+        <span className="mb-1 text-2xl text-blue-200/80">&lt;/&gt;</span>
+        <span>const</span>
+        <span>function</span>
+        <span>return</span>
+        <span>;</span>
+      </div>
+
+      <div className="landing-tech-braces absolute right-[8%] top-[20%] hidden font-mono text-4xl text-red-300/50 lg:block dark:text-red-900/50">
+        &#123; &#125;
+      </div>
+
+      <div className="landing-tech-status absolute right-[1.8%] top-[31%] hidden rounded-2xl border border-white/80 bg-white/65 px-5 py-3 font-mono text-[10px] font-semibold text-blue-200/90 shadow-[0_10px_35px_rgba(30,64,175,0.06)] backdrop-blur-md lg:block dark:border-slate-800/70 dark:bg-slate-900/55 dark:text-slate-600">
+        <div className="flex items-center gap-2 tracking-wider">
+          <span className="h-2 w-2 rounded-full bg-red-400" />
+          SYSTEM ONLINE
+        </div>
+        <div className="mt-1 pl-4 tracking-[0.2em]">01 10 01 00</div>
+      </div>
+
+      <div className="landing-tech-api absolute right-[1.6%] top-[52%] hidden rounded-2xl border border-white/80 bg-white/55 px-5 py-3 font-mono text-[10px] font-semibold leading-6 tracking-wider text-blue-200/90 shadow-[0_10px_35px_rgba(30,64,175,0.05)] backdrop-blur-md lg:block dark:border-slate-800/70 dark:bg-slate-900/50 dark:text-slate-600">
+        <div>API &nbsp; • &nbsp; SQL</div>
+        <div>class &nbsp; • &nbsp; if()</div>
+      </div>
+
+      <div className="landing-tech-binary absolute bottom-[19%] right-[4.5%] hidden font-mono text-[10px] font-semibold leading-5 tracking-[0.18em] text-blue-200/80 lg:block dark:text-slate-700">
+        <div>01011001</div>
+        <div>10100110</div>
+      </div>
+
+      <div className="landing-tech-concept absolute bottom-[12%] left-[11.5%] hidden rounded-xl border border-white/90 bg-white/75 px-5 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.07)] backdrop-blur-md xl:block dark:border-slate-800/70 dark:bg-slate-900/65">
+        <div className="flex items-center gap-2 text-[10px] font-bold tracking-wide text-blue-200 dark:text-slate-600">
+          <span className="h-2 w-2 rounded-full bg-red-500" />
+          IDEA <span>→</span> CODE <span>→</span> IMPACT
+        </div>
+        <div className="mt-2 flex items-center gap-1">
+          <span className="h-[3px] w-8 rounded-full bg-red-500" />
+          <span className="h-[3px] w-16 rounded-full bg-slate-100 dark:bg-slate-800" />
+        </div>
+      </div>
+
+      <svg className="absolute bottom-0 left-0 h-[36%] w-[16%] text-red-200/30 dark:text-red-950/20" viewBox="0 0 300 300" fill="none" preserveAspectRatio="none">
+        <path d="M-90 30C0 -5 35 90 120 170L280 330M100 155L-40 290" stroke="currentColor" strokeWidth="66" />
+      </svg>
+      <svg className="absolute bottom-0 right-0 h-[25%] w-[13%] text-red-200/40 dark:text-red-950/20" viewBox="0 0 300 220" fill="none" preserveAspectRatio="none">
+        <path d="M50 290L240 90Q285 40 330 80" stroke="currentColor" strokeWidth="74" />
       </svg>
     </div>
   );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
-  MessageCircleIcon,
+  SearchIcon,
   BookOpenIcon,
   ArrowRightIcon,
   ChevronLeftIcon,
@@ -35,6 +35,7 @@ import { BookMockup } from '../components/shared/BookMockup';
 import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
 import { HeroICTGraphic } from '../components/illustrations/HeroICTGraphic';
+import { HeroPortrait } from '../components/illustrations/HeroPortrait';
 
 
 
@@ -100,6 +101,7 @@ const PROCESS_STEPS = [
 ];
 
 export function LandingPage() {
+  const shouldReduceMotion = useReducedMotion();
   const [currentPromo, setCurrentPromo] = useState(0);
   const [paused, setPaused] = useState(false);
   const [promos, setPromos] = useState<any[]>([]);
@@ -219,147 +221,89 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* ── Hero Section ── */}
-        <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors">
-          
-          {/* Graph paper grid background across entire section */}
+        <section className="landing-hero relative isolate overflow-hidden bg-white transition-colors dark:bg-slate-950">
           <div
-            className="pointer-events-none absolute inset-0 opacity-100 dark:opacity-40"
-            aria-hidden
+            aria-hidden="true"
+            className="landing-hero-grid pointer-events-none absolute inset-0 dark:opacity-20"
             style={{
-              backgroundImage: `
-                linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px)
-              `,
-              backgroundSize: '64px 64px',
-              maskImage: 'radial-gradient(ellipse at 50% 50%, black 10%, transparent 75%)',
-              WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 10%, transparent 75%)'
+              backgroundImage:
+                'linear-gradient(rgba(174,192,213,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(174,192,213,0.16) 1px, transparent 1px)',
+              backgroundSize: 'clamp(46px, 3.2vw, 64px) clamp(46px, 3.2vw, 64px)',
+              maskImage: 'linear-gradient(to bottom, black 0%, black 45%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 45%, transparent 100%)',
             }}
           />
+          <div aria-hidden="true" className="landing-hero-ambient-glow pointer-events-none absolute -top-28 right-[12%] h-[420px] w-[420px] rounded-full bg-red-100/45 blur-[90px] dark:bg-red-950/20" />
+          <HeroICTGraphic className="z-[1]" />
 
-          {/* Soft red glow, top-right */}
-          <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.06),transparent_65%)] blur-[80px]" aria-hidden />
-
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-end min-h-[520px] lg:min-h-[600px]">
-
-              {/* ── LEFT: Text block ── */}
-              <div className="flex flex-col justify-center pt-10 pb-16 lg:pb-24 pr-0 lg:pr-12 text-center lg:text-left z-20">
-
-                {/* Eyebrow */}
+          <div className="landing-hero-container relative z-10 mx-auto">
+            <div className="landing-hero-layout">
+              <div className="landing-hero-copy relative z-30 flex flex-col">
                 <motion.div
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={shouldReduceMotion ? false : { opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.05, ease: EASE }}
-                  className="flex items-center justify-center lg:justify-start gap-2 mb-6"
+                  className="landing-hero-eyebrow flex items-center gap-5"
                 >
-                  <span className="block w-7 h-px bg-[#c20f24]" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#c20f24]">
+                  <span className="block h-px w-9 bg-[#e51930]" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.27em] text-[#d8172d] sm:text-[11px]">
                     A/L ICT · Pasindu Dissanayake
                   </span>
                 </motion.div>
 
-                {/* Main Logo instead of headline */}
                 <motion.div
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 22 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
-                  className="flex justify-center lg:justify-start mb-6"
+                  className="landing-hero-logo"
                 >
-                  <img src="/images/pd-logo.png" alt="Pasindu Dissanayake Logo" className="h-28 sm:h-36 lg:h-44 w-auto object-contain drop-shadow-sm" draggable={false} />
+                  <img
+                    src="/images/pd-logo-256.webp"
+                    width="256"
+                    height="256"
+                    alt="Pasindu Dissanayake"
+                    className="h-auto w-full object-contain"
+                    draggable={false}
+                  />
                 </motion.div>
 
-                {/* Sub-headline */}
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
+                <motion.h1
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.28, ease: EASE }}
-                  className="text-base sm:text-lg text-apple-subtext dark:text-slate-400 leading-relaxed max-w-md mx-auto lg:mx-0 transition-colors"
+                  className="landing-hero-heading text-slate-800 transition-colors dark:text-slate-100"
                 >
-                  <strong className="text-apple-text dark:text-apple-light font-medium text-lg sm:text-xl">
-                    ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන් අහලා බලන්න..!
-                  </strong>
-                </motion.p>
+                  ඉගෙනගන්න, ඉගෙනගත්ත කෙනෙක්ගෙන්{' '}
+                  <span className="lg:block">අහලා බලන්න..!</span>
+                </motion.h1>
 
-                {/* CTA buttons */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.42, ease: EASE }}
-                  className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+                  className="landing-hero-actions flex items-center"
                 >
                   <Link
                     to="/signup"
-                    className="group relative inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full bg-gradient-to-b from-[#e51930] to-[#c20f24] hover:from-[#c20f24] hover:to-[#a50d1e] text-white font-bold text-base transition-all duration-300 shadow-[0_8px_20px_rgba(194,15,36,0.2)] hover:shadow-[0_12px_30px_rgba(194,15,36,0.3)] hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto justify-center overflow-hidden border border-[#e51930]/80"
+                    className="group relative inline-flex h-[52px] w-full items-center justify-center gap-2.5 overflow-hidden rounded-full border border-[#ee3044] bg-[#dc142a] px-8 text-[15px] font-bold text-white shadow-[0_12px_28px_rgba(194,15,36,0.22)] transition-[transform,background-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-[#c20f24] hover:shadow-[0_16px_34px_rgba(194,15,36,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24] focus-visible:ring-offset-2 active:translate-y-0 sm:min-w-[250px] sm:w-auto"
                   >
-                    <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[50%] transition-transform duration-700 ease-in-out" />
-                    <span className="relative z-10 drop-shadow-sm">පන්තියට එකතු වන්න</span>
-                    <ArrowRightIcon className="w-4 h-4 relative z-10 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span className="absolute inset-y-0 -left-1/2 w-1/3 skew-x-[-18deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-[430%]" />
+                    <span className="relative whitespace-nowrap">පන්තියට එකතු වන්න</span>
+                    <ArrowRightIcon className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                   <a
                     href="https://wa.me/94719735601"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full border-2 border-zinc-200 dark:border-slate-700 text-apple-text dark:text-apple-light hover:border-[#c20f24] hover:text-[#c20f24] dark:hover:border-[#c20f24] dark:hover:text-[#c20f24] font-bold text-base transition-all duration-300 bg-white dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 w-full sm:w-auto justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                    className="inline-flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full border border-white/90 bg-white/80 px-8 text-[15px] font-bold text-slate-700 shadow-[0_12px_32px_rgba(15,23,42,0.09)] backdrop-blur-md transition-[transform,color,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-red-200 hover:text-[#c20f24] hover:shadow-[0_15px_36px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24] focus-visible:ring-offset-2 dark:border-slate-700/80 dark:bg-slate-900/75 dark:text-slate-100 dark:hover:border-red-800 sm:min-w-[230px] sm:w-auto"
                   >
-                    <MessageCircleIcon className="w-5 h-5" />
-                    අප ගැන විමසන්න
+                    <SearchIcon className="h-[18px] w-[18px]" />
+                    <span className="whitespace-nowrap">අප ගැන විමසන්න</span>
                   </a>
                 </motion.div>
               </div>
 
-              {/* ── RIGHT: Portrait + floating badge ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-                className="relative flex justify-center lg:justify-end items-end w-full h-full lg:pl-10"
-              >
-                {/* Constrained bounding box for the portrait to prevent overlap */}
-                <div className="relative w-full max-w-[360px] sm:max-w-[460px] lg:max-w-[620px] flex items-end justify-center pt-24 pb-0">
-                  
-                  {/* Premium Editorial Portrait Frame (Behind the person) */}
-                  <div className="absolute bottom-0 w-[90%] sm:w-[85%] h-[85%] sm:h-[82%] bg-gradient-to-b from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-950/80 rounded-[2.5rem] sm:rounded-[3.5rem] lg:rounded-[4.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)] -z-10 transition-all duration-500 overflow-hidden">
-                    {/* Very faint internal glow/accent inside the frame */}
-                    <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-50/50 dark:bg-sky-900/10 blur-[60px] rounded-full" />
-                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-red-50/30 dark:bg-red-900/5 blur-[60px] rounded-full" />
-                  </div>
-
-                  {/* Tech lines decoration strictly anchored to the portrait frame */}
-                  <HeroICTGraphic className="top-[-5%] left-[-5%] w-[110%] h-[110%] opacity-100 dark:opacity-80 hidden lg:block -z-20" />
-
-                  {/* Floating achievement pill (Premium Glassmorphism + subtle hover) */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-                    className="absolute top-16 sm:top-24 lg:top-20 -left-2 sm:-left-8 lg:-left-12 z-20 group"
-                  >
-                    <motion.div 
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                      className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(0,0,0,0.08)] rounded-2xl px-5 py-3 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_16px_50px_rgba(0,0,0,0.12)] cursor-default"
-                    >
-                      <span className="text-2xl drop-shadow-sm">🎓</span>
-                      <div>
-                        <p className="text-[14px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-
-                  {/* Portrait image firmly grounded, popping out of the frame */}
-                  <img
-                    src="/images/hersoimage.png"
-                    alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                    className="relative w-full h-auto object-contain object-bottom z-10 select-none pointer-events-none drop-shadow-xl"
-                    style={{
-                      filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.08))',
-                    }}
-                    draggable={false}
-                  />
-                </div>
-              </motion.div>
-
+              <HeroPortrait />
             </div>
           </div>
         </section>
