@@ -317,10 +317,10 @@ export function LandingPage() {
                   transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
                   className="absolute top-6 left-4 sm:left-8 lg:left-0 z-20 flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-zinc-100 dark:border-slate-700 shadow-lg rounded-2xl px-4 py-2.5"
                 >
-                  <span className="text-xl">🏆</span>
+                  <span className="text-xl">🎓</span>
                   <div>
-                    <p className="text-[13px] font-black text-apple-text dark:text-apple-light leading-tight">දිවයිනේ ප්‍රථමයා</p>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">2nd year running</p>
+                    <p className="text-[13px] font-black text-apple-text dark:text-apple-light leading-tight">B.Sc Information Systems</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#c20f24] leading-tight">University Of Colombo (UG)</p>
                   </div>
                 </motion.div>
 
