@@ -218,20 +218,8 @@ export function LandingPage() {
 
       <main className="flex-1">
         {/* ── Hero Section ── */}
-        <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors border-b border-gray-100 dark:border-slate-800">
+        <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-10 pb-0 lg:pt-14 transition-colors">
 
-          {/* Graph paper grid background */}
-          <div
-            className="pointer-events-none absolute inset-0 opacity-100 dark:opacity-20"
-            aria-hidden
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)
-              `,
-              backgroundSize: '32px 32px',
-            }}
-          />
           {/* Soft red glow, top-right */}
           <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.10),transparent_65%)] blur-[80px]" aria-hidden />
 
@@ -310,8 +298,26 @@ export function LandingPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-                className="relative flex justify-center lg:justify-end items-end w-full"
+                className="relative flex justify-center lg:justify-end items-end w-full lg:pl-10"
               >
+                {/* Image Background Grid Design */}
+                <div 
+                  className="absolute bottom-0 right-0 w-full sm:w-[90%] lg:w-[110%] h-[90%] sm:h-[100%] lg:h-[115%] bg-slate-50/50 dark:bg-slate-900/30 rounded-t-[3rem] sm:rounded-tl-[5rem] overflow-hidden -z-10"
+                >
+                  <div
+                    className="absolute inset-0 opacity-100 dark:opacity-20 pointer-events-none"
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px)
+                      `,
+                      backgroundSize: '32px 32px',
+                    }}
+                  />
+                  {/* Faded edge at the top */}
+                  <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white dark:from-slate-950 to-transparent" />
+                </div>
+
                 {/* Floating achievement pill */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8, y: 10 }}
