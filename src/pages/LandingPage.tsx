@@ -227,17 +227,17 @@ export function LandingPage() {
             aria-hidden
             style={{
               backgroundImage: `
-                linear-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px)
+                linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px)
               `,
               backgroundSize: '64px 64px',
-              maskImage: 'radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%)',
-              WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%)'
+              maskImage: 'radial-gradient(ellipse at 50% 50%, black 10%, transparent 75%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 10%, transparent 75%)'
             }}
           />
 
           {/* Soft red glow, top-right */}
-          <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.08),transparent_65%)] blur-[80px]" aria-hidden />
+          <div className="pointer-events-none absolute -top-32 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(194,15,36,0.06),transparent_65%)] blur-[80px]" aria-hidden />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-end min-h-[520px] lg:min-h-[600px]">
@@ -289,17 +289,17 @@ export function LandingPage() {
                 >
                   <Link
                     to="/signup"
-                    className="group relative inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full bg-gradient-to-b from-[#e51930] to-[#c20f24] hover:from-[#c20f24] hover:to-[#a50d1e] text-white font-bold text-base transition-all duration-200 shadow-[0_8px_20px_rgba(194,15,36,0.25)] hover:shadow-[0_12px_30px_rgba(194,15,36,0.4)] hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto justify-center overflow-hidden border border-[#e51930]/80"
+                    className="group relative inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full bg-gradient-to-b from-[#e51930] to-[#c20f24] hover:from-[#c20f24] hover:to-[#a50d1e] text-white font-bold text-base transition-all duration-300 shadow-[0_8px_20px_rgba(194,15,36,0.2)] hover:shadow-[0_12px_30px_rgba(194,15,36,0.3)] hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto justify-center overflow-hidden border border-[#e51930]/80"
                   >
                     <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[50%] transition-transform duration-700 ease-in-out" />
                     <span className="relative z-10 drop-shadow-sm">පන්තියට එකතු වන්න</span>
-                    <ArrowRightIcon className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
+                    <ArrowRightIcon className="w-4 h-4 relative z-10 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                   <a
                     href="https://wa.me/94719735601"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full border-2 border-zinc-200 dark:border-slate-700 text-apple-text dark:text-apple-light hover:border-[#c20f24] hover:text-[#c20f24] dark:hover:border-[#c20f24] dark:hover:text-[#c20f24] font-bold text-base transition-all duration-200 bg-white dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 w-full sm:w-auto justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                    className="inline-flex items-center gap-2.5 h-13 px-8 py-3.5 rounded-full border-2 border-zinc-200 dark:border-slate-700 text-apple-text dark:text-apple-light hover:border-[#c20f24] hover:text-[#c20f24] dark:hover:border-[#c20f24] dark:hover:text-[#c20f24] font-bold text-base transition-all duration-300 bg-white dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-950/20 w-full sm:w-auto justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <MessageCircleIcon className="w-5 h-5" />
                     අප ගැන විමසන්න
@@ -317,20 +317,20 @@ export function LandingPage() {
                 {/* Constrained bounding box for the portrait to prevent overlap */}
                 <div className="relative w-full max-w-[360px] sm:max-w-[460px] lg:max-w-[620px] flex items-end justify-center pt-20">
                   
-                  {/* Tech lines decoration strictly anchored to the portrait */}
-                  <HeroICTGraphic className="top-[-10%] left-[-10%] w-[120%] h-[120%] opacity-100 dark:opacity-80 hidden md:block -z-10" />
+                  {/* Tech lines decoration strictly anchored to the portrait (Hidden on tablet/mobile for cleanliness) */}
+                  <HeroICTGraphic className="top-[-10%] left-[-10%] w-[120%] h-[120%] opacity-100 dark:opacity-80 hidden lg:block -z-10" />
 
-                  {/* Floating achievement pill (Premium Glassmorphism) */}
+                  {/* Floating achievement pill (Premium Glassmorphism + subtle hover) */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-                    className="absolute top-10 sm:top-24 lg:top-16 -left-2 sm:-left-12 lg:-left-12 z-20"
+                    className="absolute top-10 sm:top-24 lg:top-16 -left-2 sm:-left-12 lg:-left-12 z-20 group"
                   >
                     <motion.div 
                       animate={{ y: [0, -6, 0] }}
                       transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                      className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(0,0,0,0.12)] rounded-2xl px-5 py-3"
+                      className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 shadow-[0_12px_40px_rgba(0,0,0,0.08)] rounded-2xl px-5 py-3 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_16px_50px_rgba(0,0,0,0.12)] cursor-default"
                     >
                       <span className="text-2xl drop-shadow-sm">🎓</span>
                       <div>
