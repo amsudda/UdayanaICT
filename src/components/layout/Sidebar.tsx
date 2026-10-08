@@ -131,7 +131,7 @@ export function Sidebar() {
           {({ isActive }) => (
             <div className="flex items-center gap-3">
               <item.icon className={`w-5 h-5 short:w-4 short:h-4 shrink-0 ${isActive ? 'text-white' : 'text-zinc-400'}`} />
-              {!folded && <span className="text-[15px] short:text-[13px] font-medium whitespace-nowrap">{item.name}</span>}
+              {!folded && <span className="text-[17px] short:text-[15px] font-medium whitespace-nowrap">{item.name}</span>}
             </div>
           )}
         </NavLink>
