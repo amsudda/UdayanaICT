@@ -315,17 +315,24 @@ export function LandingPage() {
                 className="relative flex justify-center lg:justify-end items-end w-full h-full lg:pl-10"
               >
                 {/* Constrained bounding box for the portrait to prevent overlap */}
-                <div className="relative w-full max-w-[360px] sm:max-w-[460px] lg:max-w-[620px] flex items-end justify-center pt-20">
+                <div className="relative w-full max-w-[360px] sm:max-w-[460px] lg:max-w-[620px] flex items-end justify-center pt-24 pb-0">
                   
-                  {/* Tech lines decoration strictly anchored to the portrait (Hidden on tablet/mobile for cleanliness) */}
-                  <HeroICTGraphic className="top-[-10%] left-[-10%] w-[120%] h-[120%] opacity-100 dark:opacity-80 hidden lg:block -z-10" />
+                  {/* Premium Editorial Portrait Frame (Behind the person) */}
+                  <div className="absolute bottom-0 w-[90%] sm:w-[85%] h-[85%] sm:h-[82%] bg-gradient-to-b from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-950/80 rounded-[2.5rem] sm:rounded-[3.5rem] lg:rounded-[4.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)] -z-10 transition-all duration-500 overflow-hidden">
+                    {/* Very faint internal glow/accent inside the frame */}
+                    <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-50/50 dark:bg-sky-900/10 blur-[60px] rounded-full" />
+                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-red-50/30 dark:bg-red-900/5 blur-[60px] rounded-full" />
+                  </div>
+
+                  {/* Tech lines decoration strictly anchored to the portrait frame */}
+                  <HeroICTGraphic className="top-[-5%] left-[-5%] w-[110%] h-[110%] opacity-100 dark:opacity-80 hidden lg:block -z-20" />
 
                   {/* Floating achievement pill (Premium Glassmorphism + subtle hover) */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
-                    className="absolute top-10 sm:top-24 lg:top-16 -left-2 sm:-left-12 lg:-left-12 z-20 group"
+                    className="absolute top-16 sm:top-24 lg:top-20 -left-2 sm:-left-8 lg:-left-12 z-20 group"
                   >
                     <motion.div 
                       animate={{ y: [0, -6, 0] }}
@@ -340,13 +347,13 @@ export function LandingPage() {
                     </motion.div>
                   </motion.div>
 
-                  {/* Portrait image firmly grounded at the bottom */}
+                  {/* Portrait image firmly grounded, popping out of the frame */}
                   <img
                     src="/images/hersoimage.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
-                    className="relative w-full h-auto object-contain object-bottom z-10 select-none pointer-events-none"
+                    className="relative w-full h-auto object-contain object-bottom z-10 select-none pointer-events-none drop-shadow-xl"
                     style={{
-                      filter: 'drop-shadow(-12px 12px 40px rgba(194,15,36,0.12)) drop-shadow(0 20px 40px rgba(0,0,0,0.1))',
+                      filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.08))',
                     }}
                     draggable={false}
                   />
