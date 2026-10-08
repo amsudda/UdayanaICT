@@ -336,7 +336,7 @@ export function LandingPage() {
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[70%] h-8 bg-black/10 dark:bg-black/30 blur-2xl rounded-full" aria-hidden />
 
                   <img
-                    src="/images/pasindu-hero-latest.jpg"
+                    src="/images/hersoimage.png"
                     alt="Pasindu Dissanayake — ICT ගුරුවරයා"
                     className="relative w-[300px] sm:w-[380px] lg:w-[460px] max-w-full select-none pointer-events-none"
                     style={{
