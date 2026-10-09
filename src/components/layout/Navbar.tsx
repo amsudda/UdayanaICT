@@ -11,7 +11,7 @@ import {
   LogOutIcon,
   LayoutDashboardIcon
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../../auth/AuthContext';
 import { NotificationBell } from '../shared/NotificationBell';
 
@@ -21,6 +21,7 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
+  const prefersReducedMotion = useReducedMotion();
   const isDashboard = location.pathname.startsWith('/dashboard');
   const isLanding = location.pathname === '/';
 
@@ -41,6 +42,7 @@ export function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -256,22 +258,23 @@ export function Navbar() {
           <motion.nav
             layout
             initial={false}
-            transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="pointer-events-auto overflow-hidden"
+            transition={{ duration: prefersReducedMotion ? 0 : 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className={`pointer-events-auto overflow-hidden transition-[max-width,border-radius,background-color,backdrop-filter,box-shadow] ease-out ${prefersReducedMotion ? 'duration-0' : 'duration-[450ms]'}`}
             style={{
-              width: isPill ? 'min(96%, 100%)' : '100%',
+              width: isLanding ? 'calc(100% - 24px)' : '100%',
+              maxWidth: isLanding ? (isPill ? '880px' : '1152px') : 'none',
               borderRadius: isPill ? '16px' : '0px',
               background: isPill
                 ? isDarkMode
-                  ? 'rgba(10,15,30,0.45)'
-                  : 'rgba(255,255,255,0.45)'
+                  ? 'rgba(10,15,30,0.78)'
+                  : 'rgba(255,255,255,0.82)'
                 : isLanding && !scrolled
                 ? 'transparent'
                 : isDarkMode
                 ? 'rgba(2,6,23,0.55)'
                 : 'rgba(255,255,255,0.55)',
-              backdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
-              WebkitBackdropFilter: (isPill || scrolled) ? 'blur(48px) saturate(180%) brightness(1.04)' : 'none',
+              backdropFilter: (isPill || scrolled) ? 'blur(16px) saturate(160%)' : 'none',
+              WebkitBackdropFilter: (isPill || scrolled) ? 'blur(16px) saturate(160%)' : 'none',
               border: isPill
                 ? isDarkMode
                   ? '1px solid rgba(255,255,255,0.1)'
@@ -290,8 +293,8 @@ export function Navbar() {
           >
             <div className={`flex justify-between items-center transition-all duration-500 ${isPill ? 'h-[52px] px-5' : 'h-16 px-4 sm:px-6 lg:px-10'}`}>
               <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-                <motion.img initial={false} src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={{ scale: 1.08, rotate: -4 }} />
-                <motion.span initial={false} animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: 0.45 }} className="font-bold tracking-tight whitespace-nowrap text-apple-text dark:text-apple-light">
+                <motion.img initial={false} src="/images/pd-logo.png" alt="Pasindu Dissanayake" className="object-contain flex-shrink-0" animate={{ width: isPill ? 28 : 36, height: isPill ? 28 : 36 }} transition={{ duration: prefersReducedMotion ? 0 : 0.45, ease: [0.25, 0.46, 0.45, 0.94] }} whileHover={prefersReducedMotion ? undefined : { scale: 1.08, rotate: -4 }} />
+                <motion.span initial={false} animate={{ fontSize: isPill ? '0.9rem' : '1.15rem' }} transition={{ duration: prefersReducedMotion ? 0 : 0.45 }} className="font-bold tracking-tight whitespace-nowrap text-apple-text dark:text-apple-light">
                   Pasindu Dissanayake
                 </motion.span>
               </Link>

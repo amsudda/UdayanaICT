@@ -11,6 +11,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../auth/AuthContext';
 import { formatLKR } from '../../data/paymentConfig';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { AdminBatchRankings } from '../components/AdminBatchRankings';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -522,8 +523,14 @@ export function AdminStudentDetailPage() {
 
         {activeTab === 'academic' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <AdminBatchRankings
+              batches={studentBatches}
+              studentId={student.id}
+              studentName={student.full_name || 'this student'}
+            />
+
             <div>
-              <h2 className="text-lg font-bold text-slate-900">AQuiz Performance</h2>
+              <h2 className="text-lg font-bold text-slate-900">Quiz Performance</h2>
               <p className="text-sm text-slate-500 mt-1">Review student assessment history and scores.</p>
             </div>
 

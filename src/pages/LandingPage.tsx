@@ -227,7 +227,7 @@ export function LandingPage() {
             className="landing-hero-grid pointer-events-none absolute inset-0 dark:opacity-20"
             style={{
               backgroundImage:
-                'linear-gradient(rgba(174,192,213,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(174,192,213,0.16) 1px, transparent 1px)',
+                'linear-gradient(rgba(91,143,211,0.31) 1px, transparent 1px), linear-gradient(90deg, rgba(91,143,211,0.31) 1px, transparent 1px)',
               backgroundSize: 'clamp(46px, 3.2vw, 64px) clamp(46px, 3.2vw, 64px)',
               maskImage: 'linear-gradient(to bottom, black 0%, black 45%, transparent 100%)',
               WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 45%, transparent 100%)',
@@ -301,6 +301,31 @@ export function LandingPage() {
                     <span className="whitespace-nowrap">අප ගැන විමසන්න</span>
                   </a>
                 </motion.div>
+                <div className="landing-hero-benefits" aria-label="Class and student support features">
+                  <div className="landing-hero-benefit">
+                    <span className="landing-hero-benefit-icon"><BookOpenIcon aria-hidden="true" /></span>
+                    <span className="landing-hero-benefit-copy">
+                      <span className="landing-hero-benefit-title">ICT Lessons</span>
+                      <span className="landing-hero-benefit-detail">Recorded theory</span>
+                    </span>
+                  </div>
+                  <span className="landing-hero-benefit-divider" aria-hidden="true" />
+                  <div className="landing-hero-benefit">
+                    <span className="landing-hero-benefit-icon"><ClipboardCheckIcon aria-hidden="true" /></span>
+                    <span className="landing-hero-benefit-copy">
+                      <span className="landing-hero-benefit-title">Paper Discussions</span>
+                      <span className="landing-hero-benefit-detail">Live paper classes</span>
+                    </span>
+                  </div>
+                  <span className="landing-hero-benefit-divider" aria-hidden="true" />
+                  <div className="landing-hero-benefit">
+                    <span className="landing-hero-benefit-icon"><GraduationCapIcon aria-hidden="true" /></span>
+                    <span className="landing-hero-benefit-copy">
+                      <span className="landing-hero-benefit-title">Tutor Guidance</span>
+                      <span className="landing-hero-benefit-detail">Extra revision help</span>
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <HeroPortrait />
@@ -608,8 +633,12 @@ export function LandingPage() {
         )}
 
         {/* Our Process */}
-        <section id="process" className="py-24 bg-apple-light dark:bg-slate-950 transition-colors scroll-mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="process" className="landing-process-section relative overflow-hidden py-24 bg-apple-light dark:bg-slate-950 transition-colors scroll-mt-20">
+          <div aria-hidden="true" className="landing-process-grid absolute inset-0" />
+          <div aria-hidden="true" className="landing-process-glow landing-process-glow-red" />
+          <div aria-hidden="true" className="landing-process-glow landing-process-glow-blue" />
+
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeUp className="text-center mb-12">
               <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-semibold text-xs mb-4 border border-red-100 dark:border-red-900 uppercase tracking-wider">
                 🎓 Our Process
@@ -621,27 +650,108 @@ export function LandingPage() {
               </h2>
             </FadeUp>
 
-            <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {PROCESS_STEPS.map((step) => (
-                <StaggerItem
-                  key={step.title}
-                  hoverLift={8}
-                  className={`relative group card-pop bg-white dark:bg-slate-800 rounded-2xl px-6 py-8 text-center border border-gray-100 dark:border-slate-700 shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_45px_rgba(194,15,36,0.14)] transition-shadow duration-300 overflow-hidden ${step.wide ? 'md:col-span-2 lg:col-span-2' : ''}`}
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 52, scale: 0.985, clipPath: 'inset(0 0 88% 0 round 28px)' }}
+              whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0 0 0% 0 round 28px)' }}
+              viewport={{ once: true, amount: 0.08, margin: '0px 0px -8% 0px' }}
+              transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
+            >
+              <div className="landing-process-system">
+                <motion.div
+                  className="landing-process-toolbar"
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: -10 }}
+                  whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.5, ease: EASE, delay: 0.28 }}
                 >
-                  {/* Colored top border accent */}
-                  <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-[#c20f24]/60 to-[#c20f24]/20`} />
-                  <div className="pop-icon mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-slate-700/60 group-hover:bg-[#c20f24]/[0.07]">
-                    <step.icon className={`w-8 h-8 ${step.color}`} strokeWidth={2.2} />
+                  <div className="landing-process-toolbar-title">
+                    <span aria-hidden="true" className="landing-process-window-controls">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className="landing-process-system-name">ICT LEARNING SYSTEM</span>
+                    <span className="landing-process-system-path">/ PROCESS CONTROL</span>
                   </div>
-                  <h3 className="mb-3 text-lg font-bold text-apple-text dark:text-apple-light transition-colors">
-                    {step.title}
-                  </h3>
-                  <p className={`text-sm leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors ${step.wide ? 'max-w-3xl mx-auto' : ''}`}>
-                    {step.text}
-                  </p>
-                </StaggerItem>
-              ))}
-            </Stagger>
+
+                  <div className="landing-process-status" aria-label={`${PROCESS_STEPS.length} learning modules active`}>
+                    <span aria-hidden="true" className="landing-process-status-dot" />
+                    <span>SYSTEM ONLINE</span>
+                    <span aria-hidden="true" className="landing-process-status-divider" />
+                    <span>{String(PROCESS_STEPS.length).padStart(2, '0')} MODULES ACTIVE</span>
+                  </div>
+                </motion.div>
+
+                <div className="landing-process-console">
+                  <motion.div
+                    aria-hidden="true"
+                    className="landing-process-circuit"
+                    initial={shouldReduceMotion ? false : { opacity: 0, scaleY: 0 }}
+                    whileInView={shouldReduceMotion ? undefined : { opacity: 1, scaleY: 1 }}
+                    viewport={{ once: true, amount: 0.1 }}
+                    transition={{ duration: 1.05, ease: EASE, delay: 0.38 }}
+                    style={{ transformOrigin: 'top' }}
+                  >
+                    <span className="landing-process-circuit-spine" />
+                    <span className="landing-process-circuit-pulse" />
+                  </motion.div>
+
+                  <div className="landing-process-modules">
+                    {PROCESS_STEPS.map((step, index) => (
+                      <motion.div
+                        key={step.title}
+                        className="landing-process-module group"
+                        initial={shouldReduceMotion ? false : { opacity: 0, y: 34, scale: 0.975 }}
+                        whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+                        viewport={{ once: true, amount: 0.28, margin: '0px 0px -8% 0px' }}
+                        transition={{ duration: 0.58, ease: EASE, delay: index % 2 === 1 ? 0.08 : 0 }}
+                        whileHover={shouldReduceMotion ? undefined : { y: -4, transition: { duration: 0.28, ease: EASE } }}
+                      >
+                        <div className="landing-process-module-head">
+                          <div className="landing-process-module-identity">
+                            <span className="landing-process-module-icon pop-icon">
+                              <step.icon className={`h-6 w-6 ${step.color}`} strokeWidth={2.15} />
+                            </span>
+                            <span className="landing-process-module-number">
+                              MODULE {String(index + 1).padStart(2, '0')}
+                            </span>
+                          </div>
+
+                          <span className="landing-process-module-state">
+                            <i aria-hidden="true" /> ACTIVE
+                          </span>
+                        </div>
+
+                        <div className="landing-process-module-copy">
+                          <h3 className="text-lg font-bold text-apple-text dark:text-apple-light transition-colors">
+                            {step.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-relaxed text-apple-subtext dark:text-slate-400 transition-colors">
+                            {step.text}
+                          </p>
+                        </div>
+
+                        <span aria-hidden="true" className="landing-process-module-port" />
+                        <span aria-hidden="true" className="landing-process-module-signal" />
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                <motion.div
+                  className="landing-process-footerline"
+                  aria-hidden="true"
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                  whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.5, ease: EASE, delay: 0.5 }}
+                >
+                  <span>PD // ICT</span>
+                  <span className="landing-process-footer-progress"><i /></span>
+                  <span>LEARN · PRACTISE · PROGRESS</span>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </section>
       </main>

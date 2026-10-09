@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRightIcon, CrownIcon, FileTextIcon } from 'lucide-react';
+import { ArrowRightIcon, CrownIcon, FileTextIcon, TrophyIcon } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
-import { loadPaperLeaderboard, type PaperLeaderRow, type PaperType } from '../../data/xp';
+import {
+  loadLeaderboard,
+  loadPaperLeaderboard,
+  type LeaderRow,
+  type PaperLeaderRow,
+  type PaperType
+} from '../../data/xp';
 
 /**
- * The batch ranked on paper marks, built as a tall board for the right
- * rail rather than a wide card.
+ * A compact batch ranking switcher for the dashboard rail. Paper mode ranks
+ * marked-paper averages; XP mode uses the existing weekly/all-time XP board.
  *
  * Shape follows the column it lives in: one row per student, the leader's
  * average setting the length of every bar beneath it, so the gap between
@@ -24,37 +30,55 @@ const MEDAL: Record<number, string> = {
   3: 'bg-gradient-to-br from-amber-500 to-amber-700 text-amber-50'
 };
 
+type BoardMode = 'papers' | 'xp';
+type XpScope = 'weekly' | 'all_time';
+
 export function PaperRankBoard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<BoardMode>('papers');
   // 'all' first: most students have sat a mix, and a board that opens on
   // full papers only looks empty to anyone whose batch has done timing ones.
   const [type, setType] = useState<PaperType>('all');
-  const [rows, setRows] = useState<PaperLeaderRow[]>([]);
+  const [xpScope, setXpScope] = useState<XpScope>('weekly');
+  const [paperRows, setPaperRows] = useState<PaperLeaderRow[]>([]);
+  const [xpRows, setXpRows] = useState<LeaderRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     (async () => {
-      const data = await loadPaperLeaderboard(type, 50);
+      const data = mode === 'papers'
+        ? await loadPaperLeaderboard(type, 50)
+        : await loadLeaderboard(xpScope, 50);
       if (!active) return;
-      setRows(data);
+      if (mode === 'papers') setPaperRows(data as PaperLeaderRow[]);
+      else setXpRows(data as LeaderRow[]);
       setLoading(false);
     })();
     return () => { active = false; };
-  }, [type]);
+  }, [mode, type, xpScope]);
 
+  const rows: Array<PaperLeaderRow | LeaderRow> = mode === 'papers' ? paperRows : xpRows;
   const myIndex = user ? rows.findIndex((r) => r.studentId === user.id) : -1;
   const me = myIndex >= 0 ? rows[myIndex] : null;
   const top = rows.slice(0, 5);
   // One row either side, so the student sees a place they can actually take.
   const nearMe = myIndex > 4 ? rows.slice(Math.max(0, myIndex - 1), myIndex + 2) : [];
-  const leader = rows[0]?.avgPct || 100;
+  const leader = mode === 'papers'
+    ? (paperRows[0]?.avgPct || 100)
+    : (xpRows[0]?.totalXp || 1);
 
-  const Row = ({ r }: { r: PaperLeaderRow }) => {
+  const Row = ({ r }: { r: PaperLeaderRow | LeaderRow }) => {
     const isMe = user?.id === r.studentId;
     const medal = MEDAL[r.position];
+    const value = mode === 'papers'
+      ? `${(r as PaperLeaderRow).avgPct.toFixed(1)}%`
+      : `${(r as LeaderRow).totalXp.toLocaleString()} XP`;
+    const progress = mode === 'papers'
+      ? ((r as PaperLeaderRow).avgPct / leader) * 100
+      : ((r as LeaderRow).totalXp / leader) * 100;
     return (
       <div className={`relative px-3 py-2.5 rounded-2xl transition-colors ${
         isMe ? 'bg-[#c20f24]/[0.07] ring-1 ring-[#c20f24]/25' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'
@@ -81,7 +105,7 @@ export function PaperRankBoard() {
           </span>
 
           <span className="text-[13px] font-black tabular-nums text-slate-900 dark:text-white shrink-0">
-            {r.avgPct.toFixed(1)}%
+            {value}
           </span>
         </div>
 
@@ -89,7 +113,7 @@ export function PaperRankBoard() {
         <div className="mt-1.5 ml-[2.4rem] h-1 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${Math.max(4, (r.avgPct / leader) * 100)}%` }}
+            animate={{ width: `${Math.max(4, progress)}%` }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className={`h-full rounded-full ${isMe ? 'bg-[#c20f24]' : r.position === 1 ? 'bg-amber-400' : 'bg-slate-300 dark:bg-slate-600'}`}
           />
@@ -103,21 +127,68 @@ export function PaperRankBoard() {
       active ? 'bg-white text-zinc-900 shadow-sm' : 'text-white/60 hover:text-white'
     }`;
 
+  const modeTabCls = (active: boolean) =>
+    `inline-flex h-7 items-center justify-center gap-1.5 rounded-lg px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+      active ? 'bg-white text-zinc-950 shadow-sm' : 'text-white/55 hover:text-white'
+    }`;
+
+  const selectMode = (next: BoardMode) => {
+    if (next === mode) return;
+    setLoading(true);
+    setMode(next);
+  };
+
+  const selectPaperType = (next: PaperType) => {
+    if (next === type) return;
+    setLoading(true);
+    setType(next);
+  };
+
+  const selectXpScope = (next: XpScope) => {
+    if (next === xpScope) return;
+    setLoading(true);
+    setXpScope(next);
+  };
+
   return (
     <section className="rounded-3xl overflow-hidden bg-white dark:bg-[#121214] border border-zinc-100 dark:border-zinc-800 shadow-sm flex flex-col">
       {/* ── Head: dark, so the board reads as its own thing in the rail ── */}
       <div className="relative bg-gradient-to-br from-zinc-950 via-[#2a0509] to-[#7a0c17] px-5 pt-5 pb-4 text-white">
         <div className="pointer-events-none absolute -top-16 -right-10 w-48 h-48 rounded-full bg-red-600/25 blur-3xl" />
 
-        <div className="relative flex items-center gap-2">
-          <FileTextIcon className="w-4 h-4 text-white/60" />
-          <h3 className="font-bold text-[15px] tracking-tight">Paper Ranking</h3>
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            {mode === 'papers'
+              ? <FileTextIcon className="w-4 h-4 shrink-0 text-white/60" />
+              : <TrophyIcon className="w-4 h-4 shrink-0 text-amber-300" />}
+            <h3 className="truncate font-bold text-[15px] tracking-tight">
+              {mode === 'papers' ? 'Paper Ranking' : 'XP Ranking'}
+            </h3>
+          </div>
+
+          <div className="flex shrink-0 rounded-xl bg-white/10 p-1" role="group" aria-label="Ranking type">
+            <button type="button" className={modeTabCls(mode === 'papers')} onClick={() => selectMode('papers')} aria-pressed={mode === 'papers'}>
+              <FileTextIcon className="h-3 w-3" /> Papers
+            </button>
+            <button type="button" className={modeTabCls(mode === 'xp')} onClick={() => selectMode('xp')} aria-pressed={mode === 'xp'}>
+              <TrophyIcon className="h-3 w-3" /> XP
+            </button>
+          </div>
         </div>
 
         <div className="relative flex gap-1 mt-3 rounded-xl bg-white/10 p-1 backdrop-blur-sm">
-          <button type="button" className={tabCls(type === 'full')} onClick={() => setType('full')}>Full</button>
-          <button type="button" className={tabCls(type === 'timing')} onClick={() => setType('timing')}>Timing</button>
-          <button type="button" className={tabCls(type === 'all')} onClick={() => setType('all')}>All</button>
+          {mode === 'papers' ? (
+            <>
+              <button type="button" className={tabCls(type === 'full')} onClick={() => selectPaperType('full')} aria-pressed={type === 'full'}>Full</button>
+              <button type="button" className={tabCls(type === 'timing')} onClick={() => selectPaperType('timing')} aria-pressed={type === 'timing'}>Timing</button>
+              <button type="button" className={tabCls(type === 'all')} onClick={() => selectPaperType('all')} aria-pressed={type === 'all'}>All</button>
+            </>
+          ) : (
+            <>
+              <button type="button" className={tabCls(xpScope === 'weekly')} onClick={() => selectXpScope('weekly')} aria-pressed={xpScope === 'weekly'}>This Week</button>
+              <button type="button" className={tabCls(xpScope === 'all_time')} onClick={() => selectXpScope('all_time')} aria-pressed={xpScope === 'all_time'}>All Time</button>
+            </>
+          )}
         </div>
 
         {/* Their own standing, in the head where it cannot be missed */}
@@ -129,9 +200,19 @@ export function PaperRankBoard() {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm font-bold tabular-nums">{me ? `${me.avgPct.toFixed(1)}%` : 'No marks'}</p>
+            <p className="text-sm font-bold tabular-nums">
+              {mode === 'papers'
+                ? me ? `${(me as PaperLeaderRow).avgPct.toFixed(1)}%` : 'No marks'
+                : me ? `${(me as LeaderRow).totalXp.toLocaleString()} XP` : 'No XP'}
+            </p>
             <p className="text-[10px] text-white/50 mt-0.5">
-              {me ? `best ${me.bestPct.toFixed(0)}% · ${me.papers} paper${me.papers === 1 ? '' : 's'}` : 'sit a paper to join'}
+              {mode === 'papers'
+                ? me
+                  ? `best ${(me as PaperLeaderRow).bestPct.toFixed(0)}% · ${(me as PaperLeaderRow).papers} paper${(me as PaperLeaderRow).papers === 1 ? '' : 's'}`
+                  : 'sit a paper to join'
+                : me
+                  ? xpScope === 'weekly' ? 'earned this week' : 'all-time earned'
+                  : 'earn XP to join'}
             </p>
           </div>
         </div>
@@ -144,9 +225,15 @@ export function PaperRankBoard() {
         ) : rows.length === 0 ? (
           <div className="py-10 px-4 text-center">
             <CrownIcon className="w-8 h-8 mx-auto text-slate-200 dark:text-slate-700 mb-2" />
-            <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No marks yet</p>
+            <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+              {mode === 'papers' ? 'No marks yet' : 'No XP yet'}
+            </p>
             <p className="text-xs text-slate-400 mt-1">
-              {type === 'timing' ? 'No timing papers' : 'No papers'} marked in your batch.
+              {mode === 'papers'
+                ? `${type === 'timing' ? 'No timing papers' : 'No papers'} marked in your batch.`
+                : xpScope === 'weekly'
+                  ? 'No XP earned in your batch this week.'
+                  : 'No XP earned in your batch yet.'}
             </p>
           </div>
         ) : (
@@ -170,10 +257,10 @@ export function PaperRankBoard() {
 
             <button
               type="button"
-              onClick={() => navigate('/dashboard/papers')}
+              onClick={() => navigate(mode === 'papers' ? '/dashboard/papers' : '/dashboard/leaderboard')}
               className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold text-[#c20f24] hover:bg-[#c20f24]/[0.06] rounded-xl transition-colors"
             >
-              My papers <ArrowRightIcon className="w-3 h-3" />
+              {mode === 'papers' ? 'My papers' : 'View XP leaderboard'} <ArrowRightIcon className="w-3 h-3" />
             </button>
           </>
         )}
