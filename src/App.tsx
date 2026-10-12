@@ -30,12 +30,11 @@ import { AdminTheoryPage } from './admin/pages/AdminTheoryPage';
 import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
 import { AdminStudentDetailPage } from './admin/pages/AdminStudentDetailPage';
 import { AdminStudentEditPage } from './admin/pages/AdminStudentEditPage';
-import { AdminPromotionsPage } from './admin/pages/AdminPromotionsPage';
+import { AdminTimetablePage } from './admin/pages/AdminTimetablePage';
 import { AdminNoticesPage } from './admin/pages/AdminNoticesPage';
 import { AdminSettingsPage } from './admin/pages/AdminSettingsPage';
 import { AdminFeaturedPage } from './admin/pages/AdminFeaturedPage';
 import { AdminMarksPage } from './admin/pages/AdminMarksPage';
-import { AdminReviewsPage } from './admin/pages/AdminReviewsPage';
 import { AdminBooksPage } from './admin/pages/AdminBooksPage';
 import { PapersPage } from './pages/dashboard/PapersPage';
 import { CourseDetailsPage } from './pages/dashboard/CourseDetailsPage';
@@ -53,6 +52,7 @@ import { LeaderboardPage } from './pages/LeaderboardPage';
 import { AchievementsPage } from './pages/AchievementsPage';
 import { XpHistoryPage } from './pages/XpHistoryPage';
 import { TuteTrackingPage } from './pages/dashboard/TuteTrackingPage';
+import { MyPapersPage } from './pages/MyPapersPage';
 
 function FullSpinner() {
   return <LogoLoader />;
@@ -123,6 +123,7 @@ function AnimatedRoutes() {
           <Route path="courses/:packId" element={<VerificationGate><CourseDetailsPage /></VerificationGate>} />
           <Route path="extra-classes" element={<VerificationGate><ExtraClassesPage /></VerificationGate>} />
           <Route path="papers" element={<PapersPage />} />
+          <Route path="my-papers" element={<MyPapersPage />} />
           <Route path="tute-tracking" element={<TuteTrackingPage />} />
           <Route path="history" element={<ClassHistoryPage />} />
           <Route path="payments" element={<PaymentsPage />} />
@@ -194,8 +195,7 @@ function AnimatedRoutes() {
           <Route path="students/:id" element={<AdminStudentDetailPage />} />
           <Route path="students/:id/edit" element={<AdminStudentEditPage />} />
           <Route path="notices" element={<AdminNoticesPage />} />
-          <Route path="promotions" element={<AdminPromotionsPage />} />
-          <Route path="reviews" element={<AdminReviewsPage />} />
+          <Route path="timetable" element={<AdminTimetablePage />} />
           <Route path="books" element={<AdminBooksPage />} />
           <Route path="featured" element={<AdminFeaturedPage />} />
           <Route path="marks" element={<AdminMarksPage />} />

@@ -8,8 +8,6 @@ import {
   VideoIcon,
   UsersIcon,
   TrendingUpIcon,
-  MegaphoneIcon,
-  MessageSquareQuoteIcon,
   BookMarkedIcon,
   GraduationCapIcon,
   SettingsIcon,
@@ -21,6 +19,7 @@ import {
   ArrowRightIcon,
   FileTextIcon,
   ClipboardListIcon,
+  CalendarClockIcon,
   PanelLeftCloseIcon,
   PanelLeftOpenIcon
 } from 'lucide-react';
@@ -62,8 +61,7 @@ const navGroups = [
     label: 'Engagement',
     items: [
       { name: 'Notices', path: '/admin/notices', icon: BellRingIcon },
-      { name: 'Promotions', path: '/admin/promotions', icon: MegaphoneIcon },
-      { name: 'Reviews', path: '/admin/reviews', icon: MessageSquareQuoteIcon },
+      { name: 'Timetable', path: '/admin/timetable', icon: CalendarClockIcon },
       { name: 'Featured', path: '/admin/featured', icon: GraduationCapIcon }
     ]
   },
@@ -330,7 +328,7 @@ export function AdminLayout() {
       {/* Mobile drawer */}
       {open && (
         <div className="lg:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
+          <button type="button" aria-label="Close admin navigation" className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
           <div className="absolute inset-y-0 left-0 w-72 max-w-[82%] bg-[#0C0C0E] shadow-2xl">
             <button
               onClick={() => setOpen(false)}

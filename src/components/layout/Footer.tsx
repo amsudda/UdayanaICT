@@ -69,7 +69,7 @@ export function Footer() {
           <div>
             <h3 className={headingCls}>Quick Links</h3>
             <ul className="space-y-3">
-              <li><a href="/#promos" className={linkCls}>Promotions</a></li>
+              <li><a href="/#timetable" className={linkCls}>Timetable</a></li>
               <li><a href="/#reviews" className={linkCls}>Reviews</a></li>
               <li><a href="/#features" className={linkCls}>Why Us</a></li>
               <li><Link to="/login" className={linkCls}>Log In</Link></li>

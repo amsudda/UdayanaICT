@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "project": {
+    "name": "magic-patterns-vite-template",
+    "productType": null,
+    "stack": [
+      "react",
+      "tailwind-v3",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css"
+    ],
+    "components": [
+      "src/components/ui"
+    ],
+    "assets": [
+      "public/images"
+    ],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "unknown",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [
+      "Badge",
+      "Button",
+      "Card",
+      "Input",
+      "ProgressBar",
+      "Select"
+    ],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+    "decisions": [
+      {
+        "scope": "landing.hero",
+        "decision": "Follow the supplied wide hero proportions: content at 15.3% from the left, a smaller logo, subtle responsive grid, and the original portrait with visible hands. Use an SVG curved crop and narrow rim instead of a white overlay, with fine orbit paths and a floating credential pill. Scale hero height with width; stack content and portrait on mobile.",
+        "source": "User-provided hero reference, 2026-10-09"
+      },
+      {
+        "scope": "landing.process",
+        "decision": "Present the existing teaching process as an ICT Learning System control panel: a two-column connected module matrix on desktop and a single connected pipeline on mobile. Preserve all process titles, Sinhala descriptions, icons, and typography; use the established red signals, blue circuit nodes, technical grid, light surfaces, and dark-mode equivalents. Reveal each module independently when its row enters the viewport.",
+        "source": "User-approved System Control Panel direction, 2026-10-09"
+      },
+      {
+        "scope": "dashboard.ranking-card",
+        "decision": "Use a primary Papers/XP switch in the compact ranking card. Preserve Full/Timing/All filters for paper ranks and provide This Week/All Time filters for XP ranks, with each mode updating its summary, rows, empty state, and destination link.",
+        "source": "User request, 2026-10-09"
+      },
+      {
+        "scope": "admin.student-detail.batch-rankings",
+        "decision": "Place an admin-only batch ranking panel at the top of the student Academic tab. Limit the batch selector to the student's enrolled batches, provide Paper and XP modes with their relevant filters, show the complete roster, and highlight the open student's position and metrics.",
+        "source": "User request, 2026-10-09"
+      },
+      {
+        "scope": "landing.timetable",
+        "decision": "Treat the hero and admin-managed online timetable as one continuous landing canvas rather than stacked sections: both share the same #fbfdff surface and dark-mode background with no divider or transition band, and the timetable begins with reduced top spacing. Present each class as a compact schedule card in a responsive one/two/three-column grid with restrained red accents and purposeful press/color motion. Keep the database model extensible for physical classes later without exposing that option now.",
+        "source": "User-selected card direction and competitor reference, 2026-10-12"
+      },
+      {
+        "scope": "landing.testimonials",
+        "decision": "Keep the original nine testimonial messages and append the eight supplied student messages as one hard-coded anonymous set named Student 01 through Student 17. Use a cohesive generated Sri Lankan student illustration atlas for the avatars. Balance every testimonial across one, two, or three independently scrolling columns so all reviews remain available at every responsive breakpoint, with a static grid for reduced-motion users.",
+        "source": "User-supplied reviews and avatar direction, 2026-10-12"
+      },
+      {
+        "scope": "admin.payments",
+        "decision": "Treat payment administration as a verification workspace rather than a flat card list. Lead with pending workload metrics, counted status tabs, and one consolidated filter toolbar; use an oldest-first queue beside a persistent evidence-and-context panel on desktop and a full-screen review view on mobile. Pending rows select the active review workspace, while approved and rejected archive rows explicitly open a full-screen details view so their original slip and audit outcome remain inspectable. Keep slip controls, student history, audit metadata, explicit approval confirmation, structured rejection reasons, server errors, concurrency protection, and real-time updates inside the review flow. Do not offer bulk approval.",
+        "source": "User-approved Payment Review Workspace plan, 2026-10-12"
+      },
+      {
+        "scope": "student.my-papers",
+        "decision": "Keep the Papers route as the downloadable past, provincial, and model paper library. Route the dashboard ranking card's My Papers action to a dedicated Progress screen backed by paper_marks, with type filters, average/best/latest/completed summaries, a chronological performance chart, concise trend insight, paper mix, and newest-first result history. Expose My Papers in the desktop Progress navigation and the mobile account drawer while retaining a clear shortcut to the paper library.",
+        "source": "User-requested separation of paper library and personal marks progression, 2026-10-13"
+      }
+    ],
+  "evidence": [
+    {
+      "fact": "components.installed",
+      "source": "src/components/ui"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v3",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-10-08T18:43:38.638Z"
+}

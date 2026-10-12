@@ -257,7 +257,7 @@ export function PaperRankBoard() {
 
             <button
               type="button"
-              onClick={() => navigate(mode === 'papers' ? '/dashboard/papers' : '/dashboard/leaderboard')}
+              onClick={() => navigate(mode === 'papers' ? '/dashboard/my-papers' : '/dashboard/leaderboard')}
               className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold text-[#c20f24] hover:bg-[#c20f24]/[0.06] rounded-xl transition-colors"
             >
               {mode === 'papers' ? 'My papers' : 'View XP leaderboard'} <ArrowRightIcon className="w-3 h-3" />

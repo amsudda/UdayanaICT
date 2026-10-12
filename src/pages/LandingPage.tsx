@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   SearchIcon,
   BookOpenIcon,
   ArrowRightIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   GraduationCapIcon,
   TimerIcon,
   GaugeIcon,
@@ -30,12 +28,12 @@ import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
 import { PixelPageBurst, PixelReveal } from '../components/shared/PixelFx';
-import { ReviewCard, type Review } from '../components/shared/ReviewCard';
 import { BookMockup } from '../components/shared/BookMockup';
-import { overlayClasses } from '../lib/overlay';
 import { supabase } from '../lib/supabase';
 import { HeroICTGraphic } from '../components/illustrations/HeroICTGraphic';
 import { HeroPortrait } from '../components/illustrations/HeroPortrait';
+import { ClassTimetable } from '../components/landing/ClassTimetable';
+import { TestimonialsSection } from '../components/landing/TestimonialsSection';
 
 
 
@@ -102,12 +100,7 @@ const PROCESS_STEPS = [
 
 export function LandingPage() {
   const shouldReduceMotion = useReducedMotion();
-  const [currentPromo, setCurrentPromo] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [promos, setPromos] = useState<any[]>([]);
   const [featured, setFeatured] = useState<any[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewCount, setReviewCount] = useState(6);
   const [books, setBooks] = useState<any[]>([]);
 
   useEffect(() => {
@@ -117,37 +110,6 @@ export function LandingPage() {
       .eq('is_visible', true)
       .order('sort_order')
       .then(({ data }) => setBooks(data ?? []));
-  }, []);
-
-  useEffect(() => {
-    supabase.from('settings').select('*').eq('id', 1).single().then(({ data }) => {
-      if (data && data.landing_review_count != null) setReviewCount(data.landing_review_count);
-    });
-  }, []);
-
-  useEffect(() => {
-    supabase
-      .from('reviews')
-      .select('*')
-      .eq('is_visible', true)
-      .order('sort_order')
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (data && data.length) {
-          setReviews(
-            data.map((r: any) => ({
-              id: r.id,
-              name: r.name,
-              school: r.school,
-              grade: r.grade,
-              stars: r.stars ?? 5,
-              quote: r.quote,
-              year: r.exam_year,
-              avatar: r.avatar_url,
-            }))
-          );
-        }
-      });
   }, []);
 
   useEffect(() => {
@@ -171,57 +133,15 @@ export function LandingPage() {
       });
   }, []);
 
-  useEffect(() => {
-    supabase
-      .from('promotions')
-      .select('*')
-      .eq('is_active', true)
-      .eq('audience_scope', 'public')
-      .order('sort_order')
-      .then(({ data }) => {
-        if (data && data.length) {
-          setPromos(
-            data.map((p: any) => ({
-              id: p.id,
-              tag: p.tag ?? '',
-              title: p.title,
-              description: p.description ?? '',
-              image: p.image_url ?? '',
-              ctaText: p.cta_text ?? 'Learn more',
-              ctaLink: p.cta_link ?? '/signup',
-              imageFit: p.image_fit ?? 'cover',
-              imagePosition: p.image_position ?? 'center',
-              fontFamily: p.font_family ?? '',
-              showOverlay: p.show_overlay ?? true,
-              overlayPosition: p.overlay_position ?? 'left'
-            }))
-          );
-          setCurrentPromo(0);
-        }
-      });
-  }, []);
-
-  const nextPromo = () => setCurrentPromo((prev) => (prev + 1) % promos.length);
-  const prevPromo = () =>
-    setCurrentPromo((prev) => (prev - 1 + promos.length) % promos.length);
-
-  useEffect(() => {
-    if (paused || promos.length === 0) return;
-    const timer = setInterval(nextPromo, 5000);
-    return () => clearInterval(timer);
-  }, [paused, promos.length]);
-
-  // safe accessor — guards against currentPromo being out of range after a refetch
-  const activePromo = promos[currentPromo % promos.length] ?? promos[0];
-
   return (
     <div className="min-h-screen bg-apple-light dark:bg-slate-950 flex flex-col font-sans transition-colors duration-300">
       <PixelPageBurst />
       <Navbar />
 
       <main className="flex-1">
-        {/* ── Hero Section ── */}
-        <section className="landing-hero relative isolate overflow-hidden bg-white transition-colors dark:bg-slate-950">
+        {/* Hero and timetable share one visual canvas so the landing story reads continuously. */}
+        <div className="relative bg-[#fbfdff] transition-colors dark:bg-slate-950">
+        <section className="landing-hero relative isolate overflow-hidden bg-transparent transition-colors">
           <div
             aria-hidden="true"
             className="landing-hero-grid pointer-events-none absolute inset-0 dark:opacity-20"
@@ -333,119 +253,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* Promotions / Announcements Carousel — only when real promos exist */}
-        {promos.length > 0 && (
-        <section id="promos" className="py-16 bg-white dark:bg-slate-900 transition-colors scroll-mt-20">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section header */}
-            <div className="text-center mb-10">
-              <span className="inline-block py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-medium text-sm mb-4 border border-red-100 dark:border-red-900 transition-colors">
-                නවතම තොරතුරු
-              </span>
-              <p className="text-lg text-apple-subtext dark:text-slate-400 max-w-2xl mx-auto transition-colors">
-                නවතම පන්ති, විශේෂ දීමනා සහ වැදගත් නිවේදන මෙතැනින් බලාගන්න.
-              </p>
-            </div>
-
-            <div
-              className="relative group rounded-3xl overflow-hidden shadow-apple dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] h-[340px] md:h-[440px] bg-slate-900"
-              onMouseEnter={() => setPaused(true)}
-              onMouseLeave={() => setPaused(false)}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentPromo}
-                  initial={{ opacity: 0, scale: 1.04 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                  className="absolute inset-0"
-                >
-                  <img
-                    src={activePromo.image}
-                    alt={activePromo.title}
-                    className="w-full h-full"
-                    style={{
-                      objectFit: (activePromo as any).imageFit ?? 'cover',
-                      objectPosition: (activePromo as any).imagePosition ?? 'center'
-                    }}
-                  />
-                  {(activePromo as any).showOverlay !== false ? (
-                    (() => {
-                      const ov = overlayClasses((activePromo as any).overlayPosition ?? 'left');
-                      return (
-                        <>
-                          {/* dark shading follows the text position for legibility */}
-                          <div className={`absolute inset-0 z-10 ${ov.gradient}`} />
-
-                          {/* Content */}
-                          <div className={`absolute inset-0 z-20 flex flex-col p-8 sm:p-12 md:p-16 ${ov.justify} ${ov.items}`} style={{ fontFamily: (activePromo as any).fontFamily || undefined }}>
-                            <motion.div
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.5, delay: 0.15 }}
-                              className="max-w-2xl"
-                            >
-                              <span className="inline-block py-1 px-3.5 rounded-full bg-[#c20f24] text-white font-semibold text-xs sm:text-sm mb-4 shadow-lg">
-                                {activePromo.tag}
-                              </span>
-                              <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
-                                {activePromo.title}
-                              </h3>
-                              <p className={`text-base md:text-lg text-gray-200 mb-7 max-w-lg leading-relaxed ${ov.blockAlign}`}>
-                                {activePromo.description}
-                              </p>
-                              <Link to={activePromo.ctaLink}>
-                                <Button size="lg" className="font-semibold !bg-[#c20f24] hover:!bg-[#9c0c1d]">
-                                  {activePromo.ctaText}
-                                </Button>
-                              </Link>
-                            </motion.div>
-                          </div>
-                        </>
-                      );
-                    })()
-                  ) : (
-                    /* Image-only ad — the whole slide is the link */
-                    activePromo.ctaLink ? (
-                      <Link to={activePromo.ctaLink} aria-label={activePromo.title} className="absolute inset-0 z-10" />
-                    ) : null
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Prev / Next arrows */}
-              <button
-                onClick={prevPromo}
-                aria-label="Previous"
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-md text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
-              >
-                <ChevronLeftIcon className="w-6 h-6" />
-              </button>
-              <button
-                onClick={nextPromo}
-                aria-label="Next"
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-md text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
-              >
-                <ChevronRightIcon className="w-6 h-6" />
-              </button>
-
-              {/* Indicators */}
-              <div className="absolute bottom-6 left-8 sm:left-12 md:left-16 z-30 flex gap-2">
-                {promos.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentPromo(idx)}
-                    aria-label={`Go to slide ${idx + 1}`}
-                    className={`h-2.5 rounded-full transition-all ${idx === currentPromo ? 'bg-white w-8' : 'bg-white/50 w-2.5 hover:bg-white/80'
-                      }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-        )}
+        <ClassTimetable />
+        </div>
 
         {/* Featured Courses — only shown when the tutor has published public packs */}
         {featured.length > 0 && (
@@ -489,39 +298,7 @@ export function LandingPage() {
           </section>
         )}
 
-        {/* ===== TESTIMONIALS SECTION — only when real reviews exist ===== */}
-        {reviews.length > 0 && (
-        <section id="reviews" className="py-24 bg-gradient-to-b from-red-50/50 to-white dark:from-slate-900 dark:to-slate-950 overflow-hidden transition-colors scroll-mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            {/* Section Header */}
-            <FadeUp className="text-center mb-14">
-              <span className="inline-flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-red-50 dark:bg-red-900/30 text-[#c20f24] font-semibold text-xs mb-4 border border-red-100 dark:border-red-900 uppercase tracking-wider">
-                ⭐ සිසුන්ගේ අදහස්
-              </span>
-              <h2
-                className="text-4xl md:text-5xl font-extrabold text-apple-text dark:text-apple-light mb-4 transition-colors"
-                style={{ fontFamily: "'Bebas Neue', 'Outfit', sans-serif", letterSpacing: '0.04em' }}
-              >
-                අපගේ සිසුන් පවසන දේ
-              </h2>
-
-            </FadeUp>
-
-            {/* Testimonial Cards Grid */}
-            <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {reviews.slice(0, reviewCount).map((t, idx) => (
-                <StaggerItem key={t.id ?? idx}>
-                  <ReviewCard review={t} />
-                </StaggerItem>
-              ))}
-            </Stagger>
-
-            {/* Bottom CTA */}
-
-          </div>
-        </section>
-        )}
+        <TestimonialsSection />
 
         {/* Features / Why Choose Us */}
         <section id="features" className="relative py-24 bg-white dark:bg-slate-900 overflow-hidden transition-colors scroll-mt-20">

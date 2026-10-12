@@ -28,8 +28,7 @@ export const PERMISSIONS: { key: string; label: string }[] = [
   { key: 'recordings', label: 'Monthly recordings' },
   { key: 'students', label: 'Students' },
   { key: 'marks', label: 'Paper marks' },
-  { key: 'promotions', label: 'Promotions' },
-  { key: 'reviews', label: 'Reviews' },
+  { key: 'timetable', label: 'Class timetable' },
   { key: 'books', label: 'Books' },
   { key: 'featured', label: 'Featured courses' },
   { key: 'settings', label: 'Settings' }

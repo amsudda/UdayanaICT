@@ -9,7 +9,8 @@ import {
   HistoryIcon,
   HeadphonesIcon,
   LogOutIcon,
-  LayoutDashboardIcon
+  LayoutDashboardIcon,
+  FileTextIcon
 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../../auth/AuthContext';
@@ -70,7 +71,7 @@ export function Navbar() {
 
 
   const navLinks = [
-    { label: 'Promotions', href: '#promos' },
+    { label: 'Timetable', href: '#timetable' },
     { label: 'Books', href: '#books' },
     { label: 'Reviews', href: '#reviews' },
     { label: 'Why Us', href: '#features' },
@@ -79,6 +80,7 @@ export function Navbar() {
 
   const accountLinks = [
     ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin', icon: LayoutDashboardIcon }] : []),
+    { name: 'My Papers', path: '/dashboard/my-papers', icon: FileTextIcon },
     { name: 'My Profile', path: '/dashboard/profile', icon: UserIcon },
     { name: 'Class History', path: '/dashboard/history', icon: HistoryIcon },
     { name: 'Help', path: '/dashboard/help', icon: HeadphonesIcon }

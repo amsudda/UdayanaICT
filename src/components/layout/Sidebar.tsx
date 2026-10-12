@@ -16,10 +16,12 @@ import {
   CalendarClockIcon,
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
-  PackageIcon
+  PackageIcon,
+  TrendingUpIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { useEffect, useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { loadMyXp } from '../../data/xp';
 import { rankForXp } from '../../data/ranks';
 import { useExamCountdown } from '../../data/examCountdown';
@@ -40,6 +42,7 @@ const menuGroups = [
   {
     label: 'Progress',
     items: [
+      { name: 'My Papers', path: '/dashboard/my-papers', icon: TrendingUpIcon },
       { name: 'Rank', path: '/dashboard/rank', icon: TrophyIcon },
       { name: 'Leaderboard', path: '/dashboard/leaderboard', icon: UsersIcon },
       { name: 'Achievements', path: '/dashboard/achievements', icon: AwardIcon }
@@ -114,7 +117,7 @@ export function Sidebar() {
     .join('')
     .toUpperCase();
 
-  const renderNavItems = (items: any[]) => (
+  const renderNavItems = (items: Array<{ name: string; path: string; icon: LucideIcon; end?: boolean }>) => (
     <div className="flex flex-col gap-1 short:gap-0">
       {items.map((item) => (
         <NavLink
