@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CrownIcon, FlameIcon, TrophyIcon, UsersIcon } from 'lucide-react';
+import { ChevronDownIcon, CrownIcon, FlameIcon, TrophyIcon, UsersIcon } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
-import { loadLeaderboard, type LeaderRow } from '../data/xp';
+import { loadBatchLeaderboard, loadMyBatches, type LeaderRow, type StudentBatch } from '../data/xp';
 import { rankForXp } from '../data/ranks';
 import { RankEmblem } from '../components/achievements/AchievementBadge';
 import { LogoLoader } from '../components/shared/LogoLoader';
@@ -10,7 +10,7 @@ import { LogoLoader } from '../components/shared/LogoLoader';
 type Scope = 'weekly' | 'all_time';
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const LIST_LIMIT = 50;
+const FULL_LEADERBOARD_LIMIT = 10000;
 
 const PODIUM = {
   1: { ring: 'ring-yellow-400', glow: 'shadow-yellow-400/40', badge: 'from-yellow-300 to-amber-500', height: 'h-28', label: '1st' },
@@ -36,28 +36,68 @@ function Avatar({ row, size }: { row: LeaderRow; size: string }) {
 export function LeaderboardPage() {
   const { user } = useAuth();
   const [scope, setScope] = useState<Scope>('weekly');
+  const [batches, setBatches] = useState<StudentBatch[] | null>(null);
+  const [selectedBatchId, setSelectedBatchId] = useState('');
   const [boards, setBoards] = useState<Record<Scope, LeaderRow[] | null>>({ weekly: null, all_time: null });
 
   useEffect(() => {
     let active = true;
-    Promise.all([loadLeaderboard('weekly', 200), loadLeaderboard('all_time', 200)]).then(([weekly, allTime]) => {
+    if (!user) {
+      setBatches([]);
+      return () => { active = false; };
+    }
+    loadMyBatches(user.id).then((studentBatches) => {
+      if (!active) return;
+      setBatches(studentBatches);
+      setSelectedBatchId((current) => {
+        if (current && studentBatches.some((batch) => batch.id === current)) return current;
+        const preferred = studentBatches.find((batch) =>
+          batch.examYear === Number(user.examYear) && batch.program === user.program
+        );
+        return (preferred ?? studentBatches[0])?.id ?? '';
+      });
+    });
+    return () => { active = false; };
+  }, [user]);
+
+  useEffect(() => {
+    let active = true;
+    if (!selectedBatchId) {
+      setBoards({ weekly: null, all_time: null });
+      return () => { active = false; };
+    }
+    setBoards({ weekly: null, all_time: null });
+    Promise.all([
+      loadBatchLeaderboard(selectedBatchId, 'weekly', FULL_LEADERBOARD_LIMIT),
+      loadBatchLeaderboard(selectedBatchId, 'all_time', FULL_LEADERBOARD_LIMIT)
+    ]).then(([weekly, allTime]) => {
       if (active) setBoards({ weekly, all_time: allTime });
     });
     return () => { active = false; };
-  }, []);
+  }, [selectedBatchId]);
 
-  if (!boards.weekly || !boards.all_time) {
+  if (batches === null || (selectedBatchId && (!boards.weekly || !boards.all_time))) {
     return <LogoLoader variant="inline" label="Loading leaderboard..." className="min-h-[60vh]" />;
   }
 
-  const rows = boards[scope] ?? [];
-  const allTimeXp = new Map(boards.all_time.map((r) => [r.studentId, r.totalXp]));
+  const selectedBatch = batches.find((batch) => batch.id === selectedBatchId);
+  const currentBoards = boards.weekly && boards.all_time ? boards : null;
+  if (!selectedBatch || !currentBoards) {
+    return (
+      <div className="mx-auto flex min-h-[55vh] max-w-3xl flex-col items-center justify-center px-6 text-center text-zinc-900 dark:text-white">
+        <UsersIcon className="mb-4 h-12 w-12 text-zinc-300 dark:text-zinc-700" />
+        <h1 className="text-2xl font-black">No batch leaderboard yet</h1>
+        <p className="mt-2 max-w-md text-sm text-zinc-500">You’ll see your XP rankings here once you’re enrolled in a class batch.</p>
+      </div>
+    );
+  }
+
+  const rows = currentBoards[scope] ?? [];
+  const allTimeXp = new Map(currentBoards.all_time.map((r) => [r.studentId, r.totalXp]));
   const rankOf = (id: string) => rankForXp(allTimeXp.get(id) ?? 0).current;
 
   const me = user ? rows.find((r) => r.studentId === user.id) : undefined;
   const podium = rows.slice(0, 3);
-  const rest = rows.slice(3, LIST_LIMIT);
-  const meBelowList = me && rows.indexOf(me) >= LIST_LIMIT;
   const podiumOrder = [podium[1], podium[0], podium[2]].filter(Boolean) as LeaderRow[];
 
   return (
@@ -73,12 +113,30 @@ export function LeaderboardPage() {
         <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
-              <UsersIcon className="w-3.5 h-3.5" /> Your batch
+              <UsersIcon className="w-3.5 h-3.5" /> {selectedBatch.name}
             </p>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tight mt-1">Leaderboard</h1>
             <p className="text-sm text-white/60 mt-2">
               {scope === 'weekly' ? 'This week’s race resets every Monday.' : 'Every XP your batch has ever earned.'}
             </p>
+
+            {batches.length > 1 && (
+              <label className="relative mt-4 block max-w-sm">
+                <span className="sr-only">Choose a batch leaderboard</span>
+                <select
+                  value={selectedBatchId}
+                  onChange={(event) => setSelectedBatchId(event.target.value)}
+                  className="h-11 w-full appearance-none rounded-xl border border-white/15 bg-white/10 py-2 pl-4 pr-10 text-sm font-bold text-white outline-none transition-colors hover:bg-white/[0.14] focus-visible:ring-2 focus-visible:ring-white/70 [&>option]:text-zinc-900"
+                >
+                  {batches.map((batch) => (
+                    <option key={batch.id} value={batch.id}>
+                      {batch.name}{batch.examYear ? ` · ${batch.examYear} ${batch.program}` : ` · ${batch.program}`}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/70" />
+              </label>
+            )}
 
             <div className="inline-flex mt-5 rounded-full bg-white/10 p-1 backdrop-blur-sm">
               {(['weekly', 'all_time'] as Scope[]).map((sc) => (
@@ -111,7 +169,7 @@ export function LeaderboardPage() {
       {rows.length === 0 ? (
         <div className="rounded-3xl bg-white dark:bg-[#121214] border border-zinc-100 dark:border-zinc-800 p-12 text-center shadow-sm">
           <TrophyIcon className="w-12 h-12 mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
-          <p className="font-bold">{scope === 'weekly' ? 'No one has earned XP this week yet' : 'No XP earned in your batch yet'}</p>
+          <p className="font-bold">{scope === 'weekly' ? `No one in ${selectedBatch.name} has earned XP this week yet` : `No XP earned in ${selectedBatch.name} yet`}</p>
           <p className="text-sm text-zinc-500 mt-1">Finish a quiz to take the top spot.</p>
         </div>
       ) : (
@@ -157,21 +215,21 @@ export function LeaderboardPage() {
             </div>
           </motion.section>
 
-          {/* ── The rest ── */}
-          {rest.length > 0 && (
+          {/* Complete standings, including the podium, so every rank appears in one list. */}
+          {rows.length > 0 && (
             <motion.section
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.14, ease: EASE }}
               className="rounded-3xl bg-white dark:bg-[#121214] border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden"
             >
-              {rest.map((r) => <Row key={r.studentId} row={r} isMe={r.studentId === user?.id} rank={rankOf(r.studentId)} scope={scope} />)}
+              <header className="flex items-center justify-between gap-4 border-b border-zinc-100 px-4 py-4 dark:border-zinc-800 sm:px-6">
+                <div>
+                  <h2 className="font-bold">Full student rankings</h2>
+                  <p className="mt-0.5 text-xs text-zinc-500">Every student in {selectedBatch.name} on the {scope === 'weekly' ? 'weekly' : 'all-time'} XP board</p>
+                </div>
+                <span className="shrink-0 text-xs font-bold tabular-nums text-zinc-400">{rows.length} {rows.length === 1 ? 'student' : 'students'}</span>
+              </header>
+              {rows.map((r) => <Row key={r.studentId} row={r} isMe={r.studentId === user?.id} rank={rankOf(r.studentId)} scope={scope} />)}
             </motion.section>
-          )}
-
-          {meBelowList && me && (
-            <section className="rounded-3xl bg-white dark:bg-[#121214] border border-red-200 dark:border-red-900/40 shadow-sm overflow-hidden">
-              <p className="px-5 pt-4 text-[11px] font-bold uppercase tracking-wider text-zinc-400">Your position</p>
-              <Row row={me} isMe rank={rankOf(me.studentId)} scope={scope} />
-            </section>
           )}
         </>
       )}

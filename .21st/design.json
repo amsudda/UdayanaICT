@@ -92,6 +92,11 @@
         "scope": "student.paper-leaderboard",
         "decision": "Give paper rankings a dedicated full leaderboard route. Show overall, full-paper, and timing-paper cohorts; summarize the student's place and board size; highlight the top three; and list every ranked student with average, best, and marked-paper count. Link it from the compact dashboard ranking and Progress navigation, with a route to the student's individual My Papers performance page.",
         "source": "User request for a full paper ranking page, 2026-10-13"
+      },
+      {
+        "scope": "student.xp-leaderboard",
+        "decision": "Show XP standings one enrolled batch at a time. Default to the student's matching program and exam year, allow switching among their other enrolled batches, and never combine separate cohorts on the dedicated XP leaderboard. Include every batch member, including students with zero XP.",
+        "source": "User request for batch-by-batch XP rankings, 2026-10-13"
       }
     ],
   "evidence": [

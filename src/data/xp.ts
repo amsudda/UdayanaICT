@@ -28,6 +28,61 @@ export type LeaderRow = {
   position: number;
 };
 
+export type StudentBatch = {
+  id: string;
+  name: string;
+  program: string;
+  examYear: number | null;
+};
+
+/** Batches the signed-in student is enrolled in, ordered newest cohort first. */
+export async function loadMyBatches(studentId: string): Promise<StudentBatch[]> {
+  const { data: memberships, error: membershipsError } = await supabase
+    .from('batch_members')
+    .select('batch_id')
+    .eq('student_id', studentId);
+
+  if (membershipsError || !memberships?.length) return [];
+
+  const batchIds = [...new Set(memberships.map((membership: any) => membership.batch_id))];
+  const { data, error } = await supabase
+    .from('batches')
+    .select('id, name, program, exam_year')
+    .in('id', batchIds);
+
+  if (error || !data) return [];
+  return data
+    .map((batch: any) => ({
+      id: batch.id,
+      name: batch.name,
+      program: batch.program,
+      examYear: batch.exam_year == null ? null : Number(batch.exam_year)
+    }))
+    .sort((a, b) => (b.examYear ?? 0) - (a.examYear ?? 0) || a.name.localeCompare(b.name));
+}
+
+/** XP standings for one enrolled batch. The RPC enforces membership server-side. */
+export async function loadBatchLeaderboard(
+  batchId: string,
+  scope: 'all_time' | 'weekly' = 'all_time',
+  limit = 20
+): Promise<LeaderRow[]> {
+  const { data, error } = await supabase.rpc('xp_batch_leaderboard', {
+    p_batch_id: batchId,
+    p_scope: scope,
+    p_limit: limit
+  });
+
+  if (error || !data) return [];
+  return (data as any[]).map((r) => ({
+    studentId: r.student_id,
+    displayName: r.display_name ?? 'Student',
+    avatarUrl: r.avatar_url ?? undefined,
+    totalXp: r.total_xp ?? 0,
+    position: r.rank_position ?? 0
+  }));
+}
+
 /** The signed-in student's lifetime XP. Returns 0 if unavailable. */
 export async function loadMyXp(): Promise<number> {
   const { data, error } = await supabase.rpc('my_xp');
@@ -55,22 +110,29 @@ export async function loadXpFeed(studentId: string, limit = 20): Promise<XpEntry
 }
 
 /**
- * Leaderboard for the caller's own batches. Scoping happens in the
+ * Leaderboard for the student's current batch. Scoping happens in the
  * database function, not here — it must not be a client-side filter.
  */
 export async function loadLeaderboard(
   scope: 'all_time' | 'weekly' = 'all_time',
   limit = 20
 ): Promise<LeaderRow[]> {
-  const { data, error } = await supabase.rpc('xp_leaderboard', { p_scope: scope, p_limit: limit });
-  if (error || !data) return [];
-  return (data as any[]).map((r) => ({
-    studentId: r.student_id,
-    displayName: r.display_name ?? 'Student',
-    avatarUrl: r.avatar_url ?? undefined,
-    totalXp: r.total_xp ?? 0,
-    position: r.rank_position ?? 0
-  }));
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) return [];
+
+  const batches = await loadMyBatches(authData.user.id);
+  if (!batches.length) return [];
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('program, exam_year')
+    .eq('id', authData.user.id)
+    .maybeSingle();
+  const currentBatch = batches.find((batch) =>
+    batch.examYear === Number(profile?.exam_year) && batch.program === profile?.program
+  ) ?? batches[0];
+
+  return loadBatchLeaderboard(currentBatch.id, scope, limit);
 }
 
 /** XP earned since the start of this week — the weekly leaderboard metric. */
