@@ -10,7 +10,8 @@ import {
   HeadphonesIcon,
   LogOutIcon,
   LayoutDashboardIcon,
-  FileTextIcon
+  FileTextIcon,
+  TrophyIcon
 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../../auth/AuthContext';
@@ -81,6 +82,7 @@ export function Navbar() {
   const accountLinks = [
     ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin', icon: LayoutDashboardIcon }] : []),
     { name: 'My Papers', path: '/dashboard/my-papers', icon: FileTextIcon },
+    { name: 'Paper Ranking', path: '/dashboard/paper-leaderboard', icon: TrophyIcon },
     { name: 'My Profile', path: '/dashboard/profile', icon: UserIcon },
     { name: 'Class History', path: '/dashboard/history', icon: HistoryIcon },
     { name: 'Help', path: '/dashboard/help', icon: HeadphonesIcon }

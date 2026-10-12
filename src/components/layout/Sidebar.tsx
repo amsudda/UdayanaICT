@@ -43,6 +43,7 @@ const menuGroups = [
     label: 'Progress',
     items: [
       { name: 'My Papers', path: '/dashboard/my-papers', icon: TrendingUpIcon },
+      { name: 'Paper Ranking', path: '/dashboard/paper-leaderboard', icon: FileTextIcon },
       { name: 'Rank', path: '/dashboard/rank', icon: TrophyIcon },
       { name: 'Leaderboard', path: '/dashboard/leaderboard', icon: UsersIcon },
       { name: 'Achievements', path: '/dashboard/achievements', icon: AwardIcon }

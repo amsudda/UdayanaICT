@@ -87,6 +87,11 @@
         "scope": "student.my-papers",
         "decision": "Keep the Papers route as the downloadable past, provincial, and model paper library. Route the dashboard ranking card's My Papers action to a dedicated Progress screen backed by paper_marks, with type filters, average/best/latest/completed summaries, a chronological performance chart, concise trend insight, paper mix, and newest-first result history. Expose My Papers in the desktop Progress navigation and the mobile account drawer while retaining a clear shortcut to the paper library.",
         "source": "User-requested separation of paper library and personal marks progression, 2026-10-13"
+      },
+      {
+        "scope": "student.paper-leaderboard",
+        "decision": "Give paper rankings a dedicated full leaderboard route. Show overall, full-paper, and timing-paper cohorts; summarize the student's place and board size; highlight the top three; and list every ranked student with average, best, and marked-paper count. Link it from the compact dashboard ranking and Progress navigation, with a route to the student's individual My Papers performance page.",
+        "source": "User request for a full paper ranking page, 2026-10-13"
       }
     ],
   "evidence": [

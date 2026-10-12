@@ -74,10 +74,14 @@ function paymentPurpose(payment: PaymentRow) {
     return { label: 'Monthly fee', detail: period || 'Month not specified', Icon: CalendarIcon };
   }
   if (payment.kind === 'theory') {
-    const period = payment.theory
-      ? `${payment.theory.month ?? ''} ${payment.theory.year ?? ''}`.trim()
-      : [payment.period_month, payment.period_year].filter(Boolean).join(' ');
-    return { label: 'Monthly recordings', detail: period || 'Month not specified', Icon: CalendarIcon };
+    const relatedPeriod = [payment.theory?.month, payment.theory?.year].filter(Boolean).join(' ');
+    const storedPeriod = [payment.period_month, payment.period_year].filter(Boolean).join(' ');
+    const period = relatedPeriod || storedPeriod;
+    return {
+      label: 'Monthly Recordings',
+      detail: period ? `${period} — Monthly Recordings` : 'Monthly Recordings · Month not specified',
+      Icon: CalendarIcon
+    };
   }
   return { label: KIND_LABELS[payment.kind] ?? 'Payment', detail: payment.reference ?? '', Icon: FileTextIcon };
 }
@@ -179,7 +183,7 @@ function QueueRow({ payment, selected, onSelect }: { payment: PaymentRow; select
           </div>
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-[12px] font-semibold text-slate-700">{purpose.detail || purpose.label}</p>
+              <p className="text-[12px] font-semibold leading-5 text-slate-700">{purpose.detail || purpose.label}</p>
               <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-400"><Clock3Icon className="h-3 w-3" /> {relativeAge(payment.created_at)} · {payment.status === 'pending' ? 'Select to review' : 'Open slip & details'}</p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -283,7 +287,7 @@ function PaymentDetail({ payment, history, slipUrl, slipLoading, slipError, zoom
       <div className="space-y-5 p-4 sm:p-6">
         <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#c20f24] ring-1 ring-slate-200"><purpose.Icon className="h-4 w-4" /></span>
-          <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Payment for</p><p className="mt-0.5 truncate text-sm font-bold text-slate-900">{purpose.detail || purpose.label}</p></div>
+          <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Payment for</p><p className="mt-0.5 text-sm font-bold text-slate-900">{purpose.detail || purpose.label}</p></div>
           <span className="ml-auto hidden shrink-0 text-xs font-semibold text-slate-500 sm:block">{purpose.label}</span>
         </div>
 

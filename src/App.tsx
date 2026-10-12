@@ -53,6 +53,7 @@ import { AchievementsPage } from './pages/AchievementsPage';
 import { XpHistoryPage } from './pages/XpHistoryPage';
 import { TuteTrackingPage } from './pages/dashboard/TuteTrackingPage';
 import { MyPapersPage } from './pages/MyPapersPage';
+import { PaperLeaderboardPage } from './pages/PaperLeaderboardPage';
 
 function FullSpinner() {
   return <LogoLoader />;
@@ -124,6 +125,7 @@ function AnimatedRoutes() {
           <Route path="extra-classes" element={<VerificationGate><ExtraClassesPage /></VerificationGate>} />
           <Route path="papers" element={<PapersPage />} />
           <Route path="my-papers" element={<MyPapersPage />} />
+          <Route path="paper-leaderboard" element={<PaperLeaderboardPage />} />
           <Route path="tute-tracking" element={<TuteTrackingPage />} />
           <Route path="history" element={<ClassHistoryPage />} />
           <Route path="payments" element={<PaymentsPage />} />

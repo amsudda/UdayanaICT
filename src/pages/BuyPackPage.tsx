@@ -64,6 +64,8 @@ export function BuyPackPage() {
           p = {
             id: monthData.id,
             title: `${monthData.month} ${monthData.year} — Monthly Recordings`,
+            period_month: monthData.month,
+            period_year: monthData.year,
             price: monthData.price,
             thumbnail_url: monthData.thumbnail_url,
             duration_label: 'Monthly access',
@@ -106,7 +108,7 @@ export function BuyPackPage() {
       if (pays && pays.length) setPayStatus(pays[0].status as 'pending' | 'approved');
       setLoading(false);
     })();
-  }, [packId, user]);
+  }, [packId, user, isMonth, navigate]);
 
   const handleSlip = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -138,6 +140,8 @@ export function BuyPackPage() {
       kind: isMonth ? 'theory' : 'pack',
       pack_id: isMonth ? null : pack.id,
       theory_month_id: isMonth ? pack.id : null,
+      period_month: isMonth ? pack.period_month : null,
+      period_year: isMonth ? pack.period_year : null,
       amount: pack.price,
       reference: reference.trim() || null,
       slip_url: path,
