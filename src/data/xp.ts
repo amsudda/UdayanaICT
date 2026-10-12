@@ -172,6 +172,7 @@ export type PaperType = 'full' | 'timing' | 'all';
 
 export type PaperLeaderRow = {
   studentId: string;
+  studentCode?: string;
   displayName: string;
   avatarUrl?: string;
   avgPct: number;
@@ -185,6 +186,7 @@ export async function loadPaperLeaderboard(type: PaperType = 'all', limit = 50):
   if (error || !data) return [];
   return (data as any[]).map((r) => ({
     studentId: r.student_id,
+    studentCode: r.student_code ?? undefined,
     displayName: r.display_name ?? 'Student',
     avatarUrl: r.avatar_url ?? undefined,
     avgPct: Number(r.avg_pct) || 0,

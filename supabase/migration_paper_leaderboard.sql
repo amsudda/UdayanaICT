@@ -21,6 +21,7 @@ create or replace function public.paper_leaderboard(
 returns table (
   student_id    uuid,
   display_name  text,
+  student_code  text,
   avatar_url    text,
   avg_pct       numeric,
   best_pct      numeric,
@@ -49,6 +50,7 @@ returns table (
   -- Ties break on who has sat more papers: consistency over a lucky one-off.
   select s.student_id,
          coalesce(p.full_name, 'Student'),
+         p.student_code,
          p.avatar_url,
          s.avg_pct,
          s.best_pct,

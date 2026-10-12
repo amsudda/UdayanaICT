@@ -98,11 +98,18 @@ export function PaperRankBoard() {
             </span>
           )}
 
-          <span className={`flex-1 min-w-0 truncate text-[13px] ${
-            isMe ? 'font-bold text-[#c20f24]' : 'font-medium text-slate-700 dark:text-slate-300'
-          }`}>
-            {isMe ? 'You' : r.displayName}
-          </span>
+          <div className="flex-1 min-w-0">
+            <span className={`block truncate text-[13px] ${
+              isMe ? 'font-bold text-[#c20f24]' : 'font-medium text-slate-700 dark:text-slate-300'
+            }`}>
+              {isMe ? 'You' : r.displayName}
+            </span>
+            {mode === 'papers' && (r as PaperLeaderRow).studentCode && (
+              <span className="block truncate text-[9px] font-medium tracking-wide text-slate-400">
+                {(r as PaperLeaderRow).studentCode}
+              </span>
+            )}
+          </div>
 
           <span className="text-[13px] font-black tabular-nums text-slate-900 dark:text-white shrink-0">
             {value}

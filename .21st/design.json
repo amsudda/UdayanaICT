@@ -90,7 +90,7 @@
       },
       {
         "scope": "student.paper-leaderboard",
-        "decision": "Give paper rankings a dedicated full leaderboard route. Show overall, full-paper, and timing-paper cohorts; summarize the student's place and board size; highlight the top three; and list every ranked student with average, best, and marked-paper count. Link it from the compact dashboard ranking and Progress navigation, with a route to the student's individual My Papers performance page.",
+        "decision": "Give paper rankings a dedicated full leaderboard route. Show overall, full-paper, and timing-paper cohorts; summarize the student's place and board size; highlight the top three; and list every ranked student with student code, average, best, and marked-paper count so duplicate names are distinguishable. Link it from the compact dashboard ranking and Progress navigation, with a route to the student's individual My Papers performance page.",
         "source": "User request for a full paper ranking page, 2026-10-13"
       },
       {

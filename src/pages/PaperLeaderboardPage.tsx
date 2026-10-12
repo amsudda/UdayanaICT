@@ -68,6 +68,7 @@ function Podium({ rows, currentStudentId }: { rows: PaperLeaderRow[]; currentStu
             <p className={`mt-3 w-full truncate text-xs font-bold sm:text-sm ${isMe ? 'text-[#c20f24] dark:text-red-400' : 'text-zinc-800 dark:text-zinc-100'}`}>
               {isMe ? 'You' : row.displayName}
             </p>
+            {row.studentCode && <p className="mt-0.5 text-[9px] font-semibold tracking-wide text-zinc-500 dark:text-zinc-400">{row.studentCode}</p>}
             <p className="mt-1 text-xl font-black tabular-nums text-zinc-950 dark:text-white sm:text-2xl">{row.avgPct.toFixed(1)}%</p>
             <p className="mt-0.5 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">{row.papers} {row.papers === 1 ? 'paper' : 'papers'}</p>
           </motion.article>
@@ -115,7 +116,7 @@ export function PaperLeaderboardPage() {
             </p>
             <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-5xl">Paper leaderboard</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
-              Compare marked paper averages with students in your shared batches. Rankings update as marks are recorded.
+              Compare paper averages across your shared batches. Student codes distinguish classmates who share a name.
             </p>
           </div>
 
@@ -123,7 +124,7 @@ export function PaperLeaderboardPage() {
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3">
               <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">Your position</p>
               <p className="mt-1 text-2xl font-black tabular-nums">{me ? `#${me.position}` : '—'}</p>
-              <p className="mt-0.5 text-[10px] text-white/50">{me ? `${me.avgPct.toFixed(1)}% average` : 'No marks yet'}</p>
+              <p className="mt-0.5 text-[10px] text-white/50">{me ? `${me.avgPct.toFixed(1)}% average` : `${user?.studentId || 'Your account'} · No marks yet`}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3">
               <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">On the board</p>
@@ -197,7 +198,7 @@ export function PaperLeaderboardPage() {
             <header className="flex items-center justify-between gap-4 border-b border-zinc-100 px-4 py-4 dark:border-zinc-800 sm:px-6">
               <div>
                 <h2 className="text-base font-bold sm:text-lg">Full leaderboard</h2>
-                <p className="mt-0.5 text-xs text-zinc-500">Every student with a marked result</p>
+                <p className="mt-0.5 text-xs text-zinc-500">Every student with a marked result, identified by student code</p>
               </div>
               <Link to="/dashboard/my-papers" className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-bold text-[#c20f24] hover:underline sm:text-xs">
                 My progress <ArrowRightIcon className="h-3.5 w-3.5" />
@@ -228,6 +229,7 @@ export function PaperLeaderboardPage() {
                           {isMe ? 'You' : row.displayName}
                           {isMe && <span className="ml-2 rounded-full bg-[#c20f24] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">You</span>}
                         </p>
+                        <p className="mt-0.5 text-[10px] font-medium text-zinc-400">{row.studentCode || 'Student code unavailable'}</p>
                         <p className="mt-0.5 text-[10px] text-zinc-400 sm:hidden">{row.papers} papers · best {row.bestPct.toFixed(1)}%</p>
                       </div>
                     </div>
