@@ -16,6 +16,7 @@ export function DeviceLockedPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [sent, setSent] = useState(deviceAccess?.hasOpenRequest === true);
+  const isRevokedDevice = deviceAccess?.lockReason?.startsWith('This browser installation was revoked') === true;
 
   useEffect(() => {
     setSent(deviceAccess?.hasOpenRequest === true);
@@ -65,10 +66,12 @@ export function DeviceLockedPage() {
             <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#c20f24] flex items-center justify-center mb-6">
               <LockKeyholeIcon className="w-7 h-7" />
             </div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#c20f24]">Temporary security lock</p>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-2">Your LMS access is temporarily paused</h1>
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#c20f24]">{isRevokedDevice ? 'Device blocked' : 'Temporary security lock'}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-2">{isRevokedDevice ? 'This browser is no longer approved' : 'Your LMS access is temporarily paused'}</h1>
             <p className="text-sm sm:text-base leading-7 text-slate-600 mt-4 max-w-2xl">
-              We observed more active browser installations than the two-device limit, or a revoked device attempted access. Your learning data and purchases are safe. Send the administrator a short explanation so they can review the devices and restore access.
+              {isRevokedDevice
+                ? 'The administrator removed this browser installation from your approved devices. Your account and learning data remain safe, and your other approved devices can continue using the LMS.'
+                : 'We observed more active browser installations than the two-device limit. Your learning data and purchases are safe. Send the administrator a short explanation so they can review the devices and restore access.'}
             </p>
           </div>
 
@@ -85,13 +88,21 @@ export function DeviceLockedPage() {
             </div>
             <div className="px-6 py-5 sm:px-8">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</p>
-              <p className="text-sm font-bold text-[#c20f24] mt-1">Admin review required</p>
-              <p className="text-xs text-slate-500 mt-0.5">Temporary, not a ban</p>
+              <p className="text-sm font-bold text-[#c20f24] mt-1">{isRevokedDevice ? 'This device is blocked' : 'Admin review required'}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{isRevokedDevice ? 'Other approved devices are unaffected' : 'Temporary, not a ban'}</p>
             </div>
           </div>
 
           <div className="px-6 py-8 sm:px-10 sm:py-9">
-            {sent || deviceAccess?.hasOpenRequest ? (
+            {isRevokedDevice ? (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5 flex items-start gap-4">
+                <ShieldAlertIcon className="w-6 h-6 text-amber-600 shrink-0" />
+                <div>
+                  <h2 className="font-bold text-slate-900">Use one of your approved devices</h2>
+                  <p className="text-sm leading-6 text-slate-600 mt-1">This browser cannot request access again because it was explicitly revoked. If you believe this was a mistake, contact the LMS administrator directly.</p>
+                </div>
+              </div>
+            ) : sent || deviceAccess?.hasOpenRequest ? (
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 flex items-start gap-4">
                 <CheckCircle2Icon className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div>

@@ -387,16 +387,13 @@ begin
   end if;
 
   if v_security.pilot_enabled
-    and (v_device_state = 'revoked' or v_audit.total_devices > v_max)
+    and v_audit.total_devices > v_max
     and v_security.status <> 'locked' then
     v_new_lock := true;
     update public.student_device_security set
       status = 'locked',
       locked_at = now(),
-      lock_reason = case
-        when v_device_state = 'revoked' then 'A permanently revoked browser attempted to access this account.'
-        else format('This account was used on %s active browser installations. The limit is %s.', v_audit.total_devices, v_max)
-      end,
+      lock_reason = format('This account was used on %s active browser installations. The limit is %s.', v_audit.total_devices, v_max),
       device_count_at_lock = v_audit.total_devices,
       lock_device_id = v_audit.device_id,
       updated_at = now()
@@ -415,6 +412,20 @@ begin
     values (v_user_id, 'Your LMS account needs a device security review. Open the access screen to send the administrator a reason.', 'device_security');
   end if;
 
+  -- A revoked installation is denied by the session-aware access gate without
+  -- locking the student's other approved devices. Record the attempt at most
+  -- once every 15 minutes so a refreshing browser cannot flood the audit log.
+  if v_security.pilot_enabled and v_device_state = 'revoked' and not exists (
+    select 1 from public.device_security_events e
+    where e.student_id = v_user_id
+      and e.action = 'revoked_device_blocked'
+      and e.details ->> 'device_id' = v_audit.device_id::text
+      and e.created_at > now() - interval '15 minutes'
+  ) then
+    insert into public.device_security_events (student_id, actor_id, action, details)
+    values (v_user_id, v_user_id, 'revoked_device_blocked', jsonb_build_object('device_id', v_audit.device_id));
+  end if;
+
   select exists (
     select 1 from public.device_access_requests r
     where r.student_id = v_user_id and r.status in ('pending', 'contacted')
@@ -423,7 +434,13 @@ begin
   return query select
     v_audit.device_id, v_audit.total_devices, v_max,
     v_audit.would_exceed_limit, v_audit.is_new_device,
-    v_security.pilot_enabled, v_security.status, v_security.lock_reason,
+    v_security.pilot_enabled,
+    case when v_security.pilot_enabled and v_device_state = 'revoked' then 'locked' else v_security.status end,
+    case
+      when v_security.pilot_enabled and v_device_state = 'revoked'
+        then 'This browser installation was revoked by the LMS administrator. Use an approved device or contact the administrator.'
+      else v_security.lock_reason
+    end,
     v_open_request;
 end;
 $$;
@@ -441,29 +458,75 @@ returns table (
   lock_reason text,
   has_open_request boolean
 )
-language sql
+language plpgsql
 stable
 security definer
 set search_path = public
 as $$
-  select
-    (select count(*)::integer from public.student_devices d where d.student_id = auth.uid() and d.lifecycle_status = 'active'),
-    coalesce((select s.max_devices from public.device_security_settings s where s.id = 1), 2),
-    coalesce((select s.pilot_enabled from public.student_device_security s where s.student_id = auth.uid()), false),
-    coalesce((select s.pilot_paused from public.device_security_settings s where s.id = 1), false),
+declare
+  v_user_id uuid := auth.uid();
+  v_session_id uuid;
+  v_total integer := 0;
+  v_max integer := 2;
+  v_pilot boolean := false;
+  v_paused boolean := false;
+  v_status text := 'active';
+  v_reason text;
+  v_current_revoked boolean := false;
+  v_has_request boolean := false;
+begin
+  if v_user_id is null then return; end if;
+
+  select coalesce(s.max_devices, 2), coalesce(s.pilot_paused, false)
+    into v_max, v_paused
+  from public.device_security_settings s where s.id = 1;
+  select coalesce(s.pilot_enabled, false), coalesce(s.status, 'active'), s.lock_reason
+    into v_pilot, v_status, v_reason
+  from public.student_device_security s where s.student_id = v_user_id;
+  select count(*)::integer into v_total
+  from public.student_devices d
+  where d.student_id = v_user_id and d.lifecycle_status = 'active';
+
+  begin
+    v_session_id := nullif(auth.jwt() ->> 'session_id', '')::uuid;
+  exception when invalid_text_representation then
+    v_session_id := null;
+  end;
+
+  if v_session_id is not null then
+    select exists (
+      select 1
+      from public.student_device_sessions session_device
+      join public.student_devices d on d.id = session_device.device_id
+      where session_device.session_id = v_session_id
+        and session_device.student_id = v_user_id
+        and d.lifecycle_status = 'revoked'
+    ) into v_current_revoked;
+  end if;
+
+  select exists (
+    select 1 from public.device_access_requests r
+    where r.student_id = v_user_id and r.status in ('pending', 'contacted')
+  ) into v_has_request;
+
+  return query select
+    v_total,
+    v_max,
+    v_pilot,
+    v_paused,
     case
-      when coalesce((select s.pilot_paused from public.device_security_settings s where s.id = 1), false) then 'active'
-      else coalesce((select s.status from public.student_device_security s where s.student_id = auth.uid()), 'active')
+      when v_paused then 'active'
+      when v_pilot and v_current_revoked then 'locked'
+      else v_status
     end,
     case
-      when coalesce((select s.pilot_paused from public.device_security_settings s where s.id = 1), false) then null
-      else (select s.lock_reason from public.student_device_security s where s.student_id = auth.uid())
+      when v_paused then null::text
+      when v_pilot and v_current_revoked
+        then 'This browser installation was revoked by the LMS administrator. Use an approved device or contact the administrator.'
+      else v_reason
     end,
-    exists (
-      select 1 from public.device_access_requests r
-      where r.student_id = auth.uid() and r.status in ('pending', 'contacted')
-    )
-  where auth.uid() is not null;
+    v_has_request;
+end;
 $$;
 
 revoke all on function public.get_my_device_rollout_access() from public, anon;
@@ -866,7 +929,6 @@ declare
   v_count integer;
   v_max integer;
   v_request_type text;
-  v_lock_device_id uuid;
 begin
   if not public.is_admin() then raise exception 'Admin access required'; end if;
   perform pg_advisory_xact_lock(hashtext(p_student_id::text));
@@ -879,13 +941,6 @@ begin
   if v_request_type = 'replacement' then
     raise exception 'Use the atomic replacement approval action for this request';
   end if;
-
-  select lock_device_id into v_lock_device_id
-  from public.student_device_security where student_id = p_student_id;
-  if exists (
-    select 1 from public.student_devices
-    where id = v_lock_device_id and lifecycle_status = 'revoked'
-  ) then raise exception 'Restore or retire the revoked device before restoring account access'; end if;
 
   select count(*)::integer into v_count
   from public.student_devices where student_id = p_student_id and lifecycle_status = 'active';

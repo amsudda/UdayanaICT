@@ -455,6 +455,7 @@ export function StudentDevicesPanel({
                     device_active: 'Device restored to an active slot',
                     device_retired: 'Device retired to history',
                     device_revoked: 'Device permanently revoked',
+                    revoked_device_blocked: 'Revoked device access blocked',
                     device_reactivated: 'Inactive device used again',
                     devices_marked_stale: 'Inactive devices moved to history',
                     lifecycle_auto_restored: 'Access restored by lifecycle policy',

@@ -198,8 +198,12 @@ export async function registerCurrentDeviceAccess(): Promise<DeviceAccessState |
 
   if (!pilot.error) {
     const row = (Array.isArray(pilot.data) ? pilot.data[0] : pilot.data) as Record<string, unknown> | null;
+    const registrationAccess = mapAccessRow(row);
+    if (registrationAccess?.status === 'locked' && registrationAccess.lockReason?.startsWith('This browser installation was revoked')) {
+      return registrationAccess;
+    }
     const effectiveAccess = await getCurrentDeviceAccess();
-    return effectiveAccess ?? mapAccessRow(row);
+    return effectiveAccess ?? registrationAccess;
   }
 
   if (!isMissingPilotFunction(pilot.error)) {
