@@ -6,7 +6,8 @@ import {
   RadioIcon,
   MegaphoneIcon,
   TrophyIcon,
-  AwardIcon } from
+  AwardIcon,
+  ShieldCheckIcon } from
 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
@@ -18,6 +19,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-LK', { month: 
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
+  const channelNameRef = useRef(`student-notification-bell-${Math.random().toString(36).slice(2)}`);
   // The dashboard's navbar is overflow-hidden, which clipped this panel to
   // the height of the bar — the bell toggled and nothing appeared. It is
   // portalled to the body now and positioned against the button, so no
@@ -52,7 +54,7 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notif[]>([]);
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  useEffect(() => {
+  const loadNotifications = useCallback(() => {
     supabase.from('notifications').select('*').order('created_at', { ascending: false }).limit(20).then(({ data }) => {
       setNotifications((data ?? []).map((n: any) => ({
         id: n.id,
@@ -65,6 +67,15 @@ export function NotificationBell() {
       })));
     });
   }, []);
+
+  useEffect(() => {
+    loadNotifications();
+    const channel = supabase
+      .channel(channelNameRef.current)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, loadNotifications)
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [loadNotifications]);
 
   const markAsRead = async (id: string) => {
     setNotifications((ns) => ns.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
@@ -84,6 +95,8 @@ export function NotificationBell() {
         return <TrophyIcon className="w-4 h-4 text-amber-500" />;
       case 'achievement':
         return <AwardIcon className="w-4 h-4 text-emerald-500" />;
+      case 'device_security':
+        return <ShieldCheckIcon className="w-4 h-4 text-blue-500" />;
       default:
         return <MegaphoneIcon className="w-4 h-4 text-amber-500" />;
     }
@@ -93,7 +106,7 @@ export function NotificationBell() {
       <button
         ref={btnRef}
         onClick={() => { place(); setIsOpen((o) => !o); }}
-        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#c20f24]"
+        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c20f24]"
         aria-label="Notifications">
 
         <BellIcon className="w-6 h-6 text-apple-text" />

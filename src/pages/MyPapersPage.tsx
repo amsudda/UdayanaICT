@@ -225,9 +225,7 @@ export function MyPapersPage() {
   const summary = useMemo(() => {
     if (!filtered.length) return null;
     const scores = filtered.map(percentageOf);
-    const average = scores.reduce((total, score) => total + score, 0) / scores.length;
     const latest = scores[scores.length - 1];
-    const best = Math.max(...scores);
     const previousAverage = scores.length > 1
       ? scores.slice(0, -1).reduce((total, score) => total + score, 0) / (scores.length - 1)
       : null;
@@ -236,8 +234,6 @@ export function MyPapersPage() {
     const early = scores.slice(0, Math.min(3, scores.length));
     const earlyAverage = early.reduce((total, score) => total + score, 0) / early.length;
     return {
-      average,
-      best,
       latest,
       latestDelta: previousAverage === null ? null : latest - previousAverage,
       recentAverage,
@@ -245,8 +241,23 @@ export function MyPapersPage() {
     };
   }, [filtered]);
 
+  const averagesByType = useMemo(() => {
+    const averageFor = (type: PaperMark['type']) => {
+      const scores = marks.filter((mark) => mark.type === type).map(percentageOf);
+      return scores.length > 0
+        ? scores.reduce((total, score) => total + score, 0) / scores.length
+        : null;
+    };
+    return {
+      full: averageFor('full'),
+      timing: averageFor('timing')
+    };
+  }, [marks]);
+
   const fullCount = filtered.filter((mark) => mark.type === 'full').length;
   const timingCount = filtered.filter((mark) => mark.type === 'timing').length;
+  const totalFullCount = marks.filter((mark) => mark.type === 'full').length;
+  const totalTimingCount = marks.filter((mark) => mark.type === 'timing').length;
   const latestFirst = [...filtered].reverse();
 
   const container = reduce
@@ -287,7 +298,7 @@ export function MyPapersPage() {
             </div>
             <h1 className="text-3xl font-black tracking-tight sm:text-4xl">My Papers</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300 sm:text-[15px]">
-              Your marked paper history, score movement, and the work behind your average.
+              Your marked paper history, score movement, and separate averages for full and timing papers.
             </p>
           </div>
           <Link
@@ -330,7 +341,7 @@ export function MyPapersPage() {
           </span>
           <h2 className="mt-5 text-xl font-bold text-slate-900 dark:text-white">No marked papers yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
-            Once your teacher records your first paper mark, your chart, average, and complete history will appear here automatically.
+            Once your teacher records your first paper mark, your chart, paper-type averages, and complete history will appear here automatically.
           </p>
           <Link to="/dashboard/papers" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#c20f24] hover:text-[#9c0c1d]">
             Find a paper to practise <ArrowRightIcon className="h-4 w-4" />
@@ -347,8 +358,8 @@ export function MyPapersPage() {
         <>
           <motion.section variants={item} className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
-              { label: 'Average', value: `${summary.average.toFixed(1)}%`, icon: TargetIcon, tone: scoreTone(summary.average), note: `Across ${filtered.length} ${filtered.length === 1 ? 'paper' : 'papers'}` },
-              { label: 'Personal best', value: `${summary.best.toFixed(1)}%`, icon: AwardIcon, tone: 'text-slate-950 dark:text-white', note: filtered.find((mark) => percentageOf(mark) === summary.best)?.title || 'Best result' },
+              { label: 'Full paper average', value: averagesByType.full === null ? '—' : `${averagesByType.full.toFixed(1)}%`, icon: AwardIcon, tone: averagesByType.full === null ? 'text-slate-400' : scoreTone(averagesByType.full), note: `${totalFullCount} full ${totalFullCount === 1 ? 'paper' : 'papers'}` },
+              { label: 'Timing paper average', value: averagesByType.timing === null ? '—' : `${averagesByType.timing.toFixed(1)}%`, icon: TargetIcon, tone: averagesByType.timing === null ? 'text-slate-400' : scoreTone(averagesByType.timing), note: `${totalTimingCount} timing ${totalTimingCount === 1 ? 'paper' : 'papers'}` },
               { label: 'Latest score', value: `${summary.latest.toFixed(1)}%`, icon: CalendarDaysIcon, tone: scoreTone(summary.latest), note: summary.latestDelta === null ? 'Your first result' : `${summary.latestDelta >= 0 ? '+' : ''}${summary.latestDelta.toFixed(1)} vs earlier average` },
               { label: 'Completed', value: String(filtered.length), icon: FileTextIcon, tone: 'text-slate-950 dark:text-white', note: `${fullCount} full · ${timingCount} timing` }
             ].map((stat) => (

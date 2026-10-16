@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   BadgeCheckIcon, CalendarIcon, CheckIcon, FilmIcon,
@@ -12,6 +12,7 @@ import { useAuth } from '../../auth/AuthContext';
 import { formatLKR } from '../../data/paymentConfig';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { AdminBatchRankings } from '../components/AdminBatchRankings';
+import { StudentDevicesPanel } from '../components/StudentDevicesPanel';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -38,6 +39,7 @@ function Toggle({ on, disabled, onClick }: { on: boolean; disabled?: boolean; on
 export function AdminStudentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user: admin } = useAuth();
 
   const [student, setStudent] = useState<any | null>(null);
@@ -53,7 +55,9 @@ export function AdminStudentDetailPage() {
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<'overview' | 'access' | 'academic' | 'payments'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'access' | 'academic' | 'payments' | 'devices'>(
+    searchParams.get('tab') === 'devices' ? 'devices' : 'overview'
+  );
   const [accessSearch, setAccessSearch] = useState('');
 
   // ID verification
@@ -273,7 +277,8 @@ export function AdminStudentDetailPage() {
           { id: 'overview', label: 'Overview' },
           { id: 'access', label: 'Access' },
           { id: 'academic', label: 'Academic' },
-          { id: 'payments', label: 'Payments' }
+          { id: 'payments', label: 'Payments' },
+          { id: 'devices', label: 'Devices' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -629,6 +634,14 @@ export function AdminStudentDetailPage() {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === 'devices' && id && (
+          <StudentDevicesPanel
+            studentId={id}
+            studentPhone={student.phone}
+            studentEmail={student.email}
+          />
         )}
       </div>
 

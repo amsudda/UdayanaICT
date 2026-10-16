@@ -27,7 +27,7 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { CourseCard } from '../components/shared/CourseCard';
-import { PixelPageBurst, PixelReveal } from '../components/shared/PixelFx';
+import { PixelPageBurst } from '../components/shared/PixelFx';
 import { BookMockup } from '../components/shared/BookMockup';
 import { supabase } from '../lib/supabase';
 import { HeroICTGraphic } from '../components/illustrations/HeroICTGraphic';
@@ -98,10 +98,28 @@ const PROCESS_STEPS = [
   },
 ];
 
+type LandingBook = {
+  id: string;
+  title: string;
+  cover_url?: string | null;
+  price?: string | null;
+  order_link?: string | null;
+};
+
+function getBookAvailability(book: LandingBook) {
+  const price = String(book.price ?? '').trim();
+  const normalizedPrice = price.toLowerCase().replace(/\s+/g, ' ');
+  const comingSoon = normalizedPrice.includes('coming soon') || normalizedPrice.includes('comming soon');
+
+  if (comingSoon) return { label: 'Coming soon', tone: 'soon' as const, price: '' };
+  if (book.order_link) return { label: 'Available', tone: 'available' as const, price };
+  return { label: 'Details soon', tone: 'soon' as const, price };
+}
+
 export function LandingPage() {
   const shouldReduceMotion = useReducedMotion();
   const [featured, setFeatured] = useState<any[]>([]);
-  const [books, setBooks] = useState<any[]>([]);
+  const [books, setBooks] = useState<LandingBook[]>([]);
 
   useEffect(() => {
     supabase
@@ -368,43 +386,104 @@ export function LandingPage() {
 
         {/* Books showcase — only when the admin has added visible books */}
         {books.length > 0 && (
-          <section id="books" className="py-24 bg-white dark:bg-slate-900 transition-colors scroll-mt-20 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <FadeUp className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold uppercase text-apple-text dark:text-apple-light transition-colors">
-                  OUR BOOKS <PixelReveal className="w-5 h-5 text-[#c20f24]" />
+          <section id="books" className="landing-books-section relative isolate overflow-hidden py-24 scroll-mt-20 transition-colors">
+            <div aria-hidden="true" className="landing-books-grid absolute inset-0" />
+            <div aria-hidden="true" className="landing-books-glow landing-books-glow-red" />
+            <div aria-hidden="true" className="landing-books-glow landing-books-glow-blue" />
+
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <FadeUp className="mx-auto mb-12 max-w-3xl text-center">
+                <span className="landing-books-kicker">
+                  <BookOpenIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  PD Library / Study Materials
+                </span>
+                <h2 className="mt-4 text-4xl font-black uppercase tracking-tight text-apple-text transition-colors dark:text-apple-light md:text-5xl">
+                  The Exam Library
                 </h2>
-                <p className="mt-3 text-base md:text-lg text-apple-subtext dark:text-slate-400 transition-colors">
+                <p className="mx-auto mt-4 max-w-2xl text-base text-apple-subtext transition-colors dark:text-slate-400 md:text-lg">
                   Short Notes, Model Papers සහ තවත් පොත් — ඔබේ විභාග සූදානමට.
                 </p>
               </FadeUp>
 
-              <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 justify-items-center">
-                {books.map((b) => (
-                  <StaggerItem
-                    key={b.id}
-                    className="flex flex-col items-center w-full max-w-[240px]"
-                  >
-                    {b.cover_url && <BookMockup cover={b.cover_url} title={b.title} className="w-44 sm:w-48" />}
-                    <h3 className="mt-5 text-lg font-bold text-apple-text dark:text-apple-light text-center transition-colors">
-                      {b.title}
-                    </h3>
-                    {b.price && (
-                      <p className="mt-1 text-[#c20f24] font-extrabold tracking-wide">{b.price}</p>
-                    )}
-                    {b.order_link && (
-                      <a
-                        href={b.order_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center gap-2 h-10 px-6 rounded-full bg-[#c20f24] hover:bg-[#9c0c1d] text-white text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-[1.03] active:scale-95"
-                      >
-                        Order Now
-                      </a>
-                    )}
-                  </StaggerItem>
-                ))}
-              </Stagger>
+              <FadeUp delay={0.12}>
+                <div className="landing-books-system">
+                  <div className="landing-books-toolbar" aria-hidden="true">
+                    <div className="landing-books-toolbar-title">
+                      <span className="landing-books-window-controls"><i /><i /><i /></span>
+                      <span className="landing-books-system-name">PD_LIBRARY</span>
+                      <span className="landing-books-system-path">/ exam-resources</span>
+                    </div>
+                    <span className="landing-books-count">{String(books.length).padStart(2, '0')} TITLES ONLINE</span>
+                  </div>
+
+                  <div className="landing-books-layout">
+                    <aside className="landing-books-intro">
+                      <span className="landing-books-intro-label">EXAM PREPARATION / PRINT</span>
+                      <h3>Made to stay open beside you.</h3>
+                      <p>
+                        Focused study material for revision, paper practice and the final stretch before the exam.
+                      </p>
+                      <div className="landing-books-intro-points">
+                        <div><span>01</span><p>Concise short notes</p></div>
+                        <div><span>02</span><p>Exam-focused practice</p></div>
+                      </div>
+                    </aside>
+
+                    <Stagger className="landing-books-collection">
+                      {books.map((book, index) => {
+                        const availability = getBookAvailability(book);
+                        const canOrder = availability.tone === 'available' && Boolean(book.order_link);
+
+                        return (
+                          <StaggerItem key={book.id} className="landing-book-item">
+                            <article className="landing-book-card">
+                              <div className="landing-book-stage">
+                                <span className="landing-book-index" aria-hidden="true">
+                                  {String(index + 1).padStart(2, '0')}
+                                </span>
+                                {book.cover_url ? (
+                                  <BookMockup cover={book.cover_url} title={book.title} className="landing-book-mockup" />
+                                ) : (
+                                  <div className="landing-book-cover-placeholder" aria-label={`${book.title} cover unavailable`}>
+                                    <BookOpenIcon aria-hidden="true" />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="landing-book-info">
+                                <div className="landing-book-meta">
+                                  <span>PD EDITION / {String(index + 1).padStart(2, '0')}</span>
+                                  <span className={`landing-book-status landing-book-status-${availability.tone}`}>
+                                    <i aria-hidden="true" />{availability.label}
+                                  </span>
+                                </div>
+                                <h3>{book.title}</h3>
+                                {availability.price && <p className="landing-book-price">{availability.price}</p>}
+
+                                {canOrder ? (
+                                  <a
+                                    href={book.order_link!}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="landing-book-action"
+                                    aria-label={`Order ${book.title}`}
+                                  >
+                                    Order now <ArrowRightIcon aria-hidden="true" />
+                                  </a>
+                                ) : (
+                                  <span className="landing-book-action landing-book-action-muted">
+                                    Release details soon
+                                  </span>
+                                )}
+                              </div>
+                            </article>
+                          </StaggerItem>
+                        );
+                      })}
+                    </Stagger>
+                  </div>
+                </div>
+              </FadeUp>
             </div>
           </section>
         )}

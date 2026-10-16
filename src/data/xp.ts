@@ -165,8 +165,8 @@ export function sliceAroundMe(rows: LeaderRow[], studentId: string, radius = 2):
 }
 
 /* ── Paper leaderboard ───────────────────────────────────────────────
-   Ranked on marks rather than XP: average percentage across a student's
-   marked papers, split by type. See migration_paper_leaderboard.sql. */
+   Full and timing boards rank the newest shared paper of that type. Overall
+   keeps the historical average. See migration_paper_leaderboard_type_latest.sql. */
 
 export type PaperType = 'full' | 'timing' | 'all';
 
@@ -179,6 +179,8 @@ export type PaperLeaderRow = {
   bestPct: number;
   papers: number;
   position: number;
+  latestPaperTitle?: string;
+  latestPaperDate?: string;
 };
 
 export async function loadPaperLeaderboard(type: PaperType = 'all', limit = 50): Promise<PaperLeaderRow[]> {
@@ -192,6 +194,8 @@ export async function loadPaperLeaderboard(type: PaperType = 'all', limit = 50):
     avgPct: Number(r.avg_pct) || 0,
     bestPct: Number(r.best_pct) || 0,
     papers: r.papers_count ?? 0,
-    position: r.rank_position ?? 0
+    position: r.rank_position ?? 0,
+    latestPaperTitle: r.latest_paper_title ?? undefined,
+    latestPaperDate: r.latest_paper_date ?? undefined
   }));
 }

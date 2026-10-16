@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import {
+  getCurrentDeviceAccess,
+  registerCurrentDeviceAccess,
+  type DeviceAccessState
+} from '../security/deviceAudit';
 
 export type AuthUser = {
   id: string;
@@ -60,11 +65,14 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isOwner: boolean;
+  deviceAccess: DeviceAccessState | null;
   login: (input: LoginInput) => Promise<Result>;
   signup: (input: RegisterInput) => Promise<Result>;
   signInWithGoogle: () => Promise<Result>;
   updateProfile: (input: UpdateProfileInput) => Promise<Result>;
   submitIdVerification: (frontPath: string, backPath: string) => Promise<Result>;
+  requestDeviceAccess: (reason: string) => Promise<Result>;
+  refreshDeviceAccess: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -126,11 +134,26 @@ const AuthContext_ = AuthContext;
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deviceAccess, setDeviceAccess] = useState<DeviceAccessState | null>(null);
 
-  const loadProfile = async (id: string) => {
+  const refreshDeviceAccess = useCallback(async () => {
+    const access = await getCurrentDeviceAccess();
+    if (access) setDeviceAccess(access);
+  }, []);
+
+  const loadProfile = useCallback(async (id: string) => {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
-    if (!error && data) setUser(mapRowToUser(data));
-  };
+    if (!error && data) {
+      const mappedUser = mapRowToUser(data);
+      setUser(mappedUser);
+      if (mappedUser.role === 'student') {
+        const access = await registerCurrentDeviceAccess();
+        setDeviceAccess(access);
+      } else {
+        setDeviceAccess(null);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -146,7 +169,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // defer supabase calls out of the callback (recommended pattern)
       setTimeout(() => {
         if (session?.user) void loadProfile(session.user.id);
-        else setUser(null);
+        else {
+          setUser(null);
+          setDeviceAccess(null);
+        }
       }, 0);
     });
 
@@ -154,7 +180,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [loadProfile]);
+
+  useEffect(() => {
+    if (!user || user.role !== 'student') return;
+    const channel = supabase
+      .channel(`student-device-access-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'student_device_security', filter: `student_id=eq.${user.id}` },
+        () => void refreshDeviceAccess()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'device_access_requests', filter: `student_id=eq.${user.id}` },
+        () => void refreshDeviceAccess()
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'device_security_settings', filter: 'id=eq.1' },
+        () => void refreshDeviceAccess()
+      )
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [refreshDeviceAccess, user]);
 
   const login = async ({ email, password }: LoginInput): Promise<Result> => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -264,9 +313,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const requestDeviceAccess = async (reason: string): Promise<Result> => {
+    if (!user || user.role !== 'student') return { success: false, message: 'Student account required.' };
+    const { error } = await supabase.rpc('request_device_access', { p_reason: reason.trim() });
+    if (error) return { success: false, message: error.message };
+    await refreshDeviceAccess();
+    return { success: true };
+  };
+
   const logout = async () => {
-    await supabase.auth.signOut();
+    // Logging out on this browser should not unexpectedly terminate a
+    // student's other audited device sessions.
+    await supabase.auth.signOut({ scope: 'local' });
     setUser(null);
+    setDeviceAccess(null);
   };
 
   return (
@@ -277,11 +337,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: Boolean(user),
         isAdmin: user?.role === 'admin' || user?.role === 'staff',
         isOwner: user?.role === 'admin',
+        deviceAccess,
         login,
         signup,
         signInWithGoogle,
         updateProfile,
         submitIdVerification,
+        requestDeviceAccess,
+        refreshDeviceAccess,
         logout
       }}
     >

@@ -12,11 +12,12 @@ import {
 } from '../../data/xp';
 
 /**
- * A compact batch ranking switcher for the dashboard rail. Paper mode ranks
- * marked-paper averages; XP mode uses the existing weekly/all-time XP board.
+ * A compact batch ranking switcher for the dashboard rail. Full and timing
+ * modes rank only their newest shared paper; Overall keeps the historical
+ * average. XP mode uses the existing weekly/all-time XP board.
  *
  * Shape follows the column it lives in: one row per student, the leader's
- * average setting the length of every bar beneath it, so the gap between
+ * score setting the length of every bar beneath it, so the gap between
  * places is something you see rather than something you work out.
  *
  * Full and timing papers stay separate boards — a 30-minute drill and a
@@ -215,7 +216,9 @@ export function PaperRankBoard() {
             <p className="text-[10px] text-white/50 mt-0.5">
               {mode === 'papers'
                 ? me
-                  ? `best ${(me as PaperLeaderRow).bestPct.toFixed(0)}% · ${(me as PaperLeaderRow).papers} paper${(me as PaperLeaderRow).papers === 1 ? '' : 's'}`
+                  ? type !== 'all'
+                    ? (me as PaperLeaderRow).latestPaperTitle || `latest ${type} paper`
+                    : `best ${(me as PaperLeaderRow).bestPct.toFixed(0)}% · ${(me as PaperLeaderRow).papers} paper${(me as PaperLeaderRow).papers === 1 ? '' : 's'}`
                   : 'sit a paper to join'
                 : me
                   ? xpScope === 'weekly' ? 'earned this week' : 'all-time earned'
@@ -267,7 +270,7 @@ export function PaperRankBoard() {
               onClick={() => navigate(mode === 'papers' ? '/dashboard/paper-leaderboard' : '/dashboard/leaderboard')}
               className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold text-[#c20f24] hover:bg-[#c20f24]/[0.06] rounded-xl transition-colors"
             >
-              {mode === 'papers' ? 'Full paper leaderboard' : 'View XP leaderboard'} <ArrowRightIcon className="w-3 h-3" />
+              {mode === 'papers' ? 'Open paper leaderboard' : 'View XP leaderboard'} <ArrowRightIcon className="w-3 h-3" />
             </button>
           </>
         )}

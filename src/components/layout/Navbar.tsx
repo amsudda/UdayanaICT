@@ -11,7 +11,8 @@ import {
   LogOutIcon,
   LayoutDashboardIcon,
   FileTextIcon,
-  TrophyIcon
+  TrophyIcon,
+  ShieldCheckIcon
 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../../auth/AuthContext';
@@ -84,6 +85,7 @@ export function Navbar() {
     { name: 'My Papers', path: '/dashboard/my-papers', icon: FileTextIcon },
     { name: 'Paper Ranking', path: '/dashboard/paper-leaderboard', icon: TrophyIcon },
     { name: 'My Profile', path: '/dashboard/profile', icon: UserIcon },
+    ...(user?.role === 'student' ? [{ name: 'My Devices', path: '/dashboard/devices', icon: ShieldCheckIcon }] : []),
     { name: 'Class History', path: '/dashboard/history', icon: HistoryIcon },
     { name: 'Help', path: '/dashboard/help', icon: HeadphonesIcon }
   ];

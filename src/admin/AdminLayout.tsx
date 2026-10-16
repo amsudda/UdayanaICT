@@ -20,6 +20,7 @@ import {
   FileTextIcon,
   ClipboardListIcon,
   CalendarClockIcon,
+  ShieldCheckIcon,
   PanelLeftCloseIcon,
   PanelLeftOpenIcon
 } from 'lucide-react';
@@ -71,7 +72,10 @@ const navGroups = [
   },
   {
     label: 'System',
-    items: [{ name: 'Settings', path: '/admin/settings', icon: SettingsIcon }]
+    items: [
+      { name: 'Device Security', path: '/admin/device-audit', icon: ShieldCheckIcon, badge: 'devices' },
+      { name: 'Settings', path: '/admin/settings', icon: SettingsIcon }
+    ]
   }
 ] as const;
 
@@ -87,8 +91,9 @@ export function AdminLayout() {
   });
   const [pending, setPending] = useState<number | null>(null);
   const [pendingIds, setPendingIds] = useState<number | null>(null);
+  const [flaggedDevices, setFlaggedDevices] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [toastKind, setToastKind] = useState<'payment' | 'id'>('payment');
+  const [toastKind, setToastKind] = useState<'payment' | 'id' | 'device'>('payment');
 
   useEffect(() => {
     try { localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0'); } catch { /* private mode */ }
@@ -110,11 +115,29 @@ export function AdminLayout() {
     setPendingIds(count ?? 0);
   }, []);
 
+  const fetchFlaggedDevices = useCallback(async () => {
+    const [flagged, locked, requests] = await Promise.all([
+      supabase.from('student_devices').select('student_id').eq('would_exceed_limit', true),
+      supabase.from('student_device_security').select('student_id').eq('status', 'locked'),
+      supabase.from('device_access_requests').select('student_id').in('status', ['pending', 'contacted'])
+    ]);
+    if (flagged.error) {
+      // The audit migration may not be installed yet. Keep navigation usable.
+      setFlaggedDevices(0);
+      return;
+    }
+    const studentIds = new Set((flagged.data ?? []).map((row) => row.student_id));
+    (locked.data ?? []).forEach((row) => studentIds.add(row.student_id));
+    (requests.data ?? []).forEach((row) => studentIds.add(row.student_id));
+    setFlaggedDevices(studentIds.size);
+  }, []);
+
   // initial + on navigation
   useEffect(() => {
     fetchPending();
     fetchPendingIds();
-  }, [fetchPending, fetchPendingIds, location.pathname]);
+    fetchFlaggedDevices();
+  }, [fetchPending, fetchPendingIds, fetchFlaggedDevices, location.pathname]);
 
   // realtime: alert the moment a payment is submitted / changes
   useEffect(() => {
@@ -165,6 +188,65 @@ export function AdminLayout() {
     };
   }, [fetchPendingIds]);
 
+  // Realtime audit signal only: students are not blocked in this phase.
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-device-audit-alerts')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'student_devices' },
+        (payload) => {
+          void fetchFlaggedDevices();
+          const row = payload.new as { would_exceed_limit?: boolean } | undefined;
+          const previous = payload.old as { would_exceed_limit?: boolean } | undefined;
+          if (row?.would_exceed_limit && !previous?.would_exceed_limit) {
+            setToastKind('device');
+            setToast('A student has exceeded the planned two-device limit');
+            setTimeout(() => setToast(null), 9000);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'device_access_requests' },
+        (payload) => {
+          void fetchFlaggedDevices();
+          if (payload.eventType === 'INSERT') {
+            setToastKind('device');
+            setToast('A student sent a device security request');
+            setTimeout(() => setToast(null), 9000);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'student_device_security' },
+        () => void fetchFlaggedDevices()
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'device_security_events' },
+        async (payload) => {
+          const row = payload.new as { action?: string } | undefined;
+          if (row?.action !== 'account_locked') return;
+          const [pilotResult, lockedResult] = await Promise.all([
+            supabase.from('student_device_security').select('student_id', { count: 'exact', head: true }).eq('pilot_enabled', true),
+            supabase.from('student_device_security').select('student_id', { count: 'exact', head: true }).eq('pilot_enabled', true).eq('status', 'locked')
+          ]);
+          const pilotTotal = pilotResult.count ?? 0;
+          const lockedTotal = lockedResult.count ?? 0;
+          const lockRate = pilotTotal ? (lockedTotal / pilotTotal) * 100 : 0;
+          setToastKind('device');
+          setToast(lockRate >= 5
+            ? `Device rollout warning: ${lockRate.toFixed(1)}% of enrolled students are locked`
+            : 'A student account was locked by the device policy');
+          setTimeout(() => setToast(null), 9000);
+        }
+      )
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [fetchFlaggedDevices]);
+
   const showBanner = (pending ?? 0) > 0 && location.pathname !== '/admin/payments';
   const showIdBanner = (pendingIds ?? 0) > 0 && location.pathname !== '/admin/students';
 
@@ -177,7 +259,7 @@ export function AdminLayout() {
   };
 
   const badgeFor = (badge?: string) =>
-    badge === 'payments' ? pending : badge === 'ids' ? pendingIds : null;
+    badge === 'payments' ? pending : badge === 'ids' ? pendingIds : badge === 'devices' ? flaggedDevices : null;
 
   /** `mini` is the collapsed desktop rail; the mobile drawer is never mini. */
   const SidebarInner = ({ mini }: { mini: boolean }) => (
@@ -208,12 +290,12 @@ export function AdminLayout() {
             )}
             <div className="space-y-0.5">
               {group.items.map((item) => {
-                const count = badgeFor((item as any).badge);
+                const count = badgeFor('badge' in item ? item.badge : undefined);
                 return (
                   <NavLink
                     key={item.name}
                     to={item.path}
-                    end={(item as any).end}
+                    end={'end' in item && item.end}
                     title={mini ? item.name : undefined}
                     className={({ isActive }) =>
                       `relative flex items-center rounded-xl text-sm font-medium transition-colors ${
@@ -384,10 +466,14 @@ export function AdminLayout() {
       {/* realtime toast */}
       {toast && (
         <button
-          onClick={() => { const dest = toastKind === 'id' ? '/admin/students' : '/admin/payments'; setToast(null); navigate(dest); }}
+          onClick={() => {
+            const dest = toastKind === 'id' ? '/admin/students' : toastKind === 'device' ? '/admin/device-audit' : '/admin/payments';
+            setToast(null);
+            navigate(dest);
+          }}
           className="fixed bottom-5 right-5 z-[70] flex items-center gap-3 bg-slate-900 text-white rounded-2xl shadow-2xl pl-4 pr-5 py-3 max-w-sm text-left hover:bg-slate-800 transition-colors"
         >
-          <BellRingIcon className={`w-5 h-5 shrink-0 ${toastKind === 'id' ? 'text-rose-400' : 'text-amber-400'}`} />
+          <BellRingIcon className={`w-5 h-5 shrink-0 ${toastKind === 'id' ? 'text-rose-400' : toastKind === 'device' ? 'text-blue-400' : 'text-amber-400'}`} />
           <span className="text-sm font-medium">{toast}</span>
         </button>
       )}

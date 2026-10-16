@@ -236,6 +236,198 @@
 }
 
 /* Our Process: ICT learning system */
+/* ══ Landing books — editorial library inside the established ICT system ══ */
+.landing-books-section { background-color: #f8fafc; }
+.landing-books-grid {
+  opacity: .55;
+  background-image: linear-gradient(#7593b416 1px, transparent 1px), linear-gradient(90deg, #7593b416 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 88%, transparent);
+}
+.landing-books-glow { position: absolute; width: 390px; height: 390px; border-radius: 50%; filter: blur(110px); pointer-events: none; }
+.landing-books-glow-red { top: 12%; right: -170px; background: #ef294426; }
+.landing-books-glow-blue { bottom: -120px; left: -170px; background: #5b8fd32b; }
+.landing-books-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid #f5c7ce;
+  border-radius: 999px;
+  background: #fff8f9;
+  color: #b90d22;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.landing-books-system {
+  overflow: hidden;
+  border: 1px solid #dbe4ee;
+  border-radius: 28px;
+  background: #f9fbfdf2;
+  box-shadow: 0 28px 80px #263a5618, inset 0 1px #fff;
+  backdrop-filter: blur(14px);
+}
+.landing-books-toolbar {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 22px;
+  border-bottom: 1px solid #dfe7f0;
+  background: #ffffffd9;
+}
+.landing-books-toolbar-title, .landing-books-window-controls { display: flex; align-items: center; }
+.landing-books-toolbar-title { min-width: 0; gap: 11px; }
+.landing-books-window-controls { gap: 6px; }
+.landing-books-window-controls i { width: 8px; height: 8px; border-radius: 50%; background: #d9e1eb; box-shadow: inset 0 0 0 1px #c8d2df; }
+.landing-books-window-controls i:first-child { background: #ed2942; box-shadow: 0 0 0 3px #fce7eb; }
+.landing-books-system-name { color: #172133; font-size: 11px; font-weight: 900; letter-spacing: .13em; white-space: nowrap; }
+.landing-books-system-path, .landing-books-count { color: #8a9bb0; font-size: 9px; font-weight: 800; letter-spacing: .12em; white-space: nowrap; }
+.landing-books-layout { display: grid; grid-template-columns: minmax(250px, .7fr) minmax(0, 2fr); }
+.landing-books-intro {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 34px;
+  border-right: 1px solid #dfe7f0;
+  background: #f7f9fc9c;
+}
+.landing-books-intro-label { color: #9aacbf; font-size: 9px; font-weight: 900; letter-spacing: .16em; }
+.landing-books-intro h3 { max-width: 280px; margin-top: 14px; color: #172133; font-size: clamp(25px, 2.25vw, 34px); font-weight: 850; letter-spacing: -.035em; line-height: 1.05; }
+.landing-books-intro > p { max-width: 300px; margin-top: 17px; color: #697b91; font-size: 14px; line-height: 1.7; }
+.landing-books-intro-points { display: grid; gap: 12px; margin-top: 28px; }
+.landing-books-intro-points > div { display: flex; align-items: center; gap: 11px; }
+.landing-books-intro-points span { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid #dae4ee; border-radius: 9px; background: #fff; color: #c20f24; font-size: 8px; font-weight: 900; box-shadow: 0 5px 14px #263a560a; }
+.landing-books-intro-points p { color: #52657b; font-size: 11px; font-weight: 750; letter-spacing: .02em; }
+.landing-books-collection { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; padding: 26px; }
+.landing-book-item { min-width: 0; }
+.landing-book-card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e0e7ef;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 34px #263a560d;
+  transition: border-color .28s ease, box-shadow .28s ease;
+}
+.landing-book-card:hover { border-color: #ef29444a; box-shadow: 0 20px 46px #263a5618, 0 8px 22px #e31b360a; }
+.landing-book-stage {
+  position: relative;
+  display: grid;
+  min-height: 322px;
+  place-items: center;
+  overflow: hidden;
+  padding: 28px 24px 14px;
+  border-bottom: 1px solid #edf1f5;
+  background: radial-gradient(circle at 50% 42%, #ffffff 0, #f5f8fb 68%, #eef3f8 100%);
+}
+.landing-book-stage::after { content: ''; position: absolute; right: 18px; bottom: 16px; width: 20px; height: 20px; border-right: 1px solid #91acd055; border-bottom: 1px solid #91acd055; }
+.landing-book-index { position: absolute; top: 18px; left: 20px; color: #cbd5e1; font-size: 11px; font-weight: 900; letter-spacing: .16em; }
+.landing-book-mockup { width: 164px; }
+.landing-book-cover-placeholder { display: grid; width: 150px; aspect-ratio: 10 / 14; place-items: center; border: 1px dashed #bdcad8; border-radius: 8px; background: #edf2f7; color: #94a3b8; }
+.landing-book-cover-placeholder svg { width: 34px; height: 34px; }
+.landing-book-info { padding: 21px 22px 23px; }
+.landing-book-meta { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 10px; }
+.landing-book-meta > span:first-child { overflow: hidden; color: #9aacbf; font-size: 8px; font-weight: 900; letter-spacing: .14em; text-overflow: ellipsis; white-space: nowrap; }
+.landing-book-status { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; font-size: 8px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.landing-book-status i { width: 6px; height: 6px; border-radius: 50%; }
+.landing-book-status-available { color: #07875d; }
+.landing-book-status-available i { background: #10b981; box-shadow: 0 0 0 3px #d1fae5, 0 0 9px #10b98177; }
+.landing-book-status-soon { color: #a66508; }
+.landing-book-status-soon i { background: #f59e0b; box-shadow: 0 0 0 3px #fef3c7; }
+.landing-book-info h3 { margin-top: 14px; color: #172133; font-size: 18px; font-weight: 850; letter-spacing: -.02em; line-height: 1.2; }
+.landing-book-price { margin-top: 7px; color: #c20f24; font-size: 14px; font-weight: 850; letter-spacing: .02em; }
+.landing-book-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #c20f24;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 9px 22px #c20f242b;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .14s ease;
+}
+.landing-book-action:hover { background: #9c0c1d; box-shadow: 0 12px 26px #c20f2438; }
+.landing-book-action:focus-visible { outline: 3px solid #f8b4bf; outline-offset: 3px; }
+.landing-book-action:active { transform: scale(.98); }
+.landing-book-action svg { width: 14px; height: 14px; transition: transform .2s ease; }
+.landing-book-action:hover svg { transform: translateX(2px); }
+.landing-book-action-muted { cursor: default; border: 1px solid #dfe6ee; background: #f4f7fa; color: #8291a3; box-shadow: none; }
+.landing-book-action-muted:hover { background: #f4f7fa; box-shadow: none; }
+.dark .landing-books-section { background-color: #020617; }
+.dark .landing-books-grid { opacity: .28; background-image: linear-gradient(#4f66842b 1px, transparent 1px), linear-gradient(90deg, #4f66842b 1px, transparent 1px); }
+.dark .landing-books-kicker { border-color: #6b2633; background: #3f1520; color: #fb8fa1; }
+.dark .landing-books-system { border-color: #263246; background: #0b1321e8; box-shadow: 0 30px 80px #0006, inset 0 1px #ffffff0a; }
+.dark .landing-books-toolbar { border-color: #263246; background: #101927e6; }
+.dark .landing-books-window-controls i { border-color: #3b485a; background: #334155; box-shadow: none; }
+.dark .landing-books-window-controls i:first-child { background: #ef2944; box-shadow: 0 0 0 3px #ef29442a; }
+.dark .landing-books-system-name, .dark .landing-books-intro h3, .dark .landing-book-info h3 { color: #f1f5f9; }
+.dark .landing-books-system-path, .dark .landing-books-count, .dark .landing-books-intro-label, .dark .landing-book-meta > span:first-child { color: #71829a; }
+.dark .landing-books-intro { border-color: #263246; background: #0d1624a8; }
+.dark .landing-books-intro > p { color: #94a3b8; }
+.dark .landing-books-intro-points span { border-color: #29364a; background: #111c2e; color: #fb7185; box-shadow: none; }
+.dark .landing-books-intro-points p { color: #a8b5c7; }
+.dark .landing-book-card { border-color: #28364a; background: #111b2b; box-shadow: 0 14px 38px #0004; }
+.dark .landing-book-card:hover { border-color: #ef29445c; box-shadow: 0 20px 50px #0007; }
+.dark .landing-book-stage { border-color: #263246; background: radial-gradient(circle at 50% 42%, #182437 0, #111b2b 68%, #0d1522 100%); }
+.dark .landing-book-index { color: #475569; }
+.dark .landing-book-cover-placeholder { border-color: #415169; background: #172235; color: #64748b; }
+.dark .landing-book-action-muted { border-color: #2d3b4f; background: #172235; color: #8291a3; }
+
+@media (max-width: 900px) {
+  .landing-books-layout { grid-template-columns: 1fr; }
+  .landing-books-intro { border-right: 0; border-bottom: 1px solid #dfe7f0; }
+  .dark .landing-books-intro { border-bottom-color: #263246; }
+  .landing-books-intro h3, .landing-books-intro > p { max-width: 540px; }
+  .landing-books-intro-points { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; }
+}
+
+@media (max-width: 640px) {
+  .landing-books-section { padding-top: 72px; padding-bottom: 72px; }
+  .landing-books-system { border-radius: 22px; }
+  .landing-books-toolbar { min-height: 50px; padding: 0 16px; }
+  .landing-books-system-path { display: none; }
+  .landing-books-count { font-size: 8px; }
+  .landing-books-intro { padding: 30px 24px; }
+  .landing-books-intro h3 { font-size: 27px; }
+  .landing-books-intro-points { grid-template-columns: 1fr; }
+  .landing-books-collection { grid-template-columns: 1fr; gap: 14px; padding: 14px; }
+  .landing-book-card { display: grid; grid-template-columns: 132px minmax(0, 1fr); border-radius: 18px; }
+  .landing-book-stage { min-height: 274px; padding: 24px 10px 8px; border-right: 1px solid #edf1f5; border-bottom: 0; }
+  .dark .landing-book-stage { border-right-color: #263246; }
+  .landing-book-stage::after { right: 10px; bottom: 10px; width: 14px; height: 14px; }
+  .landing-book-index { top: 13px; left: 13px; font-size: 9px; }
+  .landing-book-mockup { width: 108px; }
+  .landing-book-cover-placeholder { width: 102px; }
+  .landing-book-info { display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 20px 17px; }
+  .landing-book-meta { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .landing-book-info h3 { margin-top: 12px; font-size: 16px; }
+  .landing-book-action { align-self: flex-start; margin-top: 15px; padding-inline: 15px; }
+}
+
+@media (max-width: 370px) {
+  .landing-book-card { grid-template-columns: 116px minmax(0, 1fr); }
+  .landing-book-stage { min-height: 250px; }
+  .landing-book-mockup { width: 94px; }
+  .landing-book-info { padding-inline: 14px; }
+  .landing-book-action { width: 100%; padding-inline: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-book-card, .landing-book-action, .landing-book-action svg { transition: none !important; }
+  .landing-book-action:active { transform: none; }
+}
+
 .landing-process-section { background-color: #f8fafc; }
 .landing-process-grid {
   opacity: .66;

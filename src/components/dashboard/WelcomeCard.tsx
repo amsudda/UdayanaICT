@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { DashboardCard, DashboardCardContent } from './DashboardCard';
-import { BookOpenIcon, TargetIcon, AwardIcon, ChevronRightIcon } from 'lucide-react';
+import { BookOpenIcon, TargetIcon, AwardIcon, ChevronRightIcon, TimerIcon } from 'lucide-react';
 import { loadMyXp } from '../../data/xp';
 import { rankForXp } from '../../data/ranks';
 import { RankEmblem } from '../achievements/AchievementBadge';
@@ -29,9 +29,16 @@ export function WelcomeCard({ marks = [] }: WelcomeCardProps) {
 
   // Calculate accurate stats based on the student's marks
   const completedPapers = marks.length;
-  const avgScore = completedPapers > 0 
-    ? Math.round(marks.reduce((sum, m) => sum + m.marks, 0) / completedPapers)
-    : 0;
+  const averageFor = (type: 'full' | 'timing') => {
+    const scores = marks
+      .filter((mark) => mark.type === type && Number(mark.max_marks) > 0)
+      .map((mark) => (Number(mark.marks) / Number(mark.max_marks)) * 100);
+    return scores.length > 0
+      ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+      : null;
+  };
+  const fullPaperAverage = averageFor('full');
+  const timingPaperAverage = averageFor('timing');
   
   // For now, we assume at least 1 enrolled class if they are logged in
   const enrolledClasses = 1;
@@ -88,7 +95,7 @@ export function WelcomeCard({ marks = [] }: WelcomeCardProps) {
         </button>
 
         {/* Quick Stats to fill space beautifully */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           <div className="bg-white/60 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl p-4 border border-red-50 dark:border-red-900/20 flex items-center gap-4 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-colors">
             <div className="w-12 h-12 rounded-[14px] bg-red-50 dark:bg-red-500/10 text-[#c20f24] flex items-center justify-center shrink-0 shadow-sm border border-red-100/50 dark:border-transparent">
               <BookOpenIcon className="w-6 h-6" />
@@ -114,8 +121,18 @@ export function WelcomeCard({ marks = [] }: WelcomeCardProps) {
               <AwardIcon className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-2xl font-black text-[#172033] dark:text-white leading-none">{avgScore > 0 ? `${avgScore}%` : '—'}</p>
-              <p className="text-[10px] font-bold text-[#64748B] dark:text-slate-400 mt-1 uppercase tracking-wider">Avg Score</p>
+              <p className="text-2xl font-black text-[#172033] dark:text-white leading-none">{fullPaperAverage === null ? '—' : `${fullPaperAverage}%`}</p>
+              <p className="text-[10px] font-bold text-[#64748B] dark:text-slate-400 mt-1 uppercase tracking-wider">Full Average</p>
+            </div>
+          </div>
+
+          <div className="bg-white/60 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl p-4 border border-amber-50 dark:border-amber-900/20 flex items-center gap-4 hover:bg-white/80 dark:hover:bg-slate-800/60 transition-colors">
+            <div className="w-12 h-12 rounded-[14px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 shadow-sm border border-amber-100/50 dark:border-transparent">
+              <TimerIcon className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-[#172033] dark:text-white leading-none">{timingPaperAverage === null ? '—' : `${timingPaperAverage}%`}</p>
+              <p className="text-[10px] font-bold text-[#64748B] dark:text-slate-400 mt-1 uppercase tracking-wider">Timing Average</p>
             </div>
           </div>
         </div>

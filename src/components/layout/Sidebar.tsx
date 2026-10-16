@@ -17,7 +17,8 @@ import {
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
   PackageIcon,
-  TrendingUpIcon
+  TrendingUpIcon,
+  ShieldCheckIcon
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { useEffect, useState } from 'react';
@@ -53,6 +54,7 @@ const menuGroups = [
     label: 'Account',
     items: [
       { name: 'Profile', path: '/dashboard/profile', icon: UserIcon },
+      { name: 'My Devices', path: '/dashboard/devices', icon: ShieldCheckIcon },
       { name: 'Payments', path: '/dashboard/payments', icon: CreditCardIcon },
       { name: 'History', path: '/dashboard/history', icon: HistoryIcon },
       { name: 'Help', path: '/dashboard/help', icon: HeadphonesIcon }
@@ -242,7 +244,7 @@ export function Sidebar() {
             ) : (
               <p className="px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 short:mb-1 short:text-[9px]">{group.label}</p>
             )}
-            {renderNavItems(group.items)}
+            {renderNavItems(group.items.filter((item) => item.path !== '/dashboard/devices' || user?.role === 'student'))}
           </div>
         ))}
       </div>

@@ -38,6 +38,10 @@ const emptyForm = { id: '', title: '', paper_no: '', type: 'full', marks: '', ma
 
 const pctOf = (m: Mark) => (m.max_marks ? Math.round((Number(m.marks) / Number(m.max_marks)) * 100) : 0);
 const toneFor = (p: number) => (p >= 75 ? 'text-emerald-600' : p >= 50 ? 'text-amber-600' : 'text-red-600');
+const averageOf = (rows: Mark[], type: 'full' | 'timing') => {
+  const scores = rows.filter((mark) => mark.type === type && Number(mark.max_marks) > 0).map(pctOf);
+  return scores.length > 0 ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : null;
+};
 
 export function AdminMarksPage() {
   const reduce = useReducedMotion();
@@ -65,7 +69,7 @@ export function AdminMarksPage() {
     const [{ data: bs }, { data: bm }, { data: mk }] = await Promise.all([
       supabase.from('batches').select('*').order('exam_year', { ascending: false }).order('name'),
       supabase.from('batch_members').select('batch_id, student:profiles(id, full_name, student_code, email, avatar_url)'),
-      supabase.from('paper_marks').select('student_id, marks, max_marks, exam_date')
+      supabase.from('paper_marks').select('student_id, marks, max_marks, exam_date, type')
     ]);
     const grouped: Record<string, any[]> = {};
     (bm ?? []).forEach((r: any) => { if (r.student) (grouped[r.batch_id] ??= []).push(r.student); });
@@ -77,9 +81,9 @@ export function AdminMarksPage() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  /** Each student's average and series, so a row says something before it is opened. */
+  /** Each student's separate paper-type averages and combined chart series. */
   const summaryOf = useMemo(() => {
-    const map = new Map<string, { avg: number; n: number; series: number[] }>();
+    const map = new Map<string, { avg: number; fullAvg: number | null; timingAvg: number | null; n: number; series: number[] }>();
     const byStudent = new Map<string, any[]>();
     allMarks.forEach((m) => {
       if (!m.max_marks) return;
@@ -90,7 +94,13 @@ export function AdminMarksPage() {
     byStudent.forEach((rows, id) => {
       const sorted = [...rows].sort((a, b) => String(a.exam_date ?? '').localeCompare(String(b.exam_date ?? '')));
       const series = sorted.map((m) => Math.round((Number(m.marks) / Number(m.max_marks)) * 100));
-      map.set(id, { avg: Math.round(series.reduce((s, v) => s + v, 0) / series.length), n: series.length, series });
+      map.set(id, {
+        avg: Math.round(series.reduce((s, v) => s + v, 0) / series.length),
+        fullAvg: averageOf(sorted as Mark[], 'full'),
+        timingAvg: averageOf(sorted as Mark[], 'timing'),
+        n: series.length,
+        series
+      });
     });
     return map;
   }, [allMarks]);
@@ -122,7 +132,7 @@ export function AdminMarksPage() {
     if (!studentId) return;
     const { data } = await supabase.from('paper_marks').select('*').eq('student_id', studentId).order('exam_date', { ascending: true });
     setMarks((data ?? []) as Mark[]);
-    const { data: all } = await supabase.from('paper_marks').select('student_id, marks, max_marks, exam_date');
+    const { data: all } = await supabase.from('paper_marks').select('student_id, marks, max_marks, exam_date, type');
     setAllMarks(all ?? []);
   };
 
@@ -196,11 +206,15 @@ export function AdminMarksPage() {
   const summary = useMemo(() => {
     if (!marks.length) return null;
     const pcts = marks.map(pctOf);
-    const best = Math.max(...pcts);
-    const avg = Math.round(pcts.reduce((s, v) => s + v, 0) / pcts.length);
     const last = pcts[pcts.length - 1];
-    const prev = pcts.length > 1 ? Math.round(pcts.slice(0, -1).reduce((s, v) => s + v, 0) / (pcts.length - 1)) : null;
-    return { avg, best, last, papers: pcts.length, trend: prev === null ? null : last - prev };
+    return {
+      fullAvg: averageOf(marks, 'full'),
+      timingAvg: averageOf(marks, 'timing'),
+      fullCount: marks.filter((mark) => mark.type === 'full').length,
+      timingCount: marks.filter((mark) => mark.type === 'timing').length,
+      last,
+      papers: pcts.length
+    };
   }, [marks]);
 
   return (
@@ -312,11 +326,15 @@ export function AdminMarksPage() {
                         </div>
                       )}
 
-                      <div className="text-right shrink-0 w-24">
+                      <div className="shrink-0 w-32 space-y-1 text-right">
                         {sum ? (
                           <>
-                            <p className={`text-[17px] font-bold tabular-nums leading-none ${toneFor(sum.avg)}`}>{sum.avg}%</p>
-                            <p className="text-[11px] text-slate-400 mt-1">{sum.n} paper{sum.n === 1 ? '' : 's'}</p>
+                            <p className="text-[11px] font-semibold text-slate-500">
+                              Full <span className={`ml-1 font-bold tabular-nums ${sum.fullAvg === null ? 'text-slate-300' : toneFor(sum.fullAvg)}`}>{sum.fullAvg === null ? '—' : `${sum.fullAvg}%`}</span>
+                            </p>
+                            <p className="text-[11px] font-semibold text-slate-500">
+                              Timing <span className={`ml-1 font-bold tabular-nums ${sum.timingAvg === null ? 'text-slate-300' : toneFor(sum.timingAvg)}`}>{sum.timingAvg === null ? '—' : `${sum.timingAvg}%`}</span>
+                            </p>
                           </>
                         ) : (
                           <p className="text-[12px] text-slate-300 font-medium">No marks</p>
@@ -365,15 +383,15 @@ export function AdminMarksPage() {
             {summary && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                 {[
-                  { label: 'Average', value: `${summary.avg}%`, icon: TrendingUpIcon, tone: toneFor(summary.avg) },
-                  { label: 'Best', value: `${summary.best}%`, icon: AwardIcon, tone: 'text-slate-900' },
+                  { label: 'Full average', value: summary.fullAvg === null ? '—' : `${summary.fullAvg}%`, icon: AwardIcon, tone: summary.fullAvg === null ? 'text-slate-300' : toneFor(summary.fullAvg), sub: `${summary.fullCount} ${summary.fullCount === 1 ? 'paper' : 'papers'}` },
+                  { label: 'Timing average', value: summary.timingAvg === null ? '—' : `${summary.timingAvg}%`, icon: TrendingUpIcon, tone: summary.timingAvg === null ? 'text-slate-300' : toneFor(summary.timingAvg), sub: `${summary.timingCount} ${summary.timingCount === 1 ? 'paper' : 'papers'}` },
                   { label: 'Latest', value: `${summary.last}%`, icon: CalendarIcon, tone: toneFor(summary.last) },
                   {
                     label: 'Papers',
                     value: String(summary.papers),
                     icon: FileTextIcon,
                     tone: 'text-slate-900',
-                    sub: summary.trend === null ? undefined : `${summary.trend >= 0 ? '+' : ''}${summary.trend} vs their average`
+                    sub: `${summary.fullCount} full · ${summary.timingCount} timing`
                   }
                 ].map((s, i) => (
                   <motion.div

@@ -30,6 +30,7 @@ import { AdminTheoryPage } from './admin/pages/AdminTheoryPage';
 import { AdminStudentsPage } from './admin/pages/AdminStudentsPage';
 import { AdminStudentDetailPage } from './admin/pages/AdminStudentDetailPage';
 import { AdminStudentEditPage } from './admin/pages/AdminStudentEditPage';
+import { AdminDeviceAuditPage } from './admin/pages/AdminDeviceAuditPage';
 import { AdminTimetablePage } from './admin/pages/AdminTimetablePage';
 import { AdminNoticesPage } from './admin/pages/AdminNoticesPage';
 import { AdminSettingsPage } from './admin/pages/AdminSettingsPage';
@@ -54,15 +55,20 @@ import { XpHistoryPage } from './pages/XpHistoryPage';
 import { TuteTrackingPage } from './pages/dashboard/TuteTrackingPage';
 import { MyPapersPage } from './pages/MyPapersPage';
 import { PaperLeaderboardPage } from './pages/PaperLeaderboardPage';
+import { DeviceLockedPage } from './pages/DeviceLockedPage';
+import { MyDevicesPage } from './pages/MyDevicesPage';
 
 function FullSpinner() {
   return <LogoLoader />;
 }
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading, user, deviceAccess } = useAuth();
   if (loading) return <FullSpinner />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role === 'student' && deviceAccess?.pilotEnabled && deviceAccess.status === 'locked') {
+    return <DeviceLockedPage />;
+  }
   // A fresh Google sign-up has a profile but hasn't filled in the details yet.
   if (user && user.role === 'student' && !user.profileComplete) {
     return <Navigate to="/complete-profile" replace />;
@@ -131,6 +137,7 @@ function AnimatedRoutes() {
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="help" element={<HelpPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="devices" element={<MyDevicesPage />} />
           <Route path="quizzes" element={<QuizListPage />} />
           <Route path="quizzes/:id" element={<QuizInstructionsPage />} />
           <Route path="quizzes/:id/result" element={<QuizResultPage />} />
@@ -196,6 +203,7 @@ function AnimatedRoutes() {
           <Route path="students" element={<AdminStudentsPage />} />
           <Route path="students/:id" element={<AdminStudentDetailPage />} />
           <Route path="students/:id/edit" element={<AdminStudentEditPage />} />
+          <Route path="device-audit" element={<AdminDeviceAuditPage />} />
           <Route path="notices" element={<AdminNoticesPage />} />
           <Route path="timetable" element={<AdminTimetablePage />} />
           <Route path="books" element={<AdminBooksPage />} />

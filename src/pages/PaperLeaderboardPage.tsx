@@ -19,9 +19,17 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const FULL_BOARD_LIMIT = 10000;
 const FILTERS: Array<{ value: PaperType; label: string; description: string }> = [
   { value: 'all', label: 'Overall', description: 'All marked papers' },
-  { value: 'full', label: 'Full papers', description: 'Full paper results' },
-  { value: 'timing', label: 'Timing papers', description: 'Timed practice results' }
+  { value: 'full', label: 'Full papers', description: 'Newest full paper only' },
+  { value: 'timing', label: 'Timing papers', description: 'Newest timing paper only' }
 ];
+
+function formatPaperDate(value?: string) {
+  if (!value) return '';
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
 
 function Avatar({ row, size }: { row: PaperLeaderRow; size: string }) {
   return row.avatarUrl ? (
@@ -33,7 +41,7 @@ function Avatar({ row, size }: { row: PaperLeaderRow; size: string }) {
   );
 }
 
-function Podium({ rows, currentStudentId }: { rows: PaperLeaderRow[]; currentStudentId?: string }) {
+function Podium({ rows, currentStudentId, latestOnly }: { rows: PaperLeaderRow[]; currentStudentId?: string; latestOnly: boolean }) {
   const places = [2, 1, 3].map((position) => rows.find((row) => row.position === position));
   const colors: Record<number, string> = {
     1: 'border-amber-300 bg-amber-50/70 dark:border-amber-700/60 dark:bg-amber-950/20',
@@ -70,7 +78,9 @@ function Podium({ rows, currentStudentId }: { rows: PaperLeaderRow[]; currentStu
             </p>
             {row.studentCode && <p className="mt-0.5 text-[9px] font-semibold tracking-wide text-zinc-500 dark:text-zinc-400">{row.studentCode}</p>}
             <p className="mt-1 text-xl font-black tabular-nums text-zinc-950 dark:text-white sm:text-2xl">{row.avgPct.toFixed(1)}%</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">{row.papers} {row.papers === 1 ? 'paper' : 'papers'}</p>
+            <p className="mt-0.5 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+              {latestOnly ? 'Latest paper' : `${row.papers} ${row.papers === 1 ? 'paper' : 'papers'}`}
+            </p>
           </motion.article>
         );
       })}
@@ -98,6 +108,11 @@ export function PaperLeaderboardPage() {
   const leader = rows[0];
   const topThree = rows.filter((row) => row.position <= 3);
   const selected = FILTERS.find((filter) => filter.value === type) ?? FILTERS[0];
+  const isLatestPaperBoard = type !== 'all';
+  const latestPaper = isLatestPaperBoard ? rows.find((row) => row.latestPaperTitle) : undefined;
+  const latestPaperLabel = latestPaper
+    ? `${latestPaper.latestPaperTitle}${latestPaper.latestPaperDate ? ` · ${formatPaperDate(latestPaper.latestPaperDate)}` : ''}`
+    : selected.description;
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-5 pb-12 text-zinc-900 dark:text-white sm:space-y-6">
@@ -116,7 +131,7 @@ export function PaperLeaderboardPage() {
             </p>
             <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-5xl">Paper leaderboard</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
-              Compare paper averages across your shared batches. Student codes distinguish classmates who share a name.
+              Compare paper performance across your shared batches. Full and timing rankings reset to their newest paper, so old results cannot hold a permanent place.
             </p>
           </div>
 
@@ -124,7 +139,7 @@ export function PaperLeaderboardPage() {
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3">
               <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">Your position</p>
               <p className="mt-1 text-2xl font-black tabular-nums">{me ? `#${me.position}` : '—'}</p>
-              <p className="mt-0.5 text-[10px] text-white/50">{me ? `${me.avgPct.toFixed(1)}% average` : `${user?.studentId || 'Your account'} · No marks yet`}</p>
+              <p className="mt-0.5 text-[10px] text-white/50">{me ? `${me.avgPct.toFixed(1)}% ${isLatestPaperBoard ? 'latest mark' : 'average'}` : `${user?.studentId || 'Your account'} · No marks yet`}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3">
               <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">On the board</p>
@@ -150,7 +165,7 @@ export function PaperLeaderboardPage() {
               </button>
             );
           })}
-          <span className="ml-auto hidden text-[11px] text-white/45 sm:inline">{selected.description}</span>
+          <span className="ml-auto hidden max-w-xs truncate text-[11px] text-white/45 sm:inline">{isLatestPaperBoard ? latestPaperLabel : selected.description}</span>
         </div>
       </motion.section>
 
@@ -160,11 +175,11 @@ export function PaperLeaderboardPage() {
           <p className="mt-3 text-2xl font-black tabular-nums">{rows.length}</p>
         </article>
         <article className="rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#121214] sm:p-5">
-          <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400"><TargetIcon className="h-3.5 w-3.5" /> Your average</p>
+          <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400"><TargetIcon className="h-3.5 w-3.5" /> {isLatestPaperBoard ? 'Your latest mark' : 'Your average'}</p>
           <p className="mt-3 text-2xl font-black tabular-nums">{me ? `${me.avgPct.toFixed(1)}%` : '—'}</p>
         </article>
         <article className="col-span-2 rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#121214] sm:col-span-1 sm:p-5">
-          <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400"><AwardIcon className="h-3.5 w-3.5" /> Highest average</p>
+          <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400"><AwardIcon className="h-3.5 w-3.5" /> {isLatestPaperBoard ? 'Top latest mark' : 'Highest average'}</p>
           <p className="mt-3 truncate text-2xl font-black tabular-nums">{leader ? `${leader.avgPct.toFixed(1)}%` : '—'}</p>
           {leader && <p className="mt-1 truncate text-[11px] text-zinc-500">{leader.displayName}</p>}
         </article>
@@ -186,11 +201,13 @@ export function PaperLeaderboardPage() {
               <div className="mb-5 flex items-end justify-between gap-3">
                 <div>
                   <h2 className="text-base font-bold sm:text-lg">Top performers</h2>
-                  <p className="mt-1 text-xs text-zinc-500">{selected.description} · ranked by average, then papers completed</p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {isLatestPaperBoard ? `${latestPaperLabel} · ranked by this paper's mark` : `${selected.description} · ranked by average, then papers completed`}
+                  </p>
                 </div>
                 <MedalIcon className="h-5 w-5 shrink-0 text-amber-500" />
               </div>
-              <Podium rows={topThree} currentStudentId={user?.id} />
+              <Podium rows={topThree} currentStudentId={user?.id} latestOnly={isLatestPaperBoard} />
             </section>
           )}
 
@@ -206,7 +223,7 @@ export function PaperLeaderboardPage() {
             </header>
 
             <div className="hidden grid-cols-[64px_minmax(0,1fr)_110px_110px_120px] gap-3 bg-zinc-50 px-6 py-3 text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:bg-zinc-900/70 sm:grid">
-              <span>Place</span><span>Student</span><span className="text-right">Papers</span><span className="text-right">Best</span><span className="text-right">Average</span>
+              <span>Place</span><span>Student</span><span className="text-right">Papers</span><span className="text-right">Best</span><span className="text-right">{isLatestPaperBoard ? 'Latest' : 'Average'}</span>
             </div>
 
             <div>

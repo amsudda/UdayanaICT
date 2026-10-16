@@ -97,6 +97,36 @@
         "scope": "student.xp-leaderboard",
         "decision": "Show XP standings one enrolled batch at a time. Default to the student's matching program and exam year, allow switching among their other enrolled batches, and never combine separate cohorts on the dedicated XP leaderboard. Include every batch member, including students with zero XP.",
         "source": "User request for batch-by-batch XP rankings, 2026-10-13"
+      },
+      {
+        "scope": "landing.books",
+        "decision": "Present admin-managed books as one responsive PD Library system panel rather than a loose fixed-column grid. Reuse the existing CSS-3D book mockups, technical grid, restrained red/blue signals, system toolbar, and light/dark surfaces established elsewhere on the landing page. Center any number of titles with auto-fit, use compact horizontal product rows on mobile, normalize legacy Coming Soon price text into a non-orderable availability state, and avoid hover scaling or transition-all motion.",
+        "source": "User-approved ICT Exam Library direction, 2026-10-16"
+      },
+      {
+        "scope": "admin.device-audit",
+        "decision": "Treat device tracking as a calm security observation workspace during audit mode. Clearly state that access is not restricted, lead with student and installation counts, prioritize students who would exceed the planned two-device limit, and expose approximate browser, operating system, session count, and first/last-seen details in each student profile. Use the existing warm admin canvas, white bordered surfaces, restrained status color, and responsive table/card patterns.",
+        "source": "User-requested audit-first device security rollout, 2026-10-16"
+      },
+      {
+        "scope": "admin.device-pilot",
+        "decision": "Keep device enforcement opt-in per student while global audit mode remains active. Present pilot enrolment, temporary locks, student explanations, contact shortcuts, device removal, and access restoration in the student's existing Devices tab. The central Device Security workspace prioritizes open requests and locked accounts. Use explicit audit/pilot badges and calm explanatory copy so admins can distinguish observation from enforcement at every step.",
+        "source": "User-selected admin pilot rollout phase, 2026-10-16"
+      },
+      {
+        "scope": "admin.device-limited-rollout",
+        "decision": "Expand enforcement through capped, deterministic batch snapshots rather than automatic whole-batch enrollment. Preview eligible, already-pilot, and over-limit counts; exclude students already above the device limit; enforce the cap on the server; retain rollout history; allow cohort-only rollback; and provide a global emergency pause that preserves audit observations and underlying lock evidence. Global device audit remains active throughout.",
+        "source": "User-selected next staged rollout phase, 2026-10-16"
+      },
+      {
+        "scope": "device-security.rollout-monitoring",
+        "decision": "Pair the staged rollout with a live admin health workspace and a read-focused student My Devices screen. Admins monitor healthy, locked, request, and seven-day recovery counts, drill into each cohort, and receive a warning at a 5% lock rate. Students may identify their current browser and request replacement of a non-current installation, but device removal and approval remain admin-only and server-enforced.",
+        "source": "User-approved monitoring dashboard and My Devices phase, 2026-10-16"
+      },
+      {
+        "scope": "device-security.lifecycle",
+        "decision": "Count only active browser installations toward the device limit while preserving stale, retired, and revoked records as security history. Default inactivity expiry to 90 days and let admins configure 30–365 days, run a global sweep, restore slots, retire devices, or permanently revoke them. Keep replacement approval atomic, revoke registered sessions server-side, and reuse the existing notification bell and admin realtime alerts for lifecycle outcomes.",
+        "source": "User-approved device lifecycle hardening phase, 2026-10-16"
       }
     ],
   "evidence": [

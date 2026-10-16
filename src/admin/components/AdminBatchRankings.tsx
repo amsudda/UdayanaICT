@@ -42,19 +42,19 @@ function startOfUtcWeek() {
   return monday.toISOString();
 }
 
-function assignPositions(rows: RankingRow[], mode: RankingMode) {
+function assignPositions(rows: RankingRow[], mode: RankingMode, paperType: PaperType) {
   const active = rows
     .filter((row) => row.count > 0)
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
-      if (mode === 'papers' && b.count !== a.count) return b.count - a.count;
+      if (mode === 'papers' && paperType === 'all' && b.count !== a.count) return b.count - a.count;
       return a.displayName.localeCompare(b.displayName);
     });
 
   let previousKey = '';
   let previousPosition = 0;
   active.forEach((row, index) => {
-    const key = mode === 'papers' ? `${row.score}:${row.count}` : String(row.score);
+    const key = mode === 'papers' && paperType === 'all' ? `${row.score}:${row.count}` : String(row.score);
     if (key !== previousKey) previousPosition = index + 1;
     row.position = previousPosition;
     previousKey = key;
@@ -132,7 +132,7 @@ export function AdminBatchRankings({
         if (mode === 'papers') {
           let query = supabase
             .from('paper_marks')
-            .select('student_id,marks,max_marks,type')
+            .select('id,student_id,title,paper_no,marks,max_marks,type,exam_date,created_at')
             .in('student_id', memberIds)
             .gt('max_marks', 0);
           if (paperType !== 'all') query = query.eq('type', paperType);
@@ -155,9 +155,44 @@ export function AdminBatchRankings({
         if (metricsError) throw metricsError;
 
         const profileMap = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
+        const rawMetrics = metrics ?? [];
+        const historicalPaperStats = new Map<string, { count: number; best: number }>();
+        let rankingMetrics = rawMetrics;
+
+        if (mode === 'papers') {
+          rawMetrics.forEach((metric: any) => {
+            const maxMarks = Number(metric.max_marks);
+            if (maxMarks <= 0 || metric.marks == null) return;
+            const percentage = (Number(metric.marks) / maxMarks) * 100;
+            const current = historicalPaperStats.get(metric.student_id) ?? { count: 0, best: 0 };
+            current.count += 1;
+            current.best = Math.max(current.best, percentage);
+            historicalPaperStats.set(metric.student_id, current);
+          });
+
+          if (paperType !== 'all') {
+            const latest = [...rawMetrics].sort((a: any, b: any) => {
+              const dateOrder = String(b.exam_date ?? '').localeCompare(String(a.exam_date ?? ''));
+              if (dateOrder !== 0) return dateOrder;
+              const paperOrder = Number(b.paper_no ?? -1) - Number(a.paper_no ?? -1);
+              if (paperOrder !== 0) return paperOrder;
+              return String(b.created_at ?? '').localeCompare(String(a.created_at ?? ''));
+            })[0] as any;
+
+            rankingMetrics = latest
+              ? rawMetrics.filter((metric: any) => {
+                  if (metric.exam_date !== latest.exam_date) return false;
+                  return latest.paper_no != null
+                    ? metric.paper_no === latest.paper_no
+                    : String(metric.title ?? '').trim().toLowerCase() === String(latest.title ?? '').trim().toLowerCase();
+                })
+              : [];
+          }
+        }
+
         const aggregates = new Map<string, { total: number; count: number; best: number }>();
 
-        (metrics ?? []).forEach((metric: any) => {
+        rankingMetrics.forEach((metric: any) => {
           const current = aggregates.get(metric.student_id) ?? { total: 0, count: 0, best: 0 };
           if (mode === 'papers') {
             const maxMarks = Number(metric.max_marks);
@@ -174,18 +209,22 @@ export function AdminBatchRankings({
         const rankedRows = memberIds.map((memberId) => {
           const profile = profileMap.get(memberId) as any;
           const aggregate = aggregates.get(memberId) ?? { total: 0, count: 0, best: 0 };
+          const history = historicalPaperStats.get(memberId);
+          const hasCurrentPaperResult = paperType === 'all' || aggregate.count > 0;
           return {
             studentId: memberId,
             displayName: profile?.full_name || 'Student',
             avatarUrl: profile?.avatar_url || undefined,
             position: null,
             score: mode === 'papers' && aggregate.count > 0 ? aggregate.total / aggregate.count : aggregate.total,
-            count: aggregate.count,
-            best: mode === 'papers' ? aggregate.best : undefined
+            count: mode === 'papers' && paperType !== 'all'
+              ? hasCurrentPaperResult ? history?.count ?? aggregate.count : 0
+              : aggregate.count,
+            best: mode === 'papers' ? history?.best ?? aggregate.best : undefined
           } satisfies RankingRow;
         });
 
-        if (!cancelled) setRows(assignPositions(rankedRows, mode));
+        if (!cancelled) setRows(assignPositions(rankedRows, mode, paperType));
       } catch (loadError: any) {
         if (!cancelled) {
           setRows([]);
@@ -205,8 +244,10 @@ export function AdminBatchRankings({
   const rankedCount = rows.filter((row) => row.position !== null).length;
   const currentMetric = useMemo(() => {
     if (!currentStudent || currentStudent.count === 0) return 'No activity';
-    return mode === 'papers' ? `${currentStudent.score.toFixed(1)}% average` : `${currentStudent.score.toLocaleString()} XP`;
-  }, [currentStudent, mode]);
+    return mode === 'papers'
+      ? `${currentStudent.score.toFixed(1)}% ${paperType === 'all' ? 'average' : 'latest mark'}`
+      : `${currentStudent.score.toLocaleString()} XP`;
+  }, [currentStudent, mode, paperType]);
 
   if (batches.length === 0) {
     return (
@@ -328,7 +369,7 @@ export function AdminBatchRankings({
             <p className="mt-1 text-lg font-black tabular-nums text-slate-900">{currentMetric}</p>
           </div>
           <div className="bg-white px-5 py-4 sm:px-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Records counted</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{mode === 'papers' ? 'Papers completed' : 'Records counted'}</p>
             <p className="mt-1 text-lg font-black tabular-nums text-slate-900">{currentStudent.count}</p>
           </div>
         </div>
@@ -358,7 +399,7 @@ export function AdminBatchRankings({
                 <tr className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
                   <th className="w-20 px-5 py-3 sm:px-6">Rank</th>
                   <th className="px-4 py-3">Student</th>
-                  <th className="hidden px-4 py-3 text-right sm:table-cell">{mode === 'papers' ? 'Average' : 'XP earned'}</th>
+                  <th className="hidden px-4 py-3 text-right sm:table-cell">{mode === 'papers' ? paperType === 'all' ? 'Average' : 'Latest mark' : 'XP earned'}</th>
                   <th className="hidden px-5 py-3 text-right sm:table-cell sm:px-6">{mode === 'papers' ? 'Best / papers' : 'Awards'}</th>
                 </tr>
               </thead>
@@ -382,7 +423,7 @@ export function AdminBatchRankings({
                               {row.count === 0
                                 ? mode === 'papers' ? 'No marks' : 'No XP'
                                 : mode === 'papers'
-                                  ? `${row.score.toFixed(1)}% average · ${row.best?.toFixed(1)}% best · ${row.count} ${row.count === 1 ? 'paper' : 'papers'}`
+                                  ? `${row.score.toFixed(1)}% ${paperType === 'all' ? 'average' : 'latest'} · ${row.best?.toFixed(1)}% best · ${row.count} ${row.count === 1 ? 'paper' : 'papers'}`
                                   : `${row.score.toLocaleString()} XP · ${row.count} ${row.count === 1 ? 'award' : 'awards'}`}
                             </p>
                           </div>
